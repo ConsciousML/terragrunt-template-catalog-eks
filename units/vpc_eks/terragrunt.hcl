@@ -13,10 +13,13 @@ locals {
 }
 
 terraform {
-  source = "terraform-aws-modules/vpc/aws"
+  source = "tfr:///terraform-aws-modules/vpc/aws?version=${values.version}"
+}
+
+inputs = {
   create_vpc = values.create_vpc
 
-  name = "${values.vpc_name}-${local.environment}"
+  name = "${values.name}-${local.environment}"
 
   cidr = values.cidr
   azs = local.azs
