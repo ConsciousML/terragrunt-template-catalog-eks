@@ -3,7 +3,7 @@ include "root" {
 }
 
 terraform {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git//modules/deploy_key/?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//modules/deploy_key/?ref=${values.version}"
 }
 
 inputs = {

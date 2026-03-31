@@ -11,7 +11,7 @@ func TestLocalStack(t *testing.T) {
     t.Parallel()
 
     // Relative path containing the Terragrunt Stack to test
-    stackDir := "../examples/stacks/vpc_ec2/local"
+    stackDir := "../examples/stacks/eks"
 
     // Ensure destroy runs at the end, even if the test fails
     t.Cleanup(func() {

@@ -8,7 +8,7 @@ locals {
   )
 
   github_username  = "ConsciousML"
-  github_repo_name = "terragrunt-template-catalog-aws"
+  github_repo_name = "terragrunt-template-catalog-eks"
 }
 
 unit "github_oidc_provider" {

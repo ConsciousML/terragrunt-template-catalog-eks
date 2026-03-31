@@ -32,3 +32,10 @@ resource "aws_iam_role" "github_actions" {
 
   tags = var.tags
 }
+
+resource "aws_iam_role_policy" "inline" {
+  for_each = { for p in var.inline_policies : p.name => p }
+  name     = each.value.name
+  role     = aws_iam_role.github_actions.name
+  policy   = each.value.policy
+}

@@ -1,5 +1,5 @@
 unit "github_oidc_provider" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git//units/oidc_provider?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/oidc_provider?ref=${values.version}"
   path   = "github_oidc_provider"
 
   values = {
@@ -12,7 +12,7 @@ unit "github_oidc_provider" {
 }
 
 unit "iam_role_github_actions" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git//units/iam_role_github_actions?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/iam_role_github_actions?ref=${values.version}"
   path   = "iam_role_github_actions"
 
   values = {
@@ -21,11 +21,12 @@ unit "iam_role_github_actions" {
     github_username  = values.github_username
     github_repo_name = values.github_repo_name
     github_branch    = values.github_branch
+    inline_policies  = values.inline_policies
   }
 }
 
 unit "iam_policies" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git//units/iam_policies?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/iam_policies?ref=${values.version}"
   path   = "iam_policies"
 
   values = {
@@ -35,7 +36,7 @@ unit "iam_policies" {
 }
 
 unit "github_secrets" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git//units/github_secrets?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/github_secrets?ref=${values.version}"
   path   = "github_secrets"
 
   values = {
@@ -46,7 +47,7 @@ unit "github_secrets" {
 }
 
 unit "deploy_key" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git//units/deploy_key?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/deploy_key?ref=${values.version}"
   path   = "deploy_key"
 
   values = {

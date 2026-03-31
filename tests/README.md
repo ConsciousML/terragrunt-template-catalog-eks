@@ -4,11 +4,11 @@
 Follow the [installation instructions](../README.md#installation):
 
 ## Write a test
-Copy `tests/vpc_ec2_stack_test.go` in the `test` directory. Use the suffix `*_test.go`.
+Copy `tests/stack_test.go` in the `test` directory. Use the suffix `*_test.go`.
 
 Next, change the stack directory to the path of the stack you want to test:
 ```go
-stackDir := "../examples/stacks/vpc_ec2/local"
+stackDir := "../examples/stacks/eks"
 ```
 
 Finally, write additional tests steps. For example, you can perform health checks or make a request to an API to ensure your infrastructure was deployed properly.
@@ -18,9 +18,9 @@ Creating an `examples` folder is a best practice to provide complete Terraform c
 
 This makes testing easier and helps others understand how to use the module.
 
-In our case, the `examples/stacks/vpc_ec2/local` configuration calls the `stacks/vpc_ec2` in the `example` folder so it uses all the `.hcl` files in this directory.
+In our case, the `examples/stacks/eks` configuration calls the units in the `units/` directory.
 
-This has the benefit to use environment variables specific to an `example` environment.
+This has the benefit to use environment variables specific to an `example` environment (i.e all `region.hcl`, `environment.hcl` in `examples/`).
 
 ## Run Terratest
 Setup the go module:
