@@ -1,7 +1,7 @@
 locals {
   version = "main"
 
-  github_repo_name = "terragrunt-template-catalog-aws"
+  github_repo_name = "terragrunt-template-catalog-eks"
   github_token     = get_env("TF_VAR_github_token")
 }
 
@@ -13,7 +13,7 @@ stack "enable_tg_github_actions" {
     github_username  = "ConsciousML"
     github_repo_name = local.github_repo_name
     github_token     = local.github_token
-    iam_role_name    = "github-actions-terragrunt-role"
+    iam_role_name    = "gh-terragrunt-role-catalog"
     policy_arns = [
       "arn:aws:iam::aws:policy/AmazonEC2FullAccess",
       "arn:aws:iam::aws:policy/AmazonVPCFullAccess",
@@ -25,7 +25,7 @@ stack "enable_tg_github_actions" {
     oidc_url                = "https://token.actions.githubusercontent.com"
     oidc_client_id_list     = ["sts.amazonaws.com"]
     oidc_thumbprint_list    = []
-    create_oidc_provider    = true
+    create_oidc_provider    = false
     deploy_key_repositories = [local.github_repo_name]
     deploy_key_secret_names = ["DEPLOY_KEY_TG_CATALOG"]
     deploy_key_title        = "Terragrunt Catalog Deploy Key"

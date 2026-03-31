@@ -43,12 +43,12 @@ unit "vpc" {
 
 unit "cluster" {
   source = "${get_repo_root()}/units/eks_cluster"
-  path = "eks-cluster"
+  path = "eks_cluster"
 
   values = {
     version = "21.15.1"
 
-    name = "eks_cluster"
+    name = "eks-cluster"
 
     kubernetes_version = "1.35"
 
