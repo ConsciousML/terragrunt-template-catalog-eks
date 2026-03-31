@@ -18,6 +18,10 @@ permissions:
   id-token: 'write'
   pull-requests: write
 
+env:
+  # The relative path of the directory containing the Terragrunt Stack to test during code quality checks
+  TG_STACK_PATH: examples/stacks/eks
+
 jobs:
   terraform-docs:
     # Generates terraform documentation using terraform-docs
@@ -98,7 +102,7 @@ jobs:
 
       - name: Run Terragrunt stack generate and plan
         run: |
-          cd examples/stacks/vpc_ec2/local
+          cd ${{ env.TG_STACK_PATH }}
           terragrunt stack generate
           terragrunt stack run plan --backend-bootstrap --non-interactive
 
