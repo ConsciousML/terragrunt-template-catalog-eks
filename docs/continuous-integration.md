@@ -33,12 +33,11 @@ If authoring new Terraform modules in `modules/`, read the [documentation instru
 
 ## Setup
 ### Initial Setup
-Follow the [bootstrap guide](../bootstrap/README.md) to:
-- Configure GitHub Actions authentication with AWS
-- Set up Workload Identity Federation
-- Configure deploy keys for private repositories
+Follow the [bootstrap guide](../bootstrap/README.md) to configure GitHub Actions authentication with AWS.
 
-Then, in `.github/workflows/ci.yaml` change `TG_STACK_PATH` to the relative path of the directory containing the Terragrunt Stack you want to test.
+Then, in `.github/workflows/ci.yaml` change `TG_STACK_PATH` to the relative path of the directory containing the Terragrunt Stack (*) you want to test.
+
+Next, follow the [terratest configuration documentation](../tests/README.md) if you want to test a new stack in the CI.
 
 Lastly, in the [bootstrap pipeline configuration](../bootstrap/README.md#configuration) update the `policy_arns` so Terragrunt can run in GitHub Actions and deploy the bootstrap pipeline following the [deploy section](../bootstrap/README.md#deploy).
 
