@@ -1,5 +1,5 @@
 unit "vpc" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git//units/vpc?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/vpc?ref=${values.version}"
   path   = "vpc"
 
   values = {
@@ -10,7 +10,7 @@ unit "vpc" {
 }
 
 unit "subnet" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git//units/subnet?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/subnet?ref=${values.version}"
   path   = "subnet"
 
   values = {
@@ -21,7 +21,7 @@ unit "subnet" {
 }
 
 unit "ec2" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git//units/ec2?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/ec2?ref=${values.version}"
   path   = "ec2"
 
   values = {

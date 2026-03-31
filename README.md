@@ -1,8 +1,8 @@
 # Terragrunt Template Catalog for AWS
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![GitHub Release](https://img.shields.io/github/release/ConsciousML/terragrunt-template-catalog-aws.svg?style=flat)]()
-[![CI](https://github.com/ConsciousML/terragrunt-template-catalog-aws/actions/workflows/ci.yaml/badge.svg)](https://github.com/ConsciousML/terragrunt-template-catalog-aws/actions/workflows/ci.yaml)
+[![GitHub Release](https://img.shields.io/github/release/ConsciousML/terragrunt-template-catalog-eks.svg?style=flat)]()
+[![CI](https://github.com/ConsciousML/terragrunt-template-catalog-eks/actions/workflows/ci.yaml/badge.svg)](https://github.com/ConsciousML/terragrunt-template-catalog-eks/actions/workflows/ci.yaml)
 [![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
 
 A Terragrunt Template Catalog for production Infrastructure as Code (IaC) on Amazon Web Services (AWS).
@@ -41,7 +41,7 @@ Modules (modules/) → Units (units/) → Stacks (stacks/) → Examples (example
 ### Fork the Repository
 First, you'll need to fork this repository and make a few changes:
 1. Click on `Use this template` to create your own repository
-2. Use your IDE of choice to replace every occurrence of `github.com/ConsciousML/terragrunt-template-catalog-aws` and `git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git` by your GitHub repo URL following the same format
+2. Use your IDE of choice to replace every occurrence of `github.com/ConsciousML/terragrunt-template-catalog-eks` and `git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git` by your GitHub repo URL following the same format
 3. In `examples/` and `bootstrap` change the `region.hcl` to match your desired AWS region.
 
 **Warning**: If you skip step 2, the TG source links will still point to the original repository (on `github.com/ConsciousML/`).

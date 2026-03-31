@@ -8,7 +8,7 @@ locals {
 }
 
 terraform {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git//modules/oidc_provider?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//modules/oidc_provider?ref=${values.version}"
 }
 
 inputs = {

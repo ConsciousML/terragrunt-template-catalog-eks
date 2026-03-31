@@ -11,7 +11,7 @@ locals {
 }
 
 terraform {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git//modules/vpc?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//modules/vpc?ref=${values.version}"
 }
 
 

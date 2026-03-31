@@ -16,7 +16,7 @@ dependency "iam_role_github_actions" {
 }
 
 terraform {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-aws.git//modules/github_secrets?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//modules/github_secrets?ref=${values.version}"
 }
 
 inputs = {
