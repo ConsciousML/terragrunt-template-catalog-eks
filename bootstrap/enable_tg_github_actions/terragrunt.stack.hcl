@@ -6,7 +6,7 @@ locals {
 }
 
 stack "enable_tg_github_actions" {
-  source = "github.com/ConsciousML/terragrunt-template-catalog-aws//stacks/enable_tg_github_actions?ref=${local.version}"
+  source = "github.com/ConsciousML/${local.github_repo_name}//stacks/enable_tg_github_actions?ref=${local.version}"
   path   = "github_actions_bootstrap"
   values = {
     version          = local.version
@@ -19,7 +19,8 @@ stack "enable_tg_github_actions" {
       "arn:aws:iam::aws:policy/AmazonVPCFullAccess",
       "arn:aws:iam::aws:policy/IAMFullAccess",
       "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-      "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+      "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
+      "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
     ]
     github_branch           = "*"
     oidc_url                = "https://token.actions.githubusercontent.com"

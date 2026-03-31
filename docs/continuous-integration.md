@@ -38,6 +38,12 @@ Follow the [bootstrap guide](../bootstrap/README.md) to:
 - Set up Workload Identity Federation
 - Configure deploy keys for private repositories
 
+Then, in `.github/workflows/ci.yaml` change `TG_STACK_PATH` to the relative path of the directory containing the Terragrunt Stack you want to test.
+
+Lastly, in the [bootstrap pipeline configuration](../bootstrap/README.md#configuration) update the `policy_arns` so Terragrunt can run in GitHub Actions and deploy the bootstrap pipeline following the [deploy section](../bootstrap/README.md#deploy).
+
+If you don't know what `arns` you need yet and some are missing, you will get an error in the [CI](../.github/workflows/ci.yaml) in the `code-quality-checks` and `terratest` jobs.
+
 ### Pre-commit Setup (Recommended)
 Install pre-commit locally to catch issues before pushing:
 
