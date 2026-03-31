@@ -30,6 +30,7 @@ Create a IAM role with specific role policy to be used with OpenID Connect.
 | <a name="input_github_branch"></a> [github\_branch](#input\_github\_branch) | GitHub branch name or pattern (use '*' for all branches) | `string` | n/a | yes |
 | <a name="input_github_repo_name"></a> [github\_repo\_name](#input\_github\_repo\_name) | GitHub repository name | `string` | n/a | yes |
 | <a name="input_github_username"></a> [github\_username](#input\_github\_username) | GitHub username or organization name | `string` | n/a | yes |
+| <a name="input_inline_policies"></a> [inline\_policies](#input\_inline\_policies) | List of inline policies to attach to the IAM role | <pre>list(object({<br/>    name   = string<br/>    policy = string<br/>  }))</pre> | `[]` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the IAM role | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to assign to the IAM role | `map(string)` | `{}` | no |
 
