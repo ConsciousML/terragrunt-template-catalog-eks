@@ -10,11 +10,11 @@ locals {
 
 unit "vpc" {
   source = "${get_repo_root()}/units/vpc_eks"
-  path = "vpc_eks"
+  path   = "vpc_eks"
 
   values = {
     create_vpc = true
-    version = "6.6.0"
+    version    = "6.6.0"
 
     name = "vpc-eks"
 
@@ -24,10 +24,10 @@ unit "vpc" {
     private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
     public_subnets  = ["10.0.3.0/24", "10.0.4.0/24"]
 
-    enable_nat_gateway   = true
-    single_nat_gateway   = false
+    enable_nat_gateway     = true
+    single_nat_gateway     = false
     one_nat_gateway_per_az = true
-  
+
     enable_dns_hostnames = true
     enable_dns_support   = true
 
@@ -43,7 +43,7 @@ unit "vpc" {
 
 unit "cluster" {
   source = "${get_repo_root()}/units/eks_cluster"
-  path = "eks_cluster"
+  path   = "eks_cluster"
 
   values = {
     version = "21.15.1"
@@ -62,14 +62,14 @@ unit "cluster" {
     }
 
     # More info:
-   # https://docs.aws.amazon.com/eks/latest/userguide/workloads-add-ons-available-eks.html
+    # https://docs.aws.amazon.com/eks/latest/userguide/workloads-add-ons-available-eks.html
     addons = {
-      coredns                = {}
+      coredns = {}
       eks-pod-identity-agent = {
         before_compute = true
       }
-      kube-proxy             = {}
-      vpc-cni                = {
+      kube-proxy = {}
+      vpc-cni = {
         before_compute = true
       }
     }
@@ -77,8 +77,8 @@ unit "cluster" {
     eks_managed_node_groups = {
       example = {
         # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
-        ami_type       = "AL2023_x86_64_STANDARD"
-        
+        ami_type = "AL2023_x86_64_STANDARD"
+
         # Use cheapest config for testing purposes
         instance_types = ["t3.medium"]
 
@@ -90,7 +90,7 @@ unit "cluster" {
 
     # Disable EKS Auto mode
     compute_config = {
-	    enabled = false
-	  }
+      enabled = false
+    }
   }
 }
