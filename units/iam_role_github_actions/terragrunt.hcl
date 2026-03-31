@@ -16,6 +16,7 @@ inputs = {
   github_username  = values.github_username
   github_repo_name = values.github_repo_name
   github_branch    = values.github_branch
+  inline_policies  = values.inline_policies
   tags = {
     environment = "${local.environment}"
   }

@@ -23,3 +23,12 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "inline_policies" {
+  description = "List of inline policies to attach to the IAM role"
+  type = list(object({
+    name   = string
+    policy = string
+  }))
+  default = []
+}

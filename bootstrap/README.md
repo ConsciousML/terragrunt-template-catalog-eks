@@ -22,6 +22,8 @@ values = {
   github_username      = "YourGitHubUsername"
   current_repository   = "your-current-repo-name"
 
+  iam_role_name    = "github-actions-terragrunt-role"
+
   # List of the roles necessary for Terragrunt to run in CI/CD
   policy_arns = [
     "arn:aws:iam::aws:policy/YourFirstPolicyName",
@@ -53,7 +55,11 @@ values = {
 }
 ```
 
-**Caution:** The GitHub Actions OIDC provider is a **global AWS account-level resource**. It can only be created once per AWS account. If you've already run this bootstrap pipeline in another repository using the same AWS account, set `create_oidc_provider = false` to use the existing OIDC provider instead of attempting to create a new one. Otherwise, the deployment will fail with an `EntityAlreadyExists` error.
+**Caution:** 
+- The GitHub Actions OIDC provider is a **global AWS account-level resource**.
+- It can only be created once per AWS account.
+- If you've already run this bootstrap pipeline in another repository using the same AWS account, set `create_oidc_provider = false` to use the existing OIDC provider instead of attempting to create a new one. Otherwise, the deployment will fail with an `EntityAlreadyExists` error.
+- Also change the value of `iam_role_name` to avoid conflicts.
 
 Autenticate with the GitHub CLI:
 ```bash

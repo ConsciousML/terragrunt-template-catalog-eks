@@ -1,5 +1,7 @@
 locals {
-  version = "main"
+  # TODO: revert back to main
+  #version = "main"
+  version = "eks"
 
   github_repo_name = "terragrunt-template-catalog-eks"
   github_token     = get_env("TF_VAR_github_token")
@@ -26,6 +28,60 @@ stack "enable_tg_github_actions" {
       "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess",
       "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
       "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser"
+    ]
+    inline_policies = [
+      {
+        name = "EKSFullAccess"
+        policy = jsonencode({
+          Version = "2012-10-17"
+          Statement = [
+            {
+              Sid    = "EKSFullAccess"
+              Effect = "Allow"
+              Action = [
+                "eks:CreateCluster",
+                "eks:DeleteCluster",
+                "eks:DescribeCluster",
+                "eks:ListClusters",
+                "eks:UpdateClusterConfig",
+                "eks:UpdateClusterVersion",
+                "eks:DescribeUpdate",
+                "eks:TagResource",
+                "eks:UntagResource",
+                "eks:ListTagsForResource",
+                "eks:CreateFargateProfile",
+                "eks:DeleteFargateProfile",
+                "eks:DescribeFargateProfile",
+                "eks:ListFargateProfiles",
+                "eks:CreateNodegroup",
+                "eks:DeleteNodegroup",
+                "eks:DescribeNodegroup",
+                "eks:ListNodegroups",
+                "eks:UpdateNodegroupConfig",
+                "eks:UpdateNodegroupVersion",
+                "eks:CreateAddon",
+                "eks:DeleteAddon",
+                "eks:DescribeAddon",
+                "eks:DescribeAddonVersions",
+                "eks:ListAddons",
+                "eks:UpdateAddon",
+                "eks:CreateAccessEntry",
+                "eks:DeleteAccessEntry",
+                "eks:DescribeAccessEntry",
+                "eks:ListAccessEntries",
+                "eks:AssociateAccessPolicy",
+                "eks:DisassociateAccessPolicy",
+                "eks:ListAssociatedAccessPolicies",
+                "eks:AssociateIdentityProviderConfig",
+                "eks:DisassociateIdentityProviderConfig",
+                "eks:DescribeIdentityProviderConfig",
+                "eks:ListIdentityProviderConfigs",
+              ]
+              Resource = "*"
+            }
+          ]
+        })
+      }
     ]
     github_branch           = "*"
     oidc_url                = "https://token.actions.githubusercontent.com"

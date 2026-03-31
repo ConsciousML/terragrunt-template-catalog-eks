@@ -30,5 +30,13 @@ resource "aws_iam_role" "github_actions" {
     ]
   })
 
+  dynamic "inline_policy" {
+    for_each = var.inline_policies
+    content {
+      name   = inline_policy.value.name
+      policy = inline_policy.value.policy
+    }
+  }
+
   tags = var.tags
 }
