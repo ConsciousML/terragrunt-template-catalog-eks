@@ -20,7 +20,12 @@ stack "enable_tg_github_actions" {
       "arn:aws:iam::aws:policy/IAMFullAccess",
       "arn:aws:iam::aws:policy/AmazonS3FullAccess",
       "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
-      "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+      "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
+      "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+      "arn:aws:iam::aws:policy/AmazonEKSServicePolicy",
+      "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess",
+      "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
+      "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser"
     ]
     github_branch           = "*"
     oidc_url                = "https://token.actions.githubusercontent.com"
