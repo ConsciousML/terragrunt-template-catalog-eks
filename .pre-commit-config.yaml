@@ -1,11 +1,11 @@
 repos:
   - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.29
+    rev: v0.1.30
     hooks:
       - id: tofu-fmt
       - id: tofu-validate
       - id: tflint
-      - id: terragrunt-hclfmt
+      - id: terragrunt-hcl-fmt
 
   - repo: https://github.com/aquasecurity/tfsec
     rev: v1.28.14  # Use the latest stable version or pin your preferred one
