@@ -1,7 +1,5 @@
 locals {
-  # TODO: revert back to main
-  #version = "main"
-  version = "eks"
+  version = "main"
 
   github_repo_name = "terragrunt-template-catalog-eks"
   github_token     = get_env("TF_VAR_github_token")

@@ -31,9 +31,6 @@ runs:
     # Mise enable to install all the tools we need (Terragrunt, OpenTofu, Go, ...)
     # See `mise.toml`.
     - name: Install mise
-      uses: jdx/mise-action@v2.2.3
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: jdx/mise-action@v4
       with:
-        python-version: '3.13.1'
+        version: 2026.4.0
