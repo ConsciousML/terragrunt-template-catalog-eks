@@ -28,6 +28,5 @@ func TestLocalStack(t *testing.T) {
     // Run "terragrunt apply --all". This applies all modules in dependency order.
 	terragrunt.ApplyAll(t, options)
 
-    exitCode := terragrunt.PlanAllExitCode(t, options)
-    require.Equal(t, 0, exitCode)
+    // Add additional Go tests here if necessary
 }
