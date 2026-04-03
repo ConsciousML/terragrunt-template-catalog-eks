@@ -25,9 +25,8 @@ This has the benefit to use environment variables specific to an `example` envir
 ## Run Terratest
 Setup the go module:
 ```bash
-go mod init github.com/ConsciousML/terragrunt-template-stack-aws
-go get github.com/gruntwork-io/terratest/modules/terraform
-go get github.com/stretchr/testify/assert
+go mod init github.com/ConsciousML/terragrunt-template-stack-eks
+go get github.com/gruntwork-io/terratest@v0.56.0
 go mod tidy
 ```
 
