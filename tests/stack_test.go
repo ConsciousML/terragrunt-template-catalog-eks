@@ -4,7 +4,6 @@ import (
     "testing"
 
     "github.com/gruntwork-io/terratest/modules/terragrunt"
-    "github.com/stretchr/testify/require"
 )
 
 func TestLocalStack(t *testing.T) {
