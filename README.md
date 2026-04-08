@@ -54,7 +54,7 @@ First, `cd` at the root of this repository.
 
 Next, install mise:
 ```bash
-curl https://mise.run | sh
+curl https://mise.run | MISE_VERSION=v2026.4.0 sh
 ```
 
 Then, install all the tools in the `mise.toml` file:
