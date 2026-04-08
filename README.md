@@ -13,7 +13,7 @@ This is a **catalog repository**, a collection of reusable IaC components.
 
 This toolkit uses two template repositories:
 - **This repository** (catalog): Build a collection of reusable [modules](./modules), [units](./units/), and [stacks](./stacks/)
-- **Live repository**: Reference these components your the [infrastructure-live repository](https://github.com/ConsciousML/terragrunt-template-live-aws) to deploy them in a multi-environment ecosystem with production CI/CD
+- **Live repository**: Reference these components your the [infrastructure-live repository](https://github.com/ConsciousML/terragrunt-template-live-eks) to deploy them in a multi-environment ecosystem with production CI/CD
 
 You're new to Terragrunt best practices? Read [Gruntwork's official production patterns](https://github.com/gruntwork-io/terragrunt-infrastructure-catalog-example) to get the foundations required to use this extended repository.
 
@@ -36,7 +36,7 @@ Modules (modules/) → Units (units/) → Stacks (stacks/) → Examples (example
 ### Prerequisites
 - AWS account with billing enabled
 - GitHub account
-- AWS IAM permissions to manage IAM roles, VPC resources, compute resources and S3 (see `policy_arns` in the [bootstrap stack](bootstrap/enable_tg_github_actions/terragrunt.stack.hcl) for a list of the specific IAM policies)
+- AWS IAM permissions to manage IAM roles, VPC resources, EKS resources, compute resources and S3 (see `policy_arns` in the [bootstrap stack](bootstrap/enable_tg_github_actions/terragrunt.stack.hcl) for a list of the specific IAM policies)
 
 ### Fork the Repository
 First, you'll need to fork this repository and make a few changes:
@@ -54,7 +54,7 @@ First, `cd` at the root of this repository.
 
 Next, install mise:
 ```bash
-curl https://mise.run | sh
+curl https://mise.run | MISE_VERSION=v2026.4.0 sh
 ```
 
 Then, install all the tools in the `mise.toml` file:
@@ -94,25 +94,51 @@ aws configure
 
 For more information, read the [AWS CLI authentication documentation](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
 
-### Deploy an Example Architecture
+### Deploy a Dev EKS Cluster
 
-Deploy a stack that creates a VPC and deploys an EC2 instance in a subnet:
+Deploy a stack that creates a VPC and an EKS cluster:
 
 ```bash
-cd examples/stacks/vpc_ec2/local/
+cd examples/stacks/eks
 terragrunt stack generate
 terragrunt stack run apply --backend-bootstrap --non-interactive
 ```
 
-- Go into the AWS console and check that your resources have been created
-- Then cleanup by destroying the infrastructure:
+Go into the AWS console and check that your resources have been created.
+
+After around 15 min, your `dev` EKS cluster will be created.
+
+To connect `kubectl` to your EKS cluster, create a `kubeconfig` file by running the following and replacing `<region-code>` and `<cluster-name>`:
+```bash
+aws eks update-kubeconfig --region <region-code> --name <cluster-name>
+```
+
+Next, verify `kubectl` is connected:
+```
+kubectl get pods -n kube-system
+```
+
+You should see and output similar to:
+```text
+NAME                           READY   STATUS    RESTARTS   AGE
+aws-node-59ld8                 2/2     Running   0          41m
+aws-node-5bvc4                 2/2     Running   0          41m
+coredns-845b86cddf-pg8hk       1/1     Running   0          40m
+coredns-845b86cddf-vngdb       1/1     Running   0          40m
+eks-pod-identity-agent-9pq6k   1/1     Running   0          41m
+eks-pod-identity-agent-fzfk9   1/1     Running   0          41m
+kube-proxy-khhsj               1/1     Running   0          40m
+kube-proxy-pvh7h               1/1     Running   0          40m
+```
+
+Finally, cleanup by destroying the infrastructure (cwd in `examples/stacks/eks`):
 
 ```bash
 terragrunt stack generate
 terragrunt stack run destroy --non-interactive
 ```
 
-**Caution**: This workflow is for development and testing. Reference your catalog components in the [infrastructure-live repository](https://github.com/ConsciousML/terragrunt-template-live-aws) for multi-environment IaC, and production CI/CD.
+**Caution**: This workflow is for development and testing. Use your catalog components in the [infrastructure-live repository](https://github.com/ConsciousML/terragrunt-template-live-eks) for multi-environment IaC, and production CI/CD.
 
 ## Development Workflow
 

@@ -6,7 +6,7 @@ This directory provides example configurations for testing Terragrunt stacks dur
 
 This environment is designed for **development and testing only**.
 
-For production deployments, use the [terragrunt-template-live-aws](https://github.com/ConsciousML/terragrunt-template-live-aws) repository.
+For production deployments, use the [terragrunt-template-live-eks](https://github.com/ConsciousML/terragrunt-template-live-eks) repository.
 
 ## Configuration Files
 
@@ -20,22 +20,14 @@ These files automatically provide AWS variables (region, environment) to all sta
 
 ## Stack Configuration
 
-Stacks in `examples/stacks/` reference the catalog using git links with automatic version inference:
+Stacks in `examples/stacks/` reference the catalog using relative paths:
 
 ```hcl
-stack "vpc_db" {
-  source = "github.com/ConsciousML/terragrunt-template-catalog-eks//stacks/vpc_ec2?ref=${local.version}"
-  # ...
+unit "vpc" {
+  source = "${get_repo_root()}/units/vpc_eks"
+  ...
 }
 ```
-
-The `ref` parameter automatically resolves to:
-1. PR branch name (in pull requests)
-2. Current branch name  
-3. Current git branch (local development)
-4. "main" (fallback)
-
-This allows testing catalog changes from any branch without manual configuration.
 
 ## Getting Started
 
@@ -45,22 +37,22 @@ This allows testing catalog changes from any branch without manual configuration
 
 ### Deploy a Stack
 ```bash
-cd examples/stacks/vpc_ec2/local/
+cd examples/stacks/eks
 
 terragrunt stack generate
-terragrunt stack run apply
+terragrunt stack run apply --backend-bootstrap
 ```
 
 ### Destroy a Stack
 ```bash
-cd examples/stacks/vpc_ec2/local/
+cd examples/stacks/eks
 
 terragrunt stack run destroy
 ```
 
 ## Production Setup
 
-For production environments, use [terragrunt-template-live-aws](https://github.com/ConsciousML/terragrunt-template-live-aws) which provides:
+For production environments, use [terragrunt-template-live-eks](https://github.com/ConsciousML/terragrunt-template-live-eks) which provides:
 - Environment separation (dev/staging/prod)
 - Production-ready CI/CD 
 - Proper state management across environments

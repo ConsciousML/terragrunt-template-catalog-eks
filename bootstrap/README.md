@@ -75,7 +75,7 @@ export TF_VAR_github_token="$(gh auth token)"
 ```bash
 cd bootstrap/enable_tg_github_actions/
 terragrunt stack generate
-terragrunt stack run apply
+terragrunt stack run apply --backend-bootstrap
 ```
 
 ### Update Your GitHub Actions file
