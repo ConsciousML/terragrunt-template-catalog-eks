@@ -85,15 +85,6 @@ When your PR is ready for final validation:
 - **Linting errors**: Check TFLint output and fix reported issues
 - **Security issues**: Review TFSec findings and address vulnerabilities
 
-### Terragrunt Plan Failures
-- Ensure all required variables are set in `terragrunt.hcl`
-- Verify IAM Policies attached to Terragrunt's IAM Role 
-
-### Terratest Failures
-- Check the `run-terratest` label is present on the PR
-- Ensure test environment has sufficient AWS quotas
-- Review test logs for specific infrastructure deployment issues
-
 ## Tips
 - Failed workflows don't cancel automatically to prevent state corruption
 - Do not cancel the CI manually as this will generate state locks.
