@@ -30,28 +30,11 @@ remote_state {
 }
 
 generate "provider" {
-  path      = "providers.tf"
+  path      = "providers_aws.tf"
   if_exists = "overwrite"
   contents  = <<EOF
 provider "aws" {
   region = "${local.aws_region}"
-}
-EOF
-}
-
-generate "versions" {
-  path      = "versions.tf"
-  if_exists = "overwrite"
-  contents  = <<EOF
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 6.0"
-    }
-  }
-
-  required_version = ">= 1.9.1"
 }
 EOF
 }
