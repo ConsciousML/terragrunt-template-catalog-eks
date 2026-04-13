@@ -5,14 +5,17 @@ include "root" {
 locals {
   environment_hcl = find_in_parent_folders("environment.hcl")
   environment     = read_terragrunt_config(local.environment_hcl).locals.environment
+
+  cluster_config_hcl = find_in_parent_folders("cluster_config.hcl")
+  cluster_name       = read_terragrunt_config(local.cluster_config_hcl).locals.cluster_name
 }
 
 terraform {
   source = "tfr:///terraform-aws-modules/eks/aws?version=${values.version}"
 }
 
-dependency "vpc_eks" {
-  config_path = "../vpc_eks"
+dependency "vpc" {
+  config_path = "../vpc"
   mock_outputs = {
     vpc_id          = "mock_vpc_id"
     private_subnets = ["mock_subnet_id_1", "mock_subnet_id_2"]
@@ -21,7 +24,7 @@ dependency "vpc_eks" {
 }
 
 inputs = {
-  name = "${local.environment}-${values.name}"
+  name = "${local.environment}-${local.cluster_name}"
 
   kubernetes_version = values.kubernetes_version
 
@@ -30,8 +33,8 @@ inputs = {
   # Adds the current caller identity as an administrator via cluster access entry
   enable_cluster_creator_admin_permissions = values.enable_cluster_creator_admin_permissions
 
-  vpc_id     = dependency.vpc_eks.outputs.vpc_id
-  subnet_ids = dependency.vpc_eks.outputs.private_subnets
+  vpc_id     = dependency.vpc.outputs.vpc_id
+  subnet_ids = dependency.vpc.outputs.private_subnets
 
   # EKS Provisioned Control Plane configuration
   control_plane_scaling_config = values.control_plane_scaling_config
