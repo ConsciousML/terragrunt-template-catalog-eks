@@ -24,7 +24,7 @@ Stacks in `examples/stacks/` reference the catalog using relative paths:
 
 ```hcl
 unit "vpc" {
-  source = "${get_repo_root()}/units/vpc_eks"
+  source = "${get_repo_root()}/units/vpc"
   ...
 }
 ```

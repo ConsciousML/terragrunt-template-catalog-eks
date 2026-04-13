@@ -1,6 +1,16 @@
+locals {
+  # Sets the reference of the source code to:
+  version = coalesce(
+    get_env("GITHUB_HEAD_REF", ""), # PR branch name (only set in PRs)
+    get_env("GITHUB_REF_NAME", ""), # Branch/tag name
+    try(run_cmd("git", "rev-parse", "--abbrev-ref", "HEAD"), ""),
+    "main" # fallback
+  )
+}
+
 unit "vpc" {
-  source = "${get_repo_root()}/units/vpc_eks"
-  path   = "vpc_eks"
+  source = "${get_repo_root()}/units/vpc"
+  path   = "vpc"
 
   values = {
     create_vpc = true
@@ -37,8 +47,6 @@ unit "cluster" {
 
   values = {
     version = "21.15.1"
-
-    name = "eks-cluster"
 
     kubernetes_version = "1.35"
 
@@ -82,5 +90,15 @@ unit "cluster" {
     compute_config = {
       enabled = false
     }
+  }
+}
+
+unit "argocd" {
+  source = "${get_repo_root()}/units/argocd"
+  path   = "argocd"
+
+  values = {
+    version            = local.version
+    helm_chart_version = "9.5.0"
   }
 }

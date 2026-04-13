@@ -1,6 +1,6 @@
 unit "vpc" {
-  source = "${get_repo_root()}/units/vpc_eks"
-  path   = "vpc_eks"
+  source = "${get_repo_root()}/units/vpc"
+  path   = "vpc"
 
   values = {
     create_vpc = true
