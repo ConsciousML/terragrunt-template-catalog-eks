@@ -21,6 +21,8 @@ permissions:
 env:
   # The relative path of the directory containing the Terragrunt Stack to test during code quality checks
   TG_STACK_PATH: examples/stacks/eks
+  # Isolates CI state from local runs — uses a dedicated S3 bucket (tofu-state-{account_id}-catalog-eks-ci)
+  TG_ENVIRONMENT: catalog-eks-ci
 
 jobs:
   terraform-docs:
