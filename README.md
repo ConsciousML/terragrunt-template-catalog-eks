@@ -29,7 +29,7 @@ Modules (modules/) → Units (units/) → Stacks (stacks/) → Examples (example
 - **[Units](units/README.md)**: Terragrunt wrappers around modules that add configuration and dependencies
 - **[Stacks](stacks/README.md)**: Collections of units arranged in dependency graphs for pattern level re-use
 - **[Examples](examples/README.md)**: Simple configuration for testing and development
-- **[Bootstrap](bootstrap/README.md)**: GitHub Actions AWS authentication setup
+- **[Bootstrap](bootstrap/README.md)**: Contains pipelines that need to be run once per repository fork (authenticating GitHub Actions with AWS and create a Route 53 hosted zone to host the ArgoCD UI on our domain). 
 - **[CI](docs/continuous-integration.md)**: Automated configuration validation, testing (`terratest`) and documatentation (`terraform-docs`).
 
 ## Getting Started
@@ -42,7 +42,7 @@ Modules (modules/) → Units (units/) → Stacks (stacks/) → Examples (example
 First, you'll need to fork this repository and make a few changes:
 1. Click on `Use this template` to create your own repository
 2. Use your IDE of choice to replace every occurrence of `github.com/ConsciousML/terragrunt-template-catalog-eks` and `git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git` by your GitHub repo URL following the same format
-3. In `examples/` and `bootstrap` change the `region.hcl` to match your desired AWS region.
+3. In `examples/` and `bootstrap/` change the `region.hcl` to match your desired AWS region.
 
 **Warning**: If you skip step 2, the TG source links will still point to the original repository (on `github.com/ConsciousML/`).
 
@@ -152,7 +152,7 @@ See the [development guide](docs/development.md) for a detailed workflow with a 
 
 ## Continuous Integration (CI)
 
-After creating your repository from this template, run the [bootstrap process](bootstrap/README.md) once to configure GitHub Actions authentication with AWS.
+After creating your repository from this template, run the [bootstrap process](bootstrap/enable_tg_github_actions/README.md) once to configure GitHub Actions authentication with AWS.
 
 The CI provides automated checks and testing:
 1. Create a branch and make changes
