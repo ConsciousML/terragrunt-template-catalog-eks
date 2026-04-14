@@ -43,7 +43,7 @@ unit "vpc" {
 
 unit "cluster" {
   source = "${get_repo_root()}/units/eks/cluster"
-  path   = "eks_cluster"
+  path   = "eks/cluster"
 
   values = {
     version = "21.15.1"
@@ -95,7 +95,7 @@ unit "cluster" {
 
 unit "argocd" {
   source = "${get_repo_root()}/units/eks/addons/argocd"
-  path   = "argocd"
+  path   = "eks/addons/argocd"
 
   values = {
     version            = local.version
