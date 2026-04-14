@@ -1,3 +1,7 @@
+generate "provider_kubernetes" {
+  path      = "provider_kubernetes.tf"
+  if_exists = "overwrite"
+  contents  = <<EOF
 data "aws_eks_cluster" "this" {
   name = var.cluster_name
 }
@@ -28,4 +32,6 @@ provider "helm" {
       command     = "aws"
     }
   }
+}
+EOF
 }

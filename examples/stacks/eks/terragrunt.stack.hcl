@@ -42,7 +42,7 @@ unit "vpc" {
 }
 
 unit "cluster" {
-  source = "${get_repo_root()}/units/eks_cluster"
+  source = "${get_repo_root()}/units/eks/cluster"
   path   = "eks_cluster"
 
   values = {
@@ -94,7 +94,7 @@ unit "cluster" {
 }
 
 unit "argocd" {
-  source = "${get_repo_root()}/units/argocd"
+  source = "${get_repo_root()}/units/eks/addons/argocd"
   path   = "argocd"
 
   values = {
