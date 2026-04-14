@@ -2,6 +2,10 @@ include "root" {
   path = find_in_parent_folders("root.hcl")
 }
 
+include "provider_kubernetes" {
+  path = find_in_parent_folders("provider_kubernetes.hcl")
+}
+
 terraform {
   source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//modules/argocd/?ref=${values.version}"
 }
@@ -26,7 +30,7 @@ locals {
 
 
 dependency "eks_cluster" {
-  config_path = "../eks_cluster"
+  config_path = "../../cluster"
   mock_outputs = {
     cluster_name = "mock-cluster"
   }
