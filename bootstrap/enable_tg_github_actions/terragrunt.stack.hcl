@@ -22,7 +22,9 @@ stack "enable_tg_github_actions" {
       "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
       "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess",
       "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
-      "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser"
+      "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser",
+      "arn:aws:iam::aws:policy/AmazonRoute53FullAccess",
+      "arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess"
     ]
     inline_policies = [
       {

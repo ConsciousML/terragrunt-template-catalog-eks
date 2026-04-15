@@ -102,3 +102,13 @@ unit "argocd" {
     helm_chart_version = "9.5.0"
   }
 }
+
+unit "acm_certificate" {
+  source = "${get_repo_root()}/units/eks/acm_certificate"
+  path   = "eks/acm_certificate"
+
+  values = {
+    version               = local.version
+    aws_route53_zone_name = "argocd.axelmendoza.com"
+  }
+}
