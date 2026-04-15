@@ -6,6 +6,9 @@ locals {
     try(run_cmd("git", "rev-parse", "--abbrev-ref", "HEAD"), ""),
     "main" # fallback
   )
+
+  # Resource created in `bootstrap/setup_dns`
+  aws_route53_zone_name = "argocd.axelmendoza.com"
 }
 
 unit "vpc" {
@@ -100,6 +103,34 @@ unit "argocd" {
   values = {
     version            = local.version
     helm_chart_version = "9.5.0"
+    helm_values = {
+      global = {
+        domain = local.aws_route53_zone_name
+      }
+      configs = {
+        params = {
+          "server.insecure" = true
+        }
+      }
+      server = {
+        ingress = {
+          enabled          = true
+          controller       = "aws"
+          ingressClassName = "alb"
+          annotations = {
+            "alb.ingress.kubernetes.io/scheme"           = "internal"
+            "alb.ingress.kubernetes.io/target-type"      = "ip"
+            "alb.ingress.kubernetes.io/backend-protocol" = "HTTP"
+            "alb.ingress.kubernetes.io/listen-ports"     = "[{\"HTTP\":80}, {\"HTTPS\":443}]"
+            "alb.ingress.kubernetes.io/ssl-redirect"     = "443"
+          }
+          aws = {
+            serviceType            = "ClusterIP"
+            backendProtocolVersion = "GRPC"
+          }
+        }
+      }
+    }
   }
 }
 
@@ -109,6 +140,6 @@ unit "acm_certificate" {
 
   values = {
     version               = local.version
-    aws_route53_zone_name = "argocd.axelmendoza.com"
+    aws_route53_zone_name = local.aws_route53_zone_name
   }
 }

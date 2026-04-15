@@ -40,6 +40,7 @@ dependency "eks_cluster" {
 inputs = {
   cluster_name       = dependency.eks_cluster.outputs.cluster_name
   helm_chart_version = values.helm_chart_version
+  helm_values        = values.helm_values
 }
 
 exclude {

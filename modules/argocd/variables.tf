@@ -12,3 +12,9 @@ variable "helm_chart_version" {
   description = "The version of the helm chart of installing argocd"
   type        = string
 }
+
+variable "helm_values" {
+  description = "Helm values to pass to the ArgoCD chart"
+  type        = any
+  default     = {}
+}
