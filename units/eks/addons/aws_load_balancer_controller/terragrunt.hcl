@@ -53,6 +53,11 @@ dependency "vpc" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "destroy"]
 }
 
+dependency "acm_certificate" {
+  config_path  = "../../acm_certificate"
+  skip_outputs = true
+}
+
 inputs = {
   cluster_name       = dependency.eks_cluster.outputs.cluster_name
   name               = "aws-load-balancer-controller"
