@@ -96,6 +96,19 @@ unit "cluster" {
   }
 }
 
+unit "iam_role_aws_lbc" {
+  source = "${get_repo_root()}/units/eks/addons/iam_role_aws_lbc"
+  path   = "eks/addons/iam_role_aws_lbc"
+
+  values = {
+    version         = local.version
+    iam_policy_name = "aws-load-balancer-controller-policy"
+    iam_policy_url  = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v3.2.1/docs/install/iam_policy.json"
+    iam_role_name   = "aws-load-balancer-controller"
+    tags            = {}
+  }
+}
+
 unit "argocd" {
   source = "${get_repo_root()}/units/eks/addons/argocd"
   path   = "eks/addons/argocd"
