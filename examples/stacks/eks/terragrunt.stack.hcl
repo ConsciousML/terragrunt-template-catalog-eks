@@ -109,6 +109,16 @@ unit "iam_role_aws_lbc" {
   }
 }
 
+unit "aws_load_balancer_controller" {
+  source = "${get_repo_root()}/units/eks/addons/aws_load_balancer_controller"
+  path   = "eks/addons/aws_load_balancer_controller"
+
+  values = {
+    version            = local.version
+    helm_chart_version = "3.2.1"
+  }
+}
+
 unit "argocd" {
   source = "${get_repo_root()}/units/eks/addons/argocd"
   path   = "eks/addons/argocd"
