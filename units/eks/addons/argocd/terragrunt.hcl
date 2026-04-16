@@ -7,7 +7,7 @@ include "provider_kubernetes" {
 }
 
 terraform {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//modules/argocd/?ref=${values.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//modules/helm_release/?ref=${values.version}"
 }
 
 locals {
@@ -39,6 +39,11 @@ dependency "eks_cluster" {
 
 inputs = {
   cluster_name       = dependency.eks_cluster.outputs.cluster_name
+  name               = "argocd"
+  repository         = "https://argoproj.github.io/argo-helm"
+  chart              = "argo-cd"
+  namespace          = "argocd"
+  create_namespace   = true
   helm_chart_version = values.helm_chart_version
   helm_values        = values.helm_values
 }
