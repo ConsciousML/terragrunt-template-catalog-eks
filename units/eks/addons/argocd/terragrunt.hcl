@@ -42,6 +42,11 @@ dependency "eks_cluster" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "destroy"]
 }
 
+dependency "aws_load_balancer_controller" {
+  config_path  = "../aws_load_balancer_controller"
+  skip_outputs = true
+}
+
 inputs = {
   cluster_name       = dependency.eks_cluster.outputs.cluster_name
   name               = "argocd"
