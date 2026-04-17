@@ -42,7 +42,7 @@ dependency "eks_cluster" {
   mock_outputs = {
     cluster_name = "mock-cluster"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 dependency "vpc" {
@@ -50,11 +50,16 @@ dependency "vpc" {
   mock_outputs = {
     vpc_id = "mock-vpc-id"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 dependency "acm_certificate" {
   config_path  = "../../acm_certificate"
+  skip_outputs = true
+}
+
+dependency "iam_role_aws_lbc" {
+  config_path  = "../iam_role_aws_lbc"
   skip_outputs = true
 }
 
