@@ -16,7 +16,7 @@ dependency "eks_cluster" {
   mock_outputs = {
     cluster_name = "mock-cluster"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 inputs = {

@@ -39,12 +39,20 @@ dependency "eks_cluster" {
   mock_outputs = {
     cluster_name = "mock-cluster"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 dependency "aws_load_balancer_controller" {
   config_path  = "../aws_load_balancer_controller"
   skip_outputs = true
+}
+
+dependency "acm_certificate" {
+  config_path = "../../acm_certificate"
+  mock_outputs = {
+    certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 inputs = {
@@ -56,6 +64,12 @@ inputs = {
   create_namespace   = true
   helm_chart_version = values.helm_chart_version
   helm_values        = values.helm_values
+  helm_set = [
+    {
+      name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/certificate-arn"
+      value = dependency.acm_certificate.outputs.certificate_arn
+    }
+  ]
 }
 
 exclude {

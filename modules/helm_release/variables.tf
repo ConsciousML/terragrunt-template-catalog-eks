@@ -43,3 +43,13 @@ variable "helm_values" {
   type        = any
   default     = {}
 }
+
+variable "helm_set" {
+  description = "Individual Helm values to set, passed as-is to the helm_release set attribute"
+  type = list(object({
+    name  = string
+    value = string
+    type  = optional(string)
+  }))
+  default = []
+}
