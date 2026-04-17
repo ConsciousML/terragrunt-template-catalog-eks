@@ -12,7 +12,7 @@ dependency "iam_role_github_actions" {
   mock_outputs = {
     role_arn = "arn:aws:iam::123456789012:role/mock-github-actions-role"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 terraform {
