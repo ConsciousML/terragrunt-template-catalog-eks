@@ -157,6 +157,36 @@ unit "argocd" {
   }
 }
 
+unit "iam_role_external_dns" {
+  source = "${get_repo_root()}/units/eks/addons/iam_role_external_dns"
+  path   = "eks/addons/iam_role_external_dns"
+
+  values = {
+    version         = local.version
+    iam_policy_name = "external-dns-policy"
+    iam_role_name   = "external-dns"
+    tags            = {}
+  }
+}
+
+unit "external_dns" {
+  source = "${get_repo_root()}/units/eks/addons/external_dns"
+  path   = "eks/addons/external_dns"
+
+  values = {
+    version            = local.version
+    helm_chart_version = "1.20.0"
+    helm_values = {
+      sources       = ["service", "ingress"]
+      domainFilters = [local.aws_route53_zone_name]
+      provider = {
+        name = "aws"
+      }
+      registry = "txt"
+    }
+  }
+}
+
 unit "acm_certificate" {
   source = "${get_repo_root()}/units/eks/acm_certificate"
   path   = "eks/acm_certificate"
