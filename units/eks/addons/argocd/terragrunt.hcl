@@ -47,6 +47,11 @@ dependency "aws_load_balancer_controller" {
   skip_outputs = true
 }
 
+dependency "external_dns" {
+  config_path  = "../external_dns"
+  skip_outputs = true
+}
+
 dependency "acm_certificate" {
   config_path = "../../acm_certificate"
   mock_outputs = {
