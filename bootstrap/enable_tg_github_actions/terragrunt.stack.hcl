@@ -24,7 +24,7 @@ stack "enable_tg_github_actions" {
       "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
       "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser",
       "arn:aws:iam::aws:policy/AmazonRoute53FullAccess",
-      "arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess"
+      "arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess",
     ]
     inline_policies = [
       {
@@ -73,6 +73,10 @@ stack "enable_tg_github_actions" {
                 "eks:DisassociateIdentityProviderConfig",
                 "eks:DescribeIdentityProviderConfig",
                 "eks:ListIdentityProviderConfigs",
+                "eks:CreatePodIdentityAssociation",
+                "eks:DeletePodIdentityAssociation",
+                "eks:DescribePodIdentityAssociation",
+                "eks:ListPodIdentityAssociations"
               ]
               Resource = "*"
             }
