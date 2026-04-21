@@ -183,6 +183,10 @@ unit "external_dns" {
         name = "aws"
       }
       registry = "txt"
+      # Allow to create and delete records
+      policy = "sync"
+      # REMOVE
+      logLevel = "debug"
     }
   }
 }
