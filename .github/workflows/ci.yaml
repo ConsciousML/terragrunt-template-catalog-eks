@@ -23,6 +23,9 @@ env:
   TG_STACK_PATH: examples/stacks/eks
   # Isolates CI state from local runs — uses a dedicated S3 bucket (tofu-state-{account_id}-catalog-eks-ci)
   TG_ENVIRONMENT: catalog-eks-ci
+  # Timeout for testing infrastructure
+  TERRATEST_TIMEOUT: 60m
+
 
 jobs:
   terraform-docs:
@@ -180,5 +183,5 @@ jobs:
 
       - name: Run Terratest
         if: steps.check-label-skip.outputs.label_present == 'false'
-        run: go test -v ./tests/... -timeout 30m
+        run: go test -v ./tests/... -timeout ${{ env.TERRATEST_TIMEOUT }}
 

@@ -7,7 +7,7 @@ dependency "iam_role_github_actions" {
   mock_outputs = {
     role_name = "mock-github-actions-role"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 terraform {

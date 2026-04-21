@@ -30,7 +30,7 @@ remote_state {
 }
 
 generate "provider" {
-  path      = "providers.tf"
+  path      = "providers_aws.tf"
   if_exists = "overwrite"
   contents  = <<EOF
 provider "aws" {

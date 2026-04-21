@@ -11,13 +11,16 @@ terraform {
 }
 
 locals {
-  cluster_config_hcl = find_in_parent_folders("cluster_config.hcl")
-  cluster_name       = read_terragrunt_config(local.cluster_config_hcl).locals.cluster_name
-
   environment_hcl = find_in_parent_folders("environment.hcl")
   environment     = read_terragrunt_config(local.environment_hcl).locals.environment
 
+  cluster_config_hcl = find_in_parent_folders("cluster_config.hcl")
+  cluster_name       = read_terragrunt_config(local.cluster_config_hcl).locals.cluster_name
+
   cluster_name_full = "${local.environment}-${local.cluster_name}"
+
+  region_hcl = find_in_parent_folders("region.hcl")
+  region     = read_terragrunt_config(local.region_hcl).locals.region
 
   cluster_exists = run_cmd("--terragrunt-quiet", "sh", "-c", <<-EOT
     output=$(aws eks describe-cluster --name ${local.cluster_name_full} 2>&1)
@@ -42,39 +45,37 @@ dependency "eks_cluster" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
-dependency "aws_load_balancer_controller" {
-  config_path  = "../aws_load_balancer_controller"
-  skip_outputs = true
-}
-
-dependency "external_dns" {
-  config_path  = "../external_dns"
-  skip_outputs = true
-}
-
-dependency "acm_certificate" {
-  config_path = "../../acm_certificate"
+dependency "vpc" {
+  config_path = "../../../vpc"
   mock_outputs = {
-    certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    vpc_id = "mock-vpc-id"
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
+dependency "acm_certificate" {
+  config_path  = "../../acm_certificate"
+  skip_outputs = true
+}
+
+dependency "iam_role_aws_lbc" {
+  config_path  = "../iam_role_aws_lbc"
+  skip_outputs = true
+}
+
 inputs = {
   cluster_name       = dependency.eks_cluster.outputs.cluster_name
-  name               = "argocd"
-  repository         = "https://argoproj.github.io/argo-helm"
-  chart              = "argo-cd"
-  namespace          = "argocd"
-  create_namespace   = true
+  name               = "aws-load-balancer-controller"
+  repository         = "https://aws.github.io/eks-charts"
+  chart              = "aws-load-balancer-controller"
+  namespace          = "kube-system"
+  create_namespace   = false
   helm_chart_version = values.helm_chart_version
-  helm_values        = values.helm_values
-  helm_set = [
-    {
-      name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/certificate-arn"
-      value = dependency.acm_certificate.outputs.certificate_arn
-    }
-  ]
+  helm_values = {
+    clusterName = dependency.eks_cluster.outputs.cluster_name
+    region      = local.region
+    vpcId       = dependency.vpc.outputs.vpc_id
+  }
 }
 
 exclude {

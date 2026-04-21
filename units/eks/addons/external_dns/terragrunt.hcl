@@ -42,37 +42,24 @@ dependency "eks_cluster" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
-dependency "aws_load_balancer_controller" {
-  config_path  = "../aws_load_balancer_controller"
+dependency "iam_role_external_dns" {
+  config_path  = "../iam_role_external_dns"
   skip_outputs = true
-}
-
-dependency "external_dns" {
-  config_path  = "../external_dns"
-  skip_outputs = true
-}
-
-dependency "acm_certificate" {
-  config_path = "../../acm_certificate"
-  mock_outputs = {
-    certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-  }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 inputs = {
   cluster_name       = dependency.eks_cluster.outputs.cluster_name
-  name               = "argocd"
-  repository         = "https://argoproj.github.io/argo-helm"
-  chart              = "argo-cd"
-  namespace          = "argocd"
+  name               = "external-dns"
+  repository         = "https://kubernetes-sigs.github.io/external-dns/"
+  chart              = "external-dns"
+  namespace          = "external-dns"
   create_namespace   = true
   helm_chart_version = values.helm_chart_version
   helm_values        = values.helm_values
   helm_set = [
     {
-      name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/certificate-arn"
-      value = dependency.acm_certificate.outputs.certificate_arn
+      name  = "txtOwnerId"
+      value = local.cluster_name_full
     }
   ]
 }
