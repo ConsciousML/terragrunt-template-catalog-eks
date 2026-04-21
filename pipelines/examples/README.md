@@ -20,7 +20,7 @@ These files automatically provide AWS variables (region, environment) to all sta
 
 ## Stack Configuration
 
-Stacks in `examples/stacks/` reference the catalog using relative paths:
+Stacks in `pipelines/examples/stacks/` reference the catalog using relative paths:
 
 ```hcl
 unit "vpc" {
@@ -37,7 +37,7 @@ unit "vpc" {
 
 ### Deploy a Stack
 ```bash
-cd examples/stacks/eks
+cd pipelines/examples/stacks/eks
 
 terragrunt stack generate
 terragrunt stack run apply --backend-bootstrap
@@ -45,7 +45,7 @@ terragrunt stack run apply --backend-bootstrap
 
 ### Destroy a Stack
 ```bash
-cd examples/stacks/eks
+cd pipelines/examples/stacks/eks
 
 terragrunt stack run destroy
 ```

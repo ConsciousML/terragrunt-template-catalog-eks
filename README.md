@@ -22,27 +22,28 @@ You're new to Terragrunt best practices? Read [Gruntwork's official production p
 The catalog follows a layered architecture where each layer builds upon the previous one:
 
 ```
-Modules (modules/) → Units (units/) → Stacks (stacks/) → Examples (examples/)
+Modules (modules/) → Units (units/) → Stacks (stacks/) → Examples (pipelines/examples/)
 ```
 
 - **[Modules](modules/README.md)**: Reusable Terraform modules that declare AWS resources (VPC, databases, compute instances, etc.)
 - **[Units](units/README.md)**: Terragrunt wrappers around modules that add configuration and dependencies
 - **[Stacks](stacks/README.md)**: Collections of units arranged in dependency graphs for pattern level re-use
-- **[Examples](examples/README.md)**: Simple configuration for testing and development
-- **[Bootstrap](bootstrap/README.md)**: Contains pipelines that need to be run once per repository fork (authenticating GitHub Actions with AWS and create a Route 53 hosted zone to host the ArgoCD UI on our domain). 
+- **[Examples](pipelines/examples/README.md)**: Simple configuration for testing and development
+- **[Bootstrap](pipelines/bootstrap/)**: Contains pipelines that need to be run once per repository fork (authenticating GitHub Actions with AWS and create a Route 53 hosted zone to host the ArgoCD UI on our domain). 
 - **[CI](docs/continuous-integration.md)**: Automated configuration validation, testing (`terratest`) and documatentation (`terraform-docs`).
 
 ## Getting Started
 ### Prerequisites
 - AWS account with billing enabled
 - GitHub account
-- AWS IAM permissions to manage IAM roles, VPC resources, EKS resources, compute resources and S3 (see `policy_arns` in the [bootstrap stack](bootstrap/enable_tg_github_actions/terragrunt.stack.hcl) for a list of the specific IAM policies)
+- AWS IAM permissions to manage IAM roles, VPC resources, EKS resources, compute resources and S3 (see `policy_arns` in the [bootstrap stack](pipelines/bootstrap/enable_tg_github_actions/terragrunt.stack.hcl) for a list of the specific IAM policies)
 
 ### Fork the Repository
 First, you'll need to fork this repository and make a few changes:
 1. Click on `Use this template` to create your own repository
 2. Use your IDE of choice to replace every occurrence of `github.com/ConsciousML/terragrunt-template-catalog-eks` and `git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git` by your GitHub repo URL following the same format
-3. In `examples/` and `bootstrap/` change the `region.hcl` to match your desired AWS region.
+3. Change `pipelines/region.hcl` to match your desired AWS region
+4. Change `pipelines/dns_config.hcl` to match your domain name where you'll deploy ArgoCD (if you don't have a domain name, you'll need to register one using a domain registrar such a GoDaddy or Namecheap)
 
 **Warning**: If you skip step 2, the TG source links will still point to the original repository (on `github.com/ConsciousML/`).
 
@@ -79,10 +80,11 @@ For more information on how to use mise, read their [getting started guide](http
 - [Terragrunt](https://terragrunt.gruntwork.io/docs/getting-started/install/)
 - [OpenTofu](https://opentofu.org/docs/intro/install/) (or [Terraform](https://developer.hashicorp.com/terraform/install))
 - [Go](https://go.dev/doc/install)
-- [Python3.13.1](https://www.python.org/downloads/)
+- [Python 3.14.3](https://www.python.org/downloads/)
 - [tflint](https://github.com/terraform-linters/tflint)
 - [GitHub CLI](https://github.com/cli/cli#installation)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- [Go 1.26](https://go.dev/doc/install)
 
 See [mise.toml](./mise.toml) for specific versions.
 
@@ -94,12 +96,15 @@ aws configure
 
 For more information, read the [AWS CLI authentication documentation](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
 
+### Run the Bootstrap Pipelines
+Follow the [enable Terragrunt in GitHub Actions](pipelines/bootstrap/enable_tg_github_actions/README.md) and [Setup DNS](pipelines/bootstrap/setup_dns/README.md) documentation to authenticate CI/CD with AWS and to setup your hosted zone to deploy ArgoCD under a Rout53 DNS.
+
 ### Deploy a Dev EKS Cluster
 
 Deploy a stack that creates a VPC and an EKS cluster:
 
 ```bash
-cd examples/stacks/eks
+cd pipelines/examples/stacks/eks
 terragrunt stack generate
 terragrunt stack run apply --backend-bootstrap --non-interactive
 ```
@@ -131,7 +136,7 @@ kube-proxy-khhsj               1/1     Running   0          40m
 kube-proxy-pvh7h               1/1     Running   0          40m
 ```
 
-Finally, cleanup by destroying the infrastructure (cwd in `examples/stacks/eks`):
+Finally, cleanup by destroying the infrastructure (cwd in `pipelines/examples/stacks/eks`):
 
 ```bash
 terragrunt stack generate
@@ -152,7 +157,7 @@ See the [development guide](docs/development.md) for a detailed workflow with a 
 
 ## Continuous Integration (CI)
 
-After creating your repository from this template, run the [bootstrap process](bootstrap/enable_tg_github_actions/README.md) once to configure GitHub Actions authentication with AWS.
+After creating your repository from this template, run the [bootstrap process](pipelines/bootstrap/enable_tg_github_actions/README.md) once to configure GitHub Actions authentication with AWS.
 
 The CI provides automated checks and testing:
 1. Create a branch and make changes

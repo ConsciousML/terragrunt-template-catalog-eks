@@ -8,7 +8,7 @@ The development process follows a structured approach with these layers:
 
 1. **Terraform Module** (`modules/`): The core infrastructure code
 2. **Terragrunt Unit** (`units/`): Wrapper that makes the module reusable
-3. **Stack** (`examples/stacks/`): Test your changes locally before pushing
+3. **Stack** (`pipelines/examples/stacks/`): Test your changes locally before pushing
 
 ## Step-by-Step Development Process
 Read the step-by-step process and then read the [practical example](#practical-example).
@@ -36,15 +36,15 @@ Write a terragrunt wrapper in `units/your_module/terragrunt.hcl` that:
 - Maps unit inputs to module variables
 
 ### 4. Create a Local Stack for Testing
-Create a stack (i.e `examples/stacks/your_stack/terragrunt.stack.hcl`) that:
+Create a stack (i.e `pipelines/examples/stacks/your_stack/terragrunt.stack.hcl`) that:
 - References units using `${get_repo_root()}/units/unit_name` for local development
 - Combines multiple units into a cohesive infrastructure deployment
 - Provides concrete configuration values for testing
-- Uses automatic version detection:
+- Uses automatic version detectione:
 
 For example:
 ```hcl
-# examples/stacks/your_stack/terragrunt.stack.hcl
+# pipelines/examples/stacks/your_stack/terragrunt.stack.hcl
 locals {
   # Sets the reference of the source code to:
   version = coalesce(
@@ -68,7 +68,7 @@ unit "your_module" {
 
 ### 5. Test Your Changes
 ```bash
-cd examples/stacks/your_stack/
+cd pipelines/examples/stacks/your_stack/
 terragrunt stack generate
 terragrunt stack run init --backend-bootstrap
 terragrunt stack run validate

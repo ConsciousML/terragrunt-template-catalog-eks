@@ -7,8 +7,8 @@ locals {
     "main" # fallback
   )
 
-  # Resource created in `bootstrap/setup_dns`
-  aws_route53_zone_name = "argocd.axelmendoza.com"
+  dns_config_hcl = find_in_parent_folders("dns_config.hcl")
+  domain_name    = read_terragrunt_config(local.dns_config_hcl).locals.domain_name
 }
 
 unit "vpc" {
@@ -127,9 +127,6 @@ unit "argocd" {
     version            = local.version
     helm_chart_version = "9.5.0"
     helm_values = {
-      global = {
-        domain = local.aws_route53_zone_name
-      }
       configs = {
         params = {
           "server.insecure" = true
@@ -178,15 +175,14 @@ unit "external_dns" {
     helm_chart_version = "1.20.0"
     helm_values = {
       sources       = ["service", "ingress"]
-      domainFilters = [local.aws_route53_zone_name]
+      domainFilters = [local.domain_name]
       provider = {
         name = "aws"
       }
       registry = "txt"
       # Allow to create and delete records
-      policy = "sync"
-      # REMOVE
-      logLevel = "debug"
+      policy   = "sync"
+      logLevel = "info"
     }
   }
 }
@@ -197,6 +193,6 @@ unit "acm_certificate" {
 
   values = {
     version               = local.version
-    aws_route53_zone_name = local.aws_route53_zone_name
+    aws_route53_zone_name = local.domain_name
   }
 }
