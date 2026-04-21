@@ -19,12 +19,12 @@ The full DNS flow is:
 
 ### Configuration
 
-In `bootstrap/` change `region.hcl` to match your desired AWS region.
+In `pipelines/` change `region.hcl` to match your desired AWS region.
 
-Update the `domain_name` in `terragrunt.stack.hcl`:
+Update the `domain_name` in `pipelines/dns_setup.hcl`:
 
 ```hcl
-values = {
+locals {
   domain_name = "argocd.yourdomain.com"
 }
 ```
@@ -33,7 +33,7 @@ values = {
 
 From the root of this repository, run:
 ```bash
-cd bootstrap/setup_dns/
+cd pipelines/bootstrap/setup_dns/
 terragrunt stack generate
 terragrunt stack run apply --backend-bootstrap --non-interactive
 ```

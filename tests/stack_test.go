@@ -11,7 +11,7 @@ func TestLocalStack(t *testing.T) {
 
     // Edit this variable to point to your stack
     // Path is relative to the `tests/` directory.
-    stackDir := "../examples/stacks/eks"
+    stackDir := "../pipelines/examples/stacks/eks"
 
     options := &terragrunt.Options{
 		// Run from the examples subfolder where the terragrunt configs are

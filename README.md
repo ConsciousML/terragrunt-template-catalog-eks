@@ -28,15 +28,15 @@ Modules (modules/) → Units (units/) → Stacks (stacks/) → Examples (example
 - **[Modules](modules/README.md)**: Reusable Terraform modules that declare AWS resources (VPC, databases, compute instances, etc.)
 - **[Units](units/README.md)**: Terragrunt wrappers around modules that add configuration and dependencies
 - **[Stacks](stacks/README.md)**: Collections of units arranged in dependency graphs for pattern level re-use
-- **[Examples](examples/README.md)**: Simple configuration for testing and development
-- **[Bootstrap](bootstrap/README.md)**: Contains pipelines that need to be run once per repository fork (authenticating GitHub Actions with AWS and create a Route 53 hosted zone to host the ArgoCD UI on our domain). 
+- **[Examples](pipelines/examples/README.md)**: Simple configuration for testing and development
+- **[Bootstrap](pipelines/bootstrap/README.md)**: Contains pipelines that need to be run once per repository fork (authenticating GitHub Actions with AWS and create a Route 53 hosted zone to host the ArgoCD UI on our domain). 
 - **[CI](docs/continuous-integration.md)**: Automated configuration validation, testing (`terratest`) and documatentation (`terraform-docs`).
 
 ## Getting Started
 ### Prerequisites
 - AWS account with billing enabled
 - GitHub account
-- AWS IAM permissions to manage IAM roles, VPC resources, EKS resources, compute resources and S3 (see `policy_arns` in the [bootstrap stack](bootstrap/enable_tg_github_actions/terragrunt.stack.hcl) for a list of the specific IAM policies)
+- AWS IAM permissions to manage IAM roles, VPC resources, EKS resources, compute resources and S3 (see `policy_arns` in the [bootstrap stack](pipelines/bootstrap/enable_tg_github_actions/terragrunt.stack.hcl) for a list of the specific IAM policies)
 
 ### Fork the Repository
 First, you'll need to fork this repository and make a few changes:
@@ -99,7 +99,7 @@ For more information, read the [AWS CLI authentication documentation](https://do
 Deploy a stack that creates a VPC and an EKS cluster:
 
 ```bash
-cd examples/stacks/eks
+cd pipelines/examples/stacks/eks
 terragrunt stack generate
 terragrunt stack run apply --backend-bootstrap --non-interactive
 ```
@@ -131,7 +131,7 @@ kube-proxy-khhsj               1/1     Running   0          40m
 kube-proxy-pvh7h               1/1     Running   0          40m
 ```
 
-Finally, cleanup by destroying the infrastructure (cwd in `examples/stacks/eks`):
+Finally, cleanup by destroying the infrastructure (cwd in `pipelines/examples/stacks/eks`):
 
 ```bash
 terragrunt stack generate
@@ -152,7 +152,7 @@ See the [development guide](docs/development.md) for a detailed workflow with a 
 
 ## Continuous Integration (CI)
 
-After creating your repository from this template, run the [bootstrap process](bootstrap/enable_tg_github_actions/README.md) once to configure GitHub Actions authentication with AWS.
+After creating your repository from this template, run the [bootstrap process](pipelines/bootstrap/enable_tg_github_actions/README.md) once to configure GitHub Actions authentication with AWS.
 
 The CI provides automated checks and testing:
 1. Create a branch and make changes

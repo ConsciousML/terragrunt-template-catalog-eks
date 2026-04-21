@@ -1,4 +1,4 @@
-# Retrieve the data source of the hosted zone created in `bootstrap/setup_dns`
+# Retrieve the data source of the hosted zone created in `pipelines/bootstrap/setup_dns`
 data "aws_route53_zone" "this" {
   name = var.aws_route53_zone_name
 }
