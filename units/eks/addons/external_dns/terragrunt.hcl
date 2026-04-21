@@ -8,6 +8,11 @@ include "provider_kubernetes" {
 
 terraform {
   source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//modules/helm_release/?ref=${values.version}"
+
+  before_hook "wait_for_dns_cleanup" {
+    commands = ["destroy"]
+    execute  = ["sleep", "60"]
+  }
 }
 
 locals {
@@ -66,6 +71,8 @@ inputs = {
     # "%{record_type}" is for using the record type as prefix, i.e "cname-external-dns-your-cluster.argocd.yourdomain.com"
     # Instead of "external-dns-your-cluster.cname-argocd.yourdomain.com". In the later case, ownership will fail cause
     # external-dns will not find a the domain "cname-argocd.yourdomain.com" 
+
+    # The %%% is for escaping Terragrunt templates
     {
       name  = "txtPrefix"
       value = "%%%{record_type}-external-dns-${local.cluster_name_full}."
