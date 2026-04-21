@@ -29,7 +29,7 @@ Modules (modules/) → Units (units/) → Stacks (stacks/) → Examples (pipelin
 - **[Units](units/README.md)**: Terragrunt wrappers around modules that add configuration and dependencies
 - **[Stacks](stacks/README.md)**: Collections of units arranged in dependency graphs for pattern level re-use
 - **[Examples](pipelines/examples/README.md)**: Simple configuration for testing and development
-- **[Bootstrap](pipelines/bootstrap/README.md)**: Contains pipelines that need to be run once per repository fork (authenticating GitHub Actions with AWS and create a Route 53 hosted zone to host the ArgoCD UI on our domain). 
+- **[Bootstrap](pipelines/bootstrap/)**: Contains pipelines that need to be run once per repository fork (authenticating GitHub Actions with AWS and create a Route 53 hosted zone to host the ArgoCD UI on our domain). 
 - **[CI](docs/continuous-integration.md)**: Automated configuration validation, testing (`terratest`) and documatentation (`terraform-docs`).
 
 ## Getting Started

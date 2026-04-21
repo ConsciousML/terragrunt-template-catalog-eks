@@ -21,13 +21,15 @@ The full DNS flow is:
 
 In `pipelines/` change `region.hcl` to match your desired AWS region.
 
-Update the `domain_name` in `pipelines/dns_setup.hcl`:
+Update the `domain_name` in `pipelines/dns_config.hcl`:
 
 ```hcl
 locals {
   domain_name = "argocd.yourdomain.com"
 }
 ```
+
+You'll need to have a functional domain with access to the administrator panel. If you don't, please register a domain using a domain registrar such as GoDaddy or Namecheap.
 
 ### Deploy
 
