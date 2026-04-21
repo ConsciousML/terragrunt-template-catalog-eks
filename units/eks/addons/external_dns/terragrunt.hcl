@@ -60,6 +60,12 @@ inputs = {
     {
       name  = "txtOwnerId"
       value = local.cluster_name_full
+    },
+    # Prefix or Suffix are mandatory for the external-dns to create the TXT records for ownership
+    # It is necessary for it to delete the A/AAAA records when an Ingress resource is deleted
+    {
+      name  = "txtPrefix"
+      value = "external-dns-${local.cluster_name_full}."
     }
   ]
 }
