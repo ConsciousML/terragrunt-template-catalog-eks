@@ -177,8 +177,9 @@ unit "external_dns" {
     version            = local.version
     helm_chart_version = "1.20.0"
     helm_values = {
-      sources       = ["service", "ingress"]
-      domainFilters = [local.aws_route53_zone_name]
+      sources            = ["service", "ingress"]
+      domainFilters      = [local.aws_route53_zone_name]
+      managedRecordTypes = ["A", "AAAA", "CNAME", "TXT"]
       provider = {
         name = "aws"
       }
