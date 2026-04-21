@@ -6,6 +6,9 @@ locals {
     try(run_cmd("git", "rev-parse", "--abbrev-ref", "HEAD"), ""),
     "main" # fallback
   )
+
+  dns_config_hcl = find_in_parent_folders("dns_config.hcl")
+  domain_name    = read_terragrunt_config(local.dns_config_hcl).locals.domain_name
 }
 
 unit "vpc" {
@@ -172,7 +175,7 @@ unit "external_dns" {
     helm_chart_version = "1.20.0"
     helm_values = {
       sources       = ["service", "ingress"]
-      domainFilters = [local.aws_route53_zone_name]
+      domainFilters = [local.domain_name]
       provider = {
         name = "aws"
       }
@@ -190,6 +193,6 @@ unit "acm_certificate" {
 
   values = {
     version               = local.version
-    aws_route53_zone_name = local.aws_route53_zone_name
+    aws_route53_zone_name = local.domain_name
   }
 }
