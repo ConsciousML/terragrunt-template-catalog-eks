@@ -63,9 +63,12 @@ inputs = {
     },
     # Prefix or Suffix are mandatory for the external-dns to create the TXT records for ownership
     # It is necessary for it to delete the A/AAAA records when an Ingress resource is deleted
+    # "%{record_type}" is for using the record type as prefix, i.e "cname-external-dns-your-cluster.argocd.yourdomain.com"
+    # Instead of "external-dns-your-cluster.cname-argocd.yourdomain.com". In the later case, ownership will fail cause
+    # external-dns will not find a the domain "cname-argocd.yourdomain.com" 
     {
       name  = "txtPrefix"
-      value = "external-dns-${local.cluster_name_full}."
+      value = "%%%{record_type}-external-dns-${local.cluster_name_full}."
     }
   ]
 }
