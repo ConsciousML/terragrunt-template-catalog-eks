@@ -17,6 +17,9 @@ locals {
   environment_hcl = find_in_parent_folders("environment.hcl")
   environment     = read_terragrunt_config(local.environment_hcl).locals.environment
 
+  dns_config_hcl = find_in_parent_folders("dns_config.hcl")
+  domain_name    = read_terragrunt_config(local.dns_config_hcl).locals.domain_name
+
   cluster_name_full = "${local.environment}-${local.cluster_name}"
 
   cluster_exists = run_cmd("--terragrunt-quiet", "sh", "-c", <<-EOT
@@ -73,6 +76,10 @@ inputs = {
     {
       name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/certificate-arn"
       value = dependency.acm_certificate.outputs.certificate_arn
+    },
+    {
+      name  = "global.domain"
+      value = local.domain_name
     }
   ]
 }

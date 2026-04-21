@@ -13,7 +13,6 @@ stack "setup_dns" {
   path   = "setup_dns"
 
   values = {
-    version     = local.version
-    domain_name = "argocd.axelmendoza.com"
+    version = local.version
   }
 }

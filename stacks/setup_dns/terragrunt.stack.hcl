@@ -4,7 +4,6 @@ unit "route53_hosted_zone" {
 
   values = {
     version = values.version
-    name    = values.domain_name
     comment = "Managed by Terraform"
   }
 }

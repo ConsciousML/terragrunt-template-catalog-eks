@@ -6,9 +6,6 @@ locals {
     try(run_cmd("git", "rev-parse", "--abbrev-ref", "HEAD"), ""),
     "main" # fallback
   )
-
-  # Resource created in `bootstrap/setup_dns`
-  aws_route53_zone_name = "argocd.axelmendoza.com"
 }
 
 unit "vpc" {
@@ -127,9 +124,6 @@ unit "argocd" {
     version            = local.version
     helm_chart_version = "9.5.0"
     helm_values = {
-      global = {
-        domain = local.aws_route53_zone_name
-      }
       configs = {
         params = {
           "server.insecure" = true
@@ -184,9 +178,8 @@ unit "external_dns" {
       }
       registry = "txt"
       # Allow to create and delete records
-      policy = "sync"
-      # REMOVE
-      logLevel = "debug"
+      policy   = "sync"
+      logLevel = "info"
     }
   }
 }
