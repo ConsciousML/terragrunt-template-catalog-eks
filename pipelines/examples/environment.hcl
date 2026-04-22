@@ -3,5 +3,5 @@
 # as well as some resource variables to avoid collision
 # Override by setting TG_ENVIRONMENT env var (e.g. TG_ENVIRONMENT=catalog-eks-ci in CI)
 locals {
-  environment = get_env("TG_ENVIRONMENT", "example-2")
+  environment = get_env("TG_ENVIRONMENT", "example")
 }

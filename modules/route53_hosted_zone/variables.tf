@@ -19,3 +19,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "create" {
+  description = "If true, create the hosted zone. If false, look it up via data source (zone must already exist)."
+  type        = bool
+  default     = true
+}

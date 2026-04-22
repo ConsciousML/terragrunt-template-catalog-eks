@@ -17,9 +17,6 @@ locals {
   environment_hcl = find_in_parent_folders("environment.hcl")
   environment     = read_terragrunt_config(local.environment_hcl).locals.environment
 
-  dns_config_hcl = find_in_parent_folders("dns_config.hcl")
-  domain_name    = read_terragrunt_config(local.dns_config_hcl).locals.domain_name
-
   cluster_name_full = "${local.environment}-${local.cluster_name}"
 
   cluster_exists = run_cmd("--terragrunt-quiet", "sh", "-c", <<-EOT
@@ -63,6 +60,14 @@ dependency "acm_certificate" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
+dependency "route53_hosted_zone" {
+  config_path = "../../route53_hosted_zone"
+  mock_outputs = {
+    domain_name = "mock.example.com"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
 inputs = {
   cluster_name       = dependency.eks_cluster.outputs.cluster_name
   name               = "argocd"
@@ -79,7 +84,7 @@ inputs = {
     },
     {
       name  = "global.domain"
-      value = local.domain_name
+      value = dependency.route53_hosted_zone.outputs.domain_name
     }
   ]
 }

@@ -5,5 +5,6 @@ unit "route53_hosted_zone" {
   values = {
     version = values.version
     comment = "Managed by Terraform"
+    create  = true
   }
 }

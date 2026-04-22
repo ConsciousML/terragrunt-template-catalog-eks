@@ -1,5 +1,9 @@
-# The hosted zone name you've used in the `pipelines/bootstrap/setup_dns` Terragrunt pipeline
-variable "aws_route53_zone_name" {
-  description = "The name of the AWS Route53 Zone (i.e argocd.yourdomain.com)"
+variable "domain_name" {
+  description = "The domain name for the ACM certificate (e.g. argocd.dev.yourdomain.com)"
+  type        = string
+}
+
+variable "zone_id" {
+  description = "The Route53 hosted zone ID to create the DNS validation record in"
   type        = string
 }
