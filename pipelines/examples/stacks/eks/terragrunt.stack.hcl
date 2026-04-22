@@ -1,14 +1,16 @@
 locals {
-  # Sets the reference of the source code to:
-  version = coalesce(
-    get_env("GITHUB_HEAD_REF", ""), # PR branch name (only set in PRs)
-    get_env("GITHUB_REF_NAME", ""), # Branch/tag name
-    try(run_cmd("git", "rev-parse", "--abbrev-ref", "HEAD"), ""),
-    "main" # fallback
-  )
+  version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
+}
 
-  dns_config_hcl = find_in_parent_folders("dns_config.hcl")
-  domain_name    = read_terragrunt_config(local.dns_config_hcl).locals.domain_name
+unit "route53_hosted_zone" {
+  source = "${get_repo_root()}/units/eks/route53_hosted_zone"
+  path   = "eks/route53_hosted_zone"
+
+  values = {
+    version = local.version
+    comment = "Managed by Terraform"
+    create  = false
+  }
 }
 
 unit "vpc" {
@@ -174,8 +176,7 @@ unit "external_dns" {
     version            = local.version
     helm_chart_version = "1.20.0"
     helm_values = {
-      sources       = ["service", "ingress"]
-      domainFilters = [local.domain_name]
+      sources = ["service", "ingress"]
       provider = {
         name = "aws"
       }
@@ -192,7 +193,6 @@ unit "acm_certificate" {
   path   = "eks/acm_certificate"
 
   values = {
-    version               = local.version
-    aws_route53_zone_name = local.domain_name
+    version = local.version
   }
 }

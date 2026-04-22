@@ -11,6 +11,10 @@ The full DNS flow is:
 2. **Manual step**: Add those nameservers to your domain registrar as NS records for the subdomain, delegating authority to Route 53.
 3. The EKS stack then handles everything else automatically: ACM issues the TLS certificate (validated via a CNAME in the hosted zone), and the Load Balancer Controller creates an ALB and adds an Alias A record pointing the subdomain to it.
 
+## Multi Environment DNS Setup
+
+Each environment needs its own Route 53 hosted zone so that ArgoCD can be deployed independently per env — `argocd.dev.yourdomain.com`, `argocd.staging.yourdomain.com`, `argocd.prod.yourdomain.com` — without zones or state clashing. Run this bootstrap once per environment, delegate the NS records, then deploy the [EKS stack](../../examples/stacks/eks/) which will pick up the zone automatically via a data source.
+
 ## Quick Start
 
 ### Prerequisites

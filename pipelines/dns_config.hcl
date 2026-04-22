@@ -1,3 +1,4 @@
 locals {
-  domain_name = "argocd.axelmendoza.com"
+  base_domain = "axelmendoza.com"
+  subdomain   = "argocd"
 }

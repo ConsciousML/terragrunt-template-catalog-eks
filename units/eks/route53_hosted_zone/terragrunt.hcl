@@ -7,7 +7,9 @@ locals {
   environment     = read_terragrunt_config(local.environment_hcl).locals.environment
 
   dns_config_hcl = find_in_parent_folders("dns_config.hcl")
-  domain_name    = read_terragrunt_config(local.dns_config_hcl).locals.domain_name
+  base_domain    = read_terragrunt_config(local.dns_config_hcl).locals.base_domain
+  subdomain      = read_terragrunt_config(local.dns_config_hcl).locals.subdomain
+  domain_name    = "${local.subdomain}.${local.environment}.${local.base_domain}"
 }
 
 terraform {
@@ -15,9 +17,10 @@ terraform {
 }
 
 inputs = {
+  create  = values.create
   name    = local.domain_name
   comment = values.comment
   tags = {
-    environment = "${local.environment}"
+    environment = local.environment
   }
 }

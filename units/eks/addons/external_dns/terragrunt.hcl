@@ -52,6 +52,14 @@ dependency "iam_role_external_dns" {
   skip_outputs = true
 }
 
+dependency "route53_hosted_zone" {
+  config_path = "../../route53_hosted_zone"
+  mock_outputs = {
+    domain_name = "mock.example.com"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
 inputs = {
   cluster_name       = dependency.eks_cluster.outputs.cluster_name
   name               = "external-dns"
@@ -76,6 +84,10 @@ inputs = {
     {
       name  = "txtPrefix"
       value = "%%%{record_type}-external-dns-${local.cluster_name_full}."
+    },
+    {
+      name  = "domainFilters[0]"
+      value = dependency.route53_hosted_zone.outputs.domain_name
     }
   ]
 }
