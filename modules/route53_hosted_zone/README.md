@@ -23,12 +23,14 @@ After applying, retrieve the `name_servers` output and add all 4 NS records to y
 | Name | Type |
 |------|------|
 | [aws_route53_zone.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_zone) | resource |
+| [aws_route53_zone.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_comment"></a> [comment](#input\_comment) | A comment for the hosted zone | `string` | `"Managed by Terraform"` | no |
+| <a name="input_create"></a> [create](#input\_create) | If true, create the hosted zone. If false, look it up via data source (zone must already exist). | `bool` | `true` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the hosted zone (e.g. example.com) | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to assign to the hosted zone | `map(string)` | `{}` | no |
 
@@ -36,6 +38,7 @@ After applying, retrieve the `name_servers` output and add all 4 NS records to y
 
 | Name | Description |
 |------|-------------|
+| <a name="output_domain_name"></a> [domain\_name](#output\_domain\_name) | The full domain name of the hosted zone |
 | <a name="output_name_servers"></a> [name\_servers](#output\_name\_servers) | The list of name servers for the hosted zone (delegate these to your domain registrar) |
 | <a name="output_zone_id"></a> [zone\_id](#output\_zone\_id) | The hosted zone ID |
 <!-- END_TF_DOCS -->
