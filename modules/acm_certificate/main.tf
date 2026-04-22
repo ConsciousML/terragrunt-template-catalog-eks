@@ -1,11 +1,5 @@
-# Retrieve the data source of the hosted zone created in `pipelines/bootstrap/setup_dns`
-data "aws_route53_zone" "this" {
-  name = var.aws_route53_zone_name
-}
-
-
 resource "aws_acm_certificate" "this" {
-  domain_name       = data.aws_route53_zone.this.name
+  domain_name       = var.domain_name
   validation_method = "DNS"
 }
 
@@ -23,7 +17,7 @@ resource "aws_route53_record" "this" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.this.zone_id
+  zone_id         = var.zone_id
 }
 
 # Wait until the ACM certificate is issued

@@ -10,10 +10,12 @@ dependency "route53_hosted_zone" {
   config_path = "../route53_hosted_zone"
   mock_outputs = {
     domain_name = "mock.example.com"
+    zone_id     = "MOCKZONEID123456"
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph"]
 }
 
 inputs = {
-  aws_route53_zone_name = dependency.route53_hosted_zone.outputs.domain_name
+  domain_name = dependency.route53_hosted_zone.outputs.domain_name
+  zone_id     = dependency.route53_hosted_zone.outputs.zone_id
 }
