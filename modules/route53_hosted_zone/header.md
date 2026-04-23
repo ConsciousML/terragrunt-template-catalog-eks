@@ -1,5 +1,3 @@
 # AWS Route53 Hosted Zone Module
 
-This module creates a Route53 public hosted zone for a given domain name.
-
-After applying, retrieve the `name_servers` output and add all 4 NS records to your domain registrar before running any stack that depends on DNS validation (e.g. ACM certificate issuance).
+This module creates or looks up a Route53 hosted zone. Supports both public zones (internet-facing, requires NS delegation for ACM validation) and private zones (VPC-scoped, no delegation required).

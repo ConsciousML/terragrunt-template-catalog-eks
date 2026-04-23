@@ -1,19 +1,28 @@
 # DNS Bootstrap
 
-Creates a Route 53 hosted zone for the ArgoCD subdomain and outputs the nameservers to delegate to your domain registrar.
+Creates a public Route 53 hosted zone for the subdomain and outputs the nameservers to delegate to your domain registrar.
 
 ## Purpose
 
-Run this **once per environment** before deploying the EKS stack. The hosted zone must exist and be authoritative for the subdomain before ACM can validate the TLS certificate.
+Run this **once per environment** before deploying the EKS stack. The public hosted zone must exist and be authoritative for the subdomain before ACM can validate the TLS certificate.
+
+This bootstrap creates only the **public** zone. The EKS stack creates a matching **private** zone with the same domain name. The two zones serve different purposes:
+
+| Zone | Created by | Purpose |
+|------|-----------|---------|
+| Public | This bootstrap | Holds the ACM validation CNAME only. No A record. |
+| Private | EKS stack | Holds the A record written by ExternalDNS, pointing to the internal ALB. |
+
+From within the VPC, Route 53 private zones take precedence, so the domain resolves to the internal ALB. From the public internet, the public zone exists but has no A record.
 
 The full DNS flow is:
-1. This bootstrap creates the hosted zone and outputs 4 nameservers.
+1. This bootstrap creates the public hosted zone and outputs 4 nameservers.
 2. **Manual step**: Add those nameservers to your domain registrar as NS records for the subdomain, delegating authority to Route 53.
-3. The EKS stack then handles everything else automatically: ACM issues the TLS certificate (validated via a CNAME in the hosted zone), and the Load Balancer Controller creates an ALB and adds an Alias A record pointing the subdomain to it.
+3. The EKS stack handles everything else: ACM issues the TLS certificate (validated via a CNAME in the public zone), creates the private zone associated with the VPC, and ExternalDNS writes the A record to the private zone.
 
 ## Multi Environment DNS Setup
 
-Each environment needs its own Route 53 hosted zone so that ArgoCD can be deployed independently per env — `argocd.dev.yourdomain.com`, `argocd.staging.yourdomain.com`, `argocd.prod.yourdomain.com` — without zones or state clashing. Run this bootstrap once per environment, delegate the NS records, then deploy the [EKS stack](../../examples/stacks/eks/) which will pick up the zone automatically via a data source.
+Each environment needs its own Route 53 hosted zone so that the subdomain can be deployed independently per env — `argocd.dev.yourdomain.com`, `argocd.staging.yourdomain.com`, `argocd.prod.yourdomain.com` — without zones or state clashing. Run this bootstrap once per environment, delegate the NS records, then deploy the [EKS stack](../../examples/stacks/eks/) which will pick up the public zone automatically via a data source and create the private zone.
 
 ## Structure
 
@@ -113,4 +122,4 @@ Delegation is working when 4 AWS nameservers appear in the `ANSWER SECTION`. Pro
 
 ### Next Steps
 
-With delegation in place, deploy the EKS stack normally. ACM certificate validation and the Route 53 Alias A record for the ALB are created automatically. No further manual DNS steps are required.
+With delegation in place, deploy the EKS stack normally. ACM certificate validation, private zone creation, and the ExternalDNS A record pointing to the internal ALB are all handled automatically. No further manual DNS steps are required.

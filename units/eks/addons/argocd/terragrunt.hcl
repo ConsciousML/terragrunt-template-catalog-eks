@@ -60,8 +60,8 @@ dependency "acm_certificate" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
-dependency "route53_hosted_zone" {
-  config_path = "../../route53_hosted_zone"
+dependency "route53_hosted_zone_private" {
+  config_path = "../../route53_hosted_zone_private"
   mock_outputs = {
     domain_name = "mock.example.com"
   }
@@ -84,7 +84,7 @@ inputs = {
     },
     {
       name  = "global.domain"
-      value = dependency.route53_hosted_zone.outputs.domain_name
+      value = dependency.route53_hosted_zone_private.outputs.domain_name
     }
   ]
 }

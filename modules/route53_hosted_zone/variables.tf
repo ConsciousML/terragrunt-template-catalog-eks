@@ -25,3 +25,15 @@ variable "create" {
   type        = bool
   default     = true
 }
+
+variable "private_zone" {
+  description = "If true, the hosted zone is private. Used for data source lookup when create = false."
+  type        = bool
+  default     = false
+}
+
+variable "vpc_id" {
+  description = "VPC ID to associate with the hosted zone. When set, the created zone is private. Only used when create = true."
+  type        = string
+  default     = null
+}

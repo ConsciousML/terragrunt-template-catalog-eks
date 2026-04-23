@@ -5,7 +5,7 @@
 [![CI](https://github.com/ConsciousML/terragrunt-template-catalog-eks/actions/workflows/ci.yaml/badge.svg)](https://github.com/ConsciousML/terragrunt-template-catalog-eks/actions/workflows/ci.yaml)
 [![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
 
-A Terragrunt Template Catalog for production Infrastructure as Code (IaC) on Amazon Web Services (AWS).
+A Terragrunt Template Catalog for EKS production Infrastructure as Code (IaC)
 
 ## Catalog vs Live Infrastructure
 
@@ -29,7 +29,7 @@ Modules (modules/) → Units (units/) → Stacks (stacks/) → Examples (pipelin
 - **[Units](units/README.md)**: Terragrunt wrappers around modules that add configuration and dependencies
 - **[Stacks](stacks/README.md)**: Collections of units arranged in dependency graphs for pattern level re-use
 - **[Examples](pipelines/examples/README.md)**: Simple configuration for testing and development
-- **[Bootstrap](pipelines/bootstrap/)**: Contains pipelines that need to be run once per repository fork (authenticating GitHub Actions with AWS and create a Route 53 hosted zone to host the ArgoCD UI on our domain). 
+- **[Bootstrap](pipelines/bootstrap/)**: Contains pipelines that need to be run once per repository fork for authenticating GitHub Actions with AWS and creating a [Route 53](https://aws.amazon.com/route53/) [hosted zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html) to sign TLS certificates with [AWS ACM](https://aws.amazon.com/certificate-manager/)
 - **[CI](docs/continuous-integration.md)**: Automated configuration validation, testing (`terratest`) and documatentation (`terraform-docs`).
 
 ## Getting Started
@@ -43,7 +43,7 @@ First, you'll need to fork this repository and make a few changes:
 1. Click on `Use this template` to create your own repository
 2. Use your IDE of choice to replace every occurrence of `github.com/ConsciousML/terragrunt-template-catalog-eks` and `git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git` by your GitHub repo URL following the same format
 3. Change `pipelines/region.hcl` to match your desired AWS region
-4. Change `pipelines/dns_config.hcl` to match your domain name where you'll deploy ArgoCD (if you don't have a domain name, you'll need to register one using a domain registrar such a GoDaddy or Namecheap)
+4. Change `pipelines/dns_config.hcl` to match your domain name where you'll use ACM to sign TLS certificates (if you don't have a domain name, you'll need to register one using a domain registrar such a GoDaddy or Namecheap)
 
 **Warning**: If you skip step 2, the TG source links will still point to the original repository (on `github.com/ConsciousML/`).
 
@@ -97,7 +97,9 @@ aws configure
 For more information, read the [AWS CLI authentication documentation](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
 
 ### Run the Bootstrap Pipelines
-Follow the [enable Terragrunt in GitHub Actions](pipelines/bootstrap/enable_tg_github_actions/README.md) and [Setup DNS](pipelines/bootstrap/setup_dns/README.md) documentation to authenticate CI/CD with AWS and to setup your hosted zone to deploy ArgoCD under a Rout53 DNS.
+Follow the [enable Terragrunt in GitHub Actions](pipelines/bootstrap/enable_tg_github_actions/README.md) and [Setup DNS](pipelines/bootstrap/setup_dns/README.md) documentation to authenticate CI/CD with AWS and to setup your hosted zone to sign TLS certificates with ACM
+
+
 
 ### Deploy a Dev EKS Cluster
 
