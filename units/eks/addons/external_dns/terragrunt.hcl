@@ -57,8 +57,8 @@ dependency "iam_role_external_dns" {
   skip_outputs = true
 }
 
-dependency "route53_hosted_zone" {
-  config_path = "../../route53_hosted_zone"
+dependency "route53_hosted_zone_private" {
+  config_path = "../../route53_hosted_zone_private"
   mock_outputs = {
     domain_name = "mock.example.com"
   }
@@ -92,7 +92,7 @@ inputs = {
     },
     {
       name  = "domainFilters[0]"
-      value = dependency.route53_hosted_zone.outputs.domain_name
+      value = dependency.route53_hosted_zone_private.outputs.domain_name
     }
   ]
 }
