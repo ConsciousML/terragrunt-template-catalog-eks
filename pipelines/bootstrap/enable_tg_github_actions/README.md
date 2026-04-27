@@ -68,7 +68,7 @@ gh auth login --scopes "repo,admin:repo_hook"
 
 Add a GitHub fine-grained token to your environment variables:
 ```bash
-export TF_VAR_github_token="$(gh auth token)"
+export github_token="$(gh auth token)"
 ```
 
 ### Deploy
