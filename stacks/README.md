@@ -16,7 +16,13 @@ To use a stack:
 1. Refer to the [pipelines/examples/stacks/](../pipelines/examples/stacks/) directory for concrete usage examples
 2. Copy an example that matches your needs
 3. Modify the `values` block to suit your requirements
-4. Run `terragrunt stack generate` and `terragrunt stack run apply`
+4. Run:
+```bash
+source .env
+cd pipelines/examples/stacks/<your_stack>
+terragrunt stack generate
+terragrunt stack run apply
+```
 
 For understanding individual components, see the [units directory](../units/).
 

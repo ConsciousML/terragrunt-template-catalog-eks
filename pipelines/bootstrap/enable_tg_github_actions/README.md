@@ -13,6 +13,26 @@ This enables the CI to run properly without managing secrets and AWS credentials
 - Follow the [installation instructions](../../../README.md#installation):
 - Same [prerequisites](../../../README.md#prerequisites) as in the main `README.md`
 
+Autenticate with the GitHub CLI:
+```bash
+gh auth login --scopes "repo,admin:repo_hook"
+```
+
+If you haven't already, copy the example environment file:
+```bash
+cp .env.example .env
+```
+
+Copy the GitHub fine-grained token:
+```bash
+gh auth token
+```
+
+Add the token to your `.env` file replacing `<your_token>`:
+```bash
+export github_token=<your_token>
+```
+
 ### Configuration
 In `pipelines/bootstrap/` change `region.hcl` to match your desire AWS region.
 Update the following values in `terragrunt.stack.hcl`:
@@ -61,19 +81,10 @@ values = {
 - If you've already run this bootstrap pipeline in another repository using the same AWS account, set `create_oidc_provider = false` to use the existing OIDC provider instead of attempting to create a new one. Otherwise, the deployment will fail with an `EntityAlreadyExists` error.
 - Also change the value of `iam_role_name` to avoid conflicts.
 
-Autenticate with the GitHub CLI:
-```bash
-gh auth login --scopes "repo,admin:repo_hook"
-```
-
-Add a GitHub fine-grained token to your environment variables:
-```bash
-export github_token="$(gh auth token)"
-```
-
 ### Deploy
 From the root directory of this repository, run:
 ```bash
+source .env
 cd pipelines/bootstrap/enable_tg_github_actions/
 terragrunt stack generate
 terragrunt stack run apply --backend-bootstrap

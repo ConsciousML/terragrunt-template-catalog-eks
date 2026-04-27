@@ -68,6 +68,7 @@ unit "your_module" {
 
 ### 5. Test Your Changes
 ```bash
+source .env
 cd pipelines/examples/stacks/your_stack/
 terragrunt stack generate
 terragrunt stack run init --backend-bootstrap

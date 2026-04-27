@@ -97,15 +97,18 @@ aws configure
 For more information, read the [AWS CLI authentication documentation](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
 
 ### Run the Bootstrap Pipelines
-Follow the [enable Terragrunt in GitHub Actions](pipelines/bootstrap/enable_tg_github_actions/README.md) and [Setup DNS](pipelines/bootstrap/setup_dns/README.md) documentation to authenticate CI/CD with AWS and to setup your hosted zone to sign TLS certificates with ACM
-
-
+Follow the following Terragrunt pipelines that need to be materialized once per repository:
+- [Enable Terragrunt in GitHub Actions](pipelines/bootstrap/enable_tg_github_actions/README.md): authenticates CI/CD with AWS
+- [Setup DNS](pipelines/bootstrap/setup_dns/README.md): sets up your hosted zone to sign TLS certificates with ACM
+- [Tailscale](pipelines/bootstrap/tailscale/README.md): creates [Tailscale](https://tailscale.com/) resources needed to connect to tools exposed internally in your EKS cluster (ArgoCD, etc.)
 
 ### Deploy a Dev EKS Cluster
+***Warning***: make sure to perform the prerequisites of the [bootstrap pipelines](#run-the-bootstrap-pipelines) before deploying the EKS stack.
 
 Deploy a stack that creates a VPC and an EKS cluster:
 
 ```bash
+source .env
 cd pipelines/examples/stacks/eks
 terragrunt stack generate
 terragrunt stack run apply --backend-bootstrap --non-interactive

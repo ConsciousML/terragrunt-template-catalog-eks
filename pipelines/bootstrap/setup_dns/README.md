@@ -80,6 +80,7 @@ You'll need to have a functional domain with access to the administrator panel. 
 Pick an environment and run from the root of this repository:
 
 ```bash
+source .env
 cd pipelines/bootstrap/setup_dns/<env>/stack
 terragrunt stack generate
 terragrunt stack run apply --backend-bootstrap --non-interactive
@@ -88,6 +89,7 @@ terragrunt stack run apply --backend-bootstrap --non-interactive
 For example, to deploy the `dev` environment:
 
 ```bash
+source .env
 cd pipelines/bootstrap/setup_dns/dev/stack
 terragrunt stack generate
 terragrunt stack run apply --backend-bootstrap --non-interactive
