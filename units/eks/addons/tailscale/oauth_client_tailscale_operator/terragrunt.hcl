@@ -16,6 +16,6 @@ terraform {
 
 inputs = {
   description = "${local.environment}-${local.cluster_name}"
-  scopes      = ["devices:core", "auth_keys:write", "services:write"]
+  scopes      = ["devices:core", "auth_keys", "services"]
   tags        = ["tag:k8s-operator"]
 }

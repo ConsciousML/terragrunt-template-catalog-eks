@@ -4,7 +4,7 @@ locals {
 }
 
 unit "acl" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/tailscale/acl?ref=${local.version}"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/eks/addons/tailscale/acl?ref=${local.version}"
   path   = "tailscale/acl"
 
   values = {
