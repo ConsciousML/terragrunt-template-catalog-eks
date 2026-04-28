@@ -53,3 +53,12 @@ variable "helm_set" {
   }))
   default = []
 }
+
+variable "helm_set_sensitive" {
+  description = "Individual Helm values to set as sensitive, passed as-is to the helm_release set_sensitive attribute"
+  type = list(object({
+    name  = string
+    value = string
+  }))
+  default = []
+}

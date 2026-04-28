@@ -215,3 +215,13 @@ unit "tailscale_oauth_client_tailscale_operator" {
     version = local.version
   }
 }
+
+unit "tailscale_operator" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/operator"
+  path   = "eks/addons/tailscale/operator"
+
+  values = {
+    version            = local.version
+    helm_chart_version = "1.96.5"
+  }
+}
