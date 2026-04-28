@@ -206,3 +206,12 @@ unit "acm_certificate" {
     version = local.version
   }
 }
+
+unit "tailscale_oauth_client_tailscale_operator" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/oauth_client_tailscale_operator"
+  path   = "eks/addons/tailscale/oauth_client_tailscale_operator"
+
+  values = {
+    version = local.version
+  }
+}
