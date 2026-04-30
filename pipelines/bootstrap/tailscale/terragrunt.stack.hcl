@@ -16,7 +16,7 @@ unit "acl" {
       }
       autoApprovers = {
         routes = {
-          "${local.vpc_cidr}" = ["tag:k8s-operator"]
+          "${local.vpc_cidr}" = ["tag:k8s-operator", "tag:k8s"]
         }
       }
     })
