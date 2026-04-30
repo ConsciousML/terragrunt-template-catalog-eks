@@ -9,3 +9,9 @@ resource "github_actions_secret" "ts_audience" {
   secret_name     = "TS_AUDIENCE"
   plaintext_value = var.audience
 }
+
+resource "github_actions_secret" "ts_tags" {
+  repository      = var.github_repo_name
+  secret_name     = "TS_TAGS"
+  plaintext_value = var.tags
+}

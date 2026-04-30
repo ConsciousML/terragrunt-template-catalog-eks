@@ -20,3 +20,8 @@ variable "audience" {
   type        = string
   sensitive   = true
 }
+
+variable "tags" {
+  description = "Comma-separated Tailscale tags assigned to CI runner devices (TS_TAGS)"
+  type        = string
+}

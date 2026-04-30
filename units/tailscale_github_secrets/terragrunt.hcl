@@ -20,4 +20,5 @@ inputs = {
   github_repo_name = values.github_repo_name
   oauth_client_id  = dependency.tailscale_wif.outputs.client_id
   audience         = dependency.tailscale_wif.outputs.audience
+  tags             = values.tags
 }

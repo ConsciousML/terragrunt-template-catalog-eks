@@ -5,6 +5,9 @@ locals {
   # GitHub repo that CI runs from — update these when forking
   github_user      = "ConsciousML"
   github_repo_name = "terragrunt-template-catalog-eks"
+
+  # Tailscale tag assigned to CI runner devices joining via WIF
+  ci_tag = "tag:ci"
 }
 
 unit "acl" {
@@ -17,7 +20,7 @@ unit "acl" {
       tagOwners = {
         "tag:k8s-operator" = []
         "tag:k8s"          = ["tag:k8s-operator"]
-        "tag:ci"           = []
+        (local.ci_tag)     = []
       }
       autoApprovers = {
         routes = {
@@ -39,7 +42,7 @@ unit "tailscale_wif" {
     issuer  = "https://token.actions.githubusercontent.com"
     subject = "repo:${local.github_user}/${local.github_repo_name}:*"
     scopes  = ["devices:core", "auth_keys", "dns"]
-    tags    = ["tag:ci"]
+    tags    = [local.ci_tag]
   }
 }
 
@@ -51,5 +54,6 @@ unit "tailscale_github_secrets" {
     version          = local.version
     github_token     = get_env("GITHUB_TOKEN")
     github_repo_name = local.github_repo_name
+    tags             = local.ci_tag
   }
 }
