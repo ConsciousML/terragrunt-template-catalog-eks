@@ -46,7 +46,7 @@ unit "github_secrets" {
 
   values = {
     version          = local.version
-    github_token     = get_env("github_token")
+    github_token     = get_env("GITHUB_TOKEN")
     github_repo_name = local.github_repo_name
   }
 }
@@ -57,7 +57,7 @@ unit "deploy_key" {
 
   values = {
     version            = local.version
-    github_token       = get_env("github_token")
+    github_token       = get_env("GITHUB_TOKEN")
     repositories       = [local.github_repo_name]
     current_repository = local.github_repo_name
     secret_names       = ["DEPLOY_KEY_TG_CATALOG"]
