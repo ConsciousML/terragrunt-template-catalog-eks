@@ -234,3 +234,12 @@ unit "tailscale_connector" {
     version = local.version
   }
 }
+
+unit "tailscale_split_dns" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/split_dns"
+  path   = "eks/addons/tailscale/split_dns"
+
+  values = {
+    version = local.version
+  }
+}
