@@ -22,7 +22,7 @@ You're new to Terragrunt best practices? Read [Gruntwork's official production p
 The catalog follows a layered architecture where each layer builds upon the previous one:
 
 ```
-Modules (modules/) → Units (units/) → Stacks (stacks/) → Examples (pipelines/examples/)
+Modules (modules/) → Units (units/) → Examples (pipelines/examples/)
 ```
 
 - **[Modules](modules/README.md)**: Reusable Terraform modules that declare AWS resources (VPC, databases, compute instances, etc.)

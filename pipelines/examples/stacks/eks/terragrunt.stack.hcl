@@ -225,3 +225,12 @@ unit "tailscale_operator" {
     helm_chart_version = "1.96.5"
   }
 }
+
+unit "tailscale_connector" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/connector"
+  path   = "eks/addons/tailscale/connector"
+
+  values = {
+    version = local.version
+  }
+}
