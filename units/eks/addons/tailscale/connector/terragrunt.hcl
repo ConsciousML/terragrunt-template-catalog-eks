@@ -45,7 +45,7 @@ dependency "eks_cluster" {
 dependency "vpc" {
   config_path = "../../../../vpc"
   mock_outputs = {
-    private_subnets_cidr_blocks = ["10.0.1.0/24", "10.0.2.0/24"]
+    vpc_cidr_block = "10.0.0.0/16"
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
@@ -59,7 +59,7 @@ inputs = {
   cluster_name     = dependency.eks_cluster.outputs.cluster_name
   name             = "${local.environment}-${local.cluster_name}-connector"
   hostname_prefix  = "${local.environment}-${local.cluster_name}"
-  advertise_routes = dependency.vpc.outputs.private_subnets_cidr_blocks
+  advertise_routes = [dependency.vpc.outputs.vpc_cidr_block]
   replicas         = 1
 }
 
