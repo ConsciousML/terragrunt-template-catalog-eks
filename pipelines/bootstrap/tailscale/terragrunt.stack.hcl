@@ -41,8 +41,9 @@ unit "tailscale_wif" {
     version = local.version
     issuer  = "https://token.actions.githubusercontent.com"
     subject = "repo:${local.github_user}/${local.github_repo_name}:*"
-    scopes  = ["devices:core", "auth_keys", "oauth_keys", "dns"]
-    tags    = [local.ci_tag]
+    #scopes  = ["devices:core", "auth_keys", "oauth_keys", "dns"]
+    scopes = ["all"]
+    tags   = [local.ci_tag]
   }
 }
 
