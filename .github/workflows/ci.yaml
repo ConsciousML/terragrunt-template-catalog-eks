@@ -253,14 +253,13 @@ jobs:
           echo "client_secret=$client_secret" >> $GITHUB_OUTPUT
 
 
-      # TODO: uncomment
-      #- name: Run Terratest
-      #  if: steps.check-label-skip.outputs.label_present == 'false'
-      #  env:
-      #    TAILSCALE_IDENTITY_TOKEN: ""
-      #    TAILSCALE_OAUTH_CLIENT_ID: ${{ steps.ts-oauth-create.outputs.client_id }}
-      #    TAILSCALE_OAUTH_CLIENT_SECRET: ${{ steps.ts-oauth-create.outputs.client_secret }}
-      #  run: go test -v ./tests/... -timeout ${{ env.TERRATEST_TIMEOUT }}
+      - name: Run Terratest
+        if: steps.check-label-skip.outputs.label_present == 'false'
+        env:
+          TAILSCALE_IDENTITY_TOKEN: ""
+          TAILSCALE_OAUTH_CLIENT_ID: ${{ steps.ts-oauth-create.outputs.client_id }}
+          TAILSCALE_OAUTH_CLIENT_SECRET: ${{ steps.ts-oauth-create.outputs.client_secret }}
+        run: go test -v ./tests/... -timeout ${{ env.TERRATEST_TIMEOUT }}
 
       - name: Second request Tailscale API token using WIF credentials
         id: ts-token-exchange-2
@@ -295,6 +294,3 @@ jobs:
             echo "ERROR: OAuth client revokation failed"
             exit 1
           fi
-
-          
-
