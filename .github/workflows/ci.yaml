@@ -263,6 +263,15 @@ jobs:
           TAILSCALE_OAUTH_CLIENT_SECRET: ${{ steps.ts-oauth-create.outputs.client_secret }}
         run: go test -v ./tests/... -timeout ${{ env.TERRATEST_TIMEOUT }}
 
+      - name: Refresh Tailscale identity token
+        if: always() && steps.check-label-skip.outputs.label_present == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken('${{ secrets.TS_AUDIENCE }}')
+            core.setSecret(token)
+            core.exportVariable('TAILSCALE_IDENTITY_TOKEN', token)
+
       - name: Second request Tailscale API token using WIF credentials
         id: ts-token-exchange-2
         if: always() && steps.check-label-skip.outputs.label_present == 'false'
