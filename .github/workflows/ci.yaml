@@ -187,43 +187,74 @@ jobs:
           ts-audience: ${{ secrets.TS_AUDIENCE }}
           ts-tags: ${{ secrets.TS_TAGS }}
 
-      - name: Exchange WIF token for Tailscale access token
+      - name: Request Tailscale API token using WIF credentials
         id: ts-token-exchange
         if: steps.check-label-skip.outputs.label_present == 'false'
         run: |
-          response=$(curl -sS 'https://api.tailscale.com/api/v2/oauth/token' \
-            --request POST \
-            --header 'Content-Type: application/x-www-form-urlencoded' \
-            --data-urlencode "grant_type=urn:ietf:params:oauth:grant-type:token-exchange" \
-            --data-urlencode "subject_token_type=urn:ietf:params:oauth:token-type:id_token" \
-            --data-urlencode "subject_token=$TAILSCALE_IDENTITY_TOKEN" \
-            --data-urlencode "client_id=$TAILSCALE_OAUTH_CLIENT_ID")
-          echo "response: $response"
+          response=$(curl -X POST https://api.tailscale.com/api/v2/oauth/token-exchange \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "client_id=$TAILSCALE_OAUTH_CLIENT_ID" \
+            -d "jwt=$TAILSCALE_IDENTITY_TOKEN")
+
+          echo $response
+
           ts_token=$(echo "$response" | jq -r '.access_token')
+
+          if [ -z "$ts_token" ] || [ "$ts_token" = "null" ]; then
+            echo "ERROR: token exchange failed"
+            exit 1
+          fi
+
           echo "::add-mask::$ts_token"
           echo "ts_token=$ts_token" >> $GITHUB_OUTPUT
 
-      - name: Create temporary Tailscale OAuth client
-        id: ts-oauth-create
-        if: steps.check-label-skip.outputs.label_present == 'false'
-        env:
-          TS_TOKEN: ${{ steps.ts-token-exchange.outputs.ts_token }}
-        run: |
-          response=$(curl -sS 'https://api.tailscale.com/api/v2/tailnet/-/keys' \
-            --request POST \
-            --header 'Content-Type: application/json' \
-            --header "Authorization: Bearer $TS_TOKEN" \
-            --data '{
-              "keyType": "client",
-              "description": "terratest-ci-${{ github.run_id }}",
-              "scopes": ["all"]
-            }')
-          echo "response: $response"
-          client_id=$(echo "$response" | jq -r '.id')
-          client_secret=$(echo "$response" | jq -r '.key')
-          echo "::add-mask::$client_secret"
-          echo "client_id=$client_id" >> $GITHUB_OUTPUT
-          echo "client_secret=$client_secret" >> $GITHUB_OUTPUT
+      #- name: Exchange WIF token for Tailscale access token
+      #  id: ts-token-exchange
+      #  if: steps.check-label-skip.outputs.label_present == 'false'
+      #  run: |
+      #    # client_id passed as Basic auth (RFC 6749 §2.3) — empty password for federated identity
+      #    auth_header=$(printf '%s:' "$TAILSCALE_OAUTH_CLIENT_ID" | base64 | tr -d '\n')
+      #    response=$(curl -sS 'https://api.tailscale.com/api/v2/oauth/token' \
+      #      --request POST \
+      #      --header 'Content-Type: application/x-www-form-urlencoded' \
+      #      --header "Authorization: Basic $auth_header" \
+      #      --data-urlencode "grant_type=urn:ietf:params:oauth:grant-type:token-exchange" \
+      #      --data-urlencode "subject_token_type=urn:ietf:params:oauth:token-type:id_token" \
+      #      --data-urlencode "subject_token=$TAILSCALE_IDENTITY_TOKEN")
+      #    echo "response: $response"
+      #    ts_token=$(echo "$response" | jq -r '.access_token')
+      #    if [ -z "$ts_token" ] || [ "$ts_token" = "null" ]; then
+      #      echo "ERROR: token exchange failed"
+      #      exit 1
+      #    fi
+      #    echo "::add-mask::$ts_token"
+      #    echo "ts_token=$ts_token" >> $GITHUB_OUTPUT
+
+      #- name: Create temporary Tailscale OAuth client
+      #  id: ts-oauth-create
+      #  if: steps.check-label-skip.outputs.label_present == 'false'
+      #  env:
+      #    TS_TOKEN: ${{ steps.ts-token-exchange.outputs.ts_token }}
+      #  run: |
+      #    response=$(curl -sS 'https://api.tailscale.com/api/v2/tailnet/-/keys' \
+      #      --request POST \
+      #      --header 'Content-Type: application/json' \
+      #      --header "Authorization: Bearer $TS_TOKEN" \
+      #      --data '{
+      #        "keyType": "client",
+      #        "description": "terratest-ci-${{ github.run_id }}",
+      #        "scopes": ["all"]
+      #      }')
+      #    echo "response: $response"
+      #    client_id=$(echo "$response" | jq -r '.id')
+      #    client_secret=$(echo "$response" | jq -r '.key')
+      #    if [ -z "$client_id" ] || [ "$client_id" = "null" ]; then
+      #      echo "ERROR: OAuth client creation failed"
+      #      exit 1
+      #    fi
+      #    echo "::add-mask::$client_secret"
+      #    echo "client_id=$client_id" >> $GITHUB_OUTPUT
+      #    echo "client_secret=$client_secret" >> $GITHUB_OUTPUT
 
       # TODO: uncomment
       #- name: Run Terratest
@@ -234,23 +265,23 @@ jobs:
       #    TAILSCALE_OAUTH_CLIENT_SECRET: ${{ steps.ts-oauth-create.outputs.client_secret }}
       #  run: go test -v ./tests/... -timeout ${{ env.TERRATEST_TIMEOUT }}
 
-      - name: Revoke temporary Tailscale OAuth client
-        if: always() && steps.ts-oauth-create.outputs.client_id != ''
-        env:
-          CLIENT_ID: ${{ steps.ts-oauth-create.outputs.client_id }}
-          CLIENT_SECRET: ${{ steps.ts-oauth-create.outputs.client_secret }}
-        run: |
-          token_response=$(curl -sS 'https://api.tailscale.com/api/v2/oauth/token' \
-            --request POST \
-            --header 'Content-Type: application/x-www-form-urlencoded' \
-            --data-urlencode "grant_type=client_credentials" \
-            --data-urlencode "client_id=$CLIENT_ID" \
-            --data-urlencode "client_secret=$CLIENT_SECRET")
-          echo "token response: $token_response"
-          ts_token=$(echo "$token_response" | jq -r '.access_token')
+      #- name: Revoke temporary Tailscale OAuth client
+      #  if: always() && steps.ts-oauth-create.outputs.client_id != ''
+      #  env:
+      #    CLIENT_ID: ${{ steps.ts-oauth-create.outputs.client_id }}
+      #    CLIENT_SECRET: ${{ steps.ts-oauth-create.outputs.client_secret }}
+      #  run: |
+      #    token_response=$(curl -sS 'https://api.tailscale.com/api/v2/oauth/token' \
+      #      --request POST \
+      #      --header 'Content-Type: application/x-www-form-urlencoded' \
+      #      --data-urlencode "grant_type=client_credentials" \
+      #      --data-urlencode "client_id=$CLIENT_ID" \
+      #      --data-urlencode "client_secret=$CLIENT_SECRET")
+      #    echo "token response: $token_response"
+      #    ts_token=$(echo "$token_response" | jq -r '.access_token')
 
-          delete_response=$(curl -sS "https://api.tailscale.com/api/v2/tailnet/-/keys/$CLIENT_ID" \
-            --request DELETE \
-            --header "Authorization: Bearer $ts_token")
-          echo "delete response: $delete_response"
+      #    delete_response=$(curl -sS "https://api.tailscale.com/api/v2/tailnet/-/keys/$CLIENT_ID" \
+      #      --request DELETE \
+      #      --header "Authorization: Bearer $ts_token")
+      #    echo "delete response: $delete_response"
 
