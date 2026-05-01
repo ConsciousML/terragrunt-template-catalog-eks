@@ -18,9 +18,10 @@ unit "acl" {
     version = local.version
     acl = jsonencode({
       tagOwners = {
-        "tag:k8s-operator" = []
-        "tag:k8s"          = ["tag:k8s-operator"]
+        # CI needs to create OAuth with "tag:k8s-operator"
         (local.ci_tag)     = []
+        "tag:k8s-operator" = [(local.ci_tag)]
+        "tag:k8s"          = ["tag:k8s-operator"]
       }
       autoApprovers = {
         routes = {
@@ -41,9 +42,8 @@ unit "tailscale_wif" {
     version = local.version
     issuer  = "https://token.actions.githubusercontent.com"
     subject = "repo:${local.github_user}/${local.github_repo_name}:*"
-    #scopes  = ["devices:core", "auth_keys", "oauth_keys", "dns"]
-    scopes = ["all"]
-    tags   = [local.ci_tag]
+    scopes  = ["all"]
+    tags    = [local.ci_tag]
   }
 }
 
