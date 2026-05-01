@@ -240,8 +240,6 @@ jobs:
               \"scopes\": [\"all\"]
             }") 
 
-          echo "response: $response"
-
           client_id=$(echo "$response" | jq -r '.id')
           client_secret=$(echo "$response" | jq -r '.key')
 
@@ -289,8 +287,14 @@ jobs:
           TS_TOKEN: ${{ steps.ts-token-exchange-2.outputs.ts_token }}
           CLIENT_ID: ${{ steps.ts-oauth-create.outputs.client_id }}
         run: |
-          delete_response=$(curl -sS "https://api.tailscale.com/api/v2/tailnet/-/keys/$CLIENT_ID" \
+          response=$(curl -sS "https://api.tailscale.com/api/v2/tailnet/-/keys/$CLIENT_ID" \
             --request DELETE \
             --header "Authorization: Bearer $TS_TOKEN")
-          echo "delete response: $delete_response"
+
+          if [ "$response" != "null" ]; then
+            echo "ERROR: OAuth client revokation failed"
+            exit 1
+          fi
+
+          
 
