@@ -252,7 +252,9 @@ jobs:
           echo "client_id=$client_id" >> $GITHUB_OUTPUT
           echo "client_secret=$client_secret" >> $GITHUB_OUTPUT
 
-
+      # Use newly created OAuth client instead of WIF credentials
+      # WIF token expires after 10 min and terratest takes 30m+
+      # OAuth is a long lived credential but we delete it just after terratest
       - name: Run Terratest
         if: steps.check-label-skip.outputs.label_present == 'false'
         env:
@@ -263,7 +265,7 @@ jobs:
 
       - name: Second request Tailscale API token using WIF credentials
         id: ts-token-exchange-2
-        if: steps.check-label-skip.outputs.label_present == 'false'
+        if: always() && steps.check-label-skip.outputs.label_present == 'false'
         run: |
           response=$(curl -X POST https://api.tailscale.com/api/v2/oauth/token-exchange \
             -H "Content-Type: application/x-www-form-urlencoded" \
