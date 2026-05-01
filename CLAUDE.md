@@ -7,7 +7,9 @@ This is the **catalog** (building blocks), not live infrastructure. Deployments 
 
 ## Never Read
 
-Do not read or traverse `.terraform*` or `.terragrunt*` directories.
+NEVER read, list, or traverse any directory matching `.terraform*` or `.terragrunt*` (e.g. `.terragrunt-stack`, `.terragrunt-cache`, `.terraform`). These are generated cache directories. If you catch yourself about to run any command (find, ls, cat, read) targeting one of these paths, stop immediately.
+
+To find unit or module files, always follow the `source =` references declared in `.hcl` config files and navigate to `modules/` or `units/` directly.
 
 ## Architecture
 
