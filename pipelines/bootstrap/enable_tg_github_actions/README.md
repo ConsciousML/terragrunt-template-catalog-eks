@@ -87,7 +87,7 @@ From the root directory of this repository, run:
 source .env
 cd pipelines/bootstrap/enable_tg_github_actions/
 terragrunt stack generate
-terragrunt stack run apply --backend-bootstrap
+terragrunt run --all apply --backend-bootstrap
 ```
 
 ### Update Your GitHub Actions file

@@ -71,10 +71,10 @@ unit "your_module" {
 source .env
 cd pipelines/examples/stacks/your_stack/
 terragrunt stack generate
-terragrunt stack run init --backend-bootstrap
-terragrunt stack run validate
-terragrunt stack run plan
-terragrunt stack run apply
+terragrunt run --all init --backend-bootstrap
+terragrunt run --all validate
+terragrunt run --all plan
+terragrunt run --all apply
 ```
 
 ### 6. Create Pull Request

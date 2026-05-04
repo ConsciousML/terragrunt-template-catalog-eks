@@ -83,7 +83,7 @@ Pick an environment and run from the root of this repository:
 source .env
 cd pipelines/bootstrap/setup_dns/<env>/stack
 terragrunt stack generate
-terragrunt stack run apply --backend-bootstrap --non-interactive
+terragrunt --all run apply --backend-bootstrap --non-interactive
 ```
 
 For example, to deploy the `dev` environment:
@@ -92,7 +92,7 @@ For example, to deploy the `dev` environment:
 source .env
 cd pipelines/bootstrap/setup_dns/dev/stack
 terragrunt stack generate
-terragrunt stack run apply --backend-bootstrap --non-interactive
+terragrunt --all run apply --backend-bootstrap --non-interactive
 ```
 
 Retrieve the 4 nameservers from the output (the value of the `name_servers` key):
