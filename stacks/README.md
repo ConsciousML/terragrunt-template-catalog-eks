@@ -1,6 +1,6 @@
 # Terragrunt Stacks Directory
 
-This directory contains reusable [Terragrunt stacks](https://terragrunt.gruntwork.io/docs/features/stacks/) for deploying multiple components on AWS,
+This directory contains reusable [Terragrunt stacks](https://terragrunt.gruntwork.io/docs/features/stacks/) for deploying multiple components on AWS.
 
 ## What are Stacks?
 
@@ -42,3 +42,12 @@ Stacks are **templates with inputs** that require configuration values to functi
 - Terragrunt resolves the execution order automatically
 - Input values flow through the graph to configure each unit
 
+## For Developpers
+**Caution**: if you want to change the code of these pipelines, make sure to change every occurence of the following in the `stacks/` folder:
+```hcl
+source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/oidc_provider?ref=${values.version}"
+```
+by your forked repository (replacing `<your_github_username>` and `<your_forked_repo_name>`):
+```hcl
+source = "git::git@github.com:<your_github_username>/<your_forked_repo_name>.git//units/oidc_provider?ref=${values.version}"
+```

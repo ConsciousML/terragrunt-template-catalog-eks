@@ -4,7 +4,8 @@ include "root" {
 }
 
 include "provider_kubernetes" {
-  path = find_in_parent_folders("provider_kubernetes.hcl")
+  path   = find_in_parent_folders("provider_kubernetes.hcl")
+  expose = true
 }
 
 terraform {
@@ -47,7 +48,7 @@ inputs = {
   helm_set = [
     {
       name  = "txtOwnerId"
-      value = local.cluster_name_full
+      value = include.provider_kubernetes.locals.cluster_name_full
     },
     # Prefix or Suffix are mandatory for the external-dns to create the TXT records for ownership
     # It is necessary for it to delete the A/AAAA records when an Ingress resource is deleted
@@ -58,7 +59,7 @@ inputs = {
     # The %%% is for escaping Terragrunt templates
     {
       name  = "txtPrefix"
-      value = "%%%{record_type}-external-dns-${local.cluster_name_full}."
+      value = "%%%{record_type}-external-dns-${include.provider_kubernetes.locals.cluster_name_full}."
     },
     {
       name  = "domainFilters[0]"

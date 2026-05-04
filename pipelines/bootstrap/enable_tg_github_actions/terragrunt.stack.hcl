@@ -13,7 +13,7 @@ stack "enable_tg_github_actions" {
   path   = "github_actions_bootstrap"
   values = {
     version          = local.version
-    github_username  = "ConsciousML"
+    github_username  = local.github_username
     github_repo_name = local.github_repo_name
     github_token     = local.github_token
     iam_role_name    = "gh-terragrunt-role-catalog"
