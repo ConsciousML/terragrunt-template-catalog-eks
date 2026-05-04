@@ -1,21 +1,19 @@
 include "root" {
-  path = find_in_parent_folders("root.hcl")
+  path   = find_in_parent_folders("root.hcl")
+  expose = true
 }
 
 locals {
-  environment_hcl = find_in_parent_folders("environment.hcl")
-  environment     = read_terragrunt_config(local.environment_hcl).locals.environment
-
-  cluster_config_hcl = find_in_parent_folders("cluster_config.hcl")
-  cluster_name       = read_terragrunt_config(local.cluster_config_hcl).locals.cluster_name
+  cluster_hcl       = find_in_parent_folders("cluster_name_env.hcl")
+  cluster_name_full = read_terragrunt_config(local.cluster_hcl).locals.cluster_name_full
 }
 
 terraform {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//modules/tailscale_oauth_client?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_username}/${include.root.locals.github_repo_name}.git//modules/tailscale_oauth_client?ref=${values.version}"
 }
 
 inputs = {
-  description = "${local.environment}-${local.cluster_name}"
+  description = local.cluster_name_full
   scopes      = ["devices:core", "auth_keys", "services"]
   tags        = ["tag:k8s-operator"]
 }

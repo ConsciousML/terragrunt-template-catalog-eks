@@ -1,7 +1,9 @@
 locals {
-  version          = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
-  github_username  = "ConsciousML"
-  github_repo_name = "terragrunt-template-catalog-eks"
+  version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
+
+  github_locals    = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
+  github_username  = local.github_locals.github_username
+  github_repo_name = local.github_locals.github_repo_name
 }
 
 stack "setup_dns" {

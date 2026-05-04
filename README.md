@@ -10,7 +10,7 @@ A Terragrunt Template Catalog for multi-environment Infrastructure as Code (IaC)
 ## Catalog and Live Infrastructure
 
 This toolkit uses two template repositories:
-- **Catalog repository** (this repo): Defines a collection of reusable IaC building blocks: Terraform/OpenTofu [modules](./modules), Terragrunt [units](./units/), and [stacks](./stacks/)
+- **Catalog repository** (this repo): Defines a collection of reusable IaC building blocks: Terraform/OpenTofu [modules](./modules/README.md), Terragrunt [units](./units/README.md), and [stacks](./stacks/README.md)
 - [**Live repository**](https://github.com/ConsciousML/terragrunt-template-live-eks): Uses these building blocks to deploy them in a multi-environment ecosystem with production CI/CD
 
 You're new to Terragrunt best practices? Read [Gruntwork's official production patterns](https://github.com/gruntwork-io/terragrunt-infrastructure-catalog-example) to get the foundations required to use this toolkit.
@@ -27,7 +27,7 @@ Modules (modules/) → Units (units/) → Examples (pipelines/examples/)
 - **[Stacks](stacks/README.md)**: Collections of units arranged in dependency graphs for pattern level re-use across repositories
 - **[Examples](pipelines/examples/README.md)**: Configurations for testing and development
 - **[CI](docs/continuous-integration.md)**: Automated configuration validation, testing (`terratest`) and documatentation (`terraform-docs`).
-- **[Bootstrap](pipelines/bootstrap/)**: Contains pipelines that need to be run once per repository fork
+- **[Bootstrap](pipelines/bootstrap/README.md)**: Contains pipelines that need to be run once per repository fork
 
 ## Getting Started
 ### Prerequisites
@@ -36,11 +36,19 @@ Modules (modules/) → Units (units/) → Examples (pipelines/examples/)
 - AWS IAM permissions to manage IAM roles, VPC resources, EKS resources, compute resources and S3 (see `policy_arns` in the [bootstrap stack](pipelines/bootstrap/enable_tg_github_actions/terragrunt.stack.hcl) for a list of the specific IAM policies)
 
 ### Fork the Repository
-First, you'll need to fork this repository and make a few changes:
-1. Click on `Use this template` to create your own repository
-2. Use your IDE/script of choice to replace every occurrence of `github.com/ConsciousML/terragrunt-template-catalog-eks` and `git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git` by your GitHub repo URL following the same format
-3. Change `pipelines/region.hcl` to match your desired AWS region
-4. Change `pipelines/dns_config.hcl` to match your domain name where you'll use ACM to sign TLS certificates (if you don't have a domain name, you'll need to register one using a domain registrar such a GoDaddy or Namecheap)
+Click on the `Use this template` button.
+
+### Configuration
+In your forked repository, change the following Terragrunt configuration files:
+1. In `pipelines/github.hcl`, modify:
+```hcl
+locals {
+  github_username  = "YourGitHubUsername"
+  github_repo_name = "the-repository-name-of-your-fork"
+}
+```
+2. Change `pipelines/region.hcl` to match your desired AWS region
+3. Change `pipelines/dns_config.hcl` to match your domain name where you'll use ACM to sign TLS certificates (if you don't have a domain name, you'll need to register one using a domain registrar such a GoDaddy or Namecheap)
 
 ### Installation
 

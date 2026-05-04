@@ -2,7 +2,9 @@
 
 ## Manually Removing a Terragrunt State
 
-Sometimes you need to fully remove a module's state — for example, when the state references resources that no longer exist.
+Sometimes you need to fully remove a module's state.
+
+For example, when the state references resources that no longer exist.
 
 This requires deleting the state file in S3 **and** the corresponding digest entry in DynamoDB. Doing only one will cause Tofu to error on the next run.
 

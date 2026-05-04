@@ -38,21 +38,15 @@ Write a terragrunt wrapper in `units/your_module/terragrunt.hcl` that:
 ### 4. Create a Local Stack for Testing
 Create a stack (i.e `pipelines/examples/stacks/your_stack/terragrunt.stack.hcl`) that:
 - References units using `${get_repo_root()}/units/unit_name` for local development
-- Combines multiple units into a cohesive infrastructure deployment
-- Provides concrete configuration values for testing
-- Uses automatic version detectione:
+- Combines multiple units into an infrastructure deployment
+- Provides configuration values for testing
+- Uses automatic version detection
 
 For example:
 ```hcl
 # pipelines/examples/stacks/your_stack/terragrunt.stack.hcl
 locals {
-  # Sets the reference of the source code to:
-  version = coalesce(
-    get_env("GITHUB_HEAD_REF", ""), # PR branch name (only set in PRs)
-    get_env("GITHUB_REF_NAME", ""), # Branch/tag name
-    try(run_cmd("git", "rev-parse", "--abbrev-ref", "HEAD"), ""),
-    "main" # fallback
-  )
+  version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
 }
 
 unit "your_module" {

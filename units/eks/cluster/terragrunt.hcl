@@ -3,11 +3,10 @@ include "root" {
 }
 
 locals {
-  environment_hcl = find_in_parent_folders("environment.hcl")
-  environment     = read_terragrunt_config(local.environment_hcl).locals.environment
-
-  cluster_config_hcl = find_in_parent_folders("cluster_config.hcl")
-  cluster_name       = read_terragrunt_config(local.cluster_config_hcl).locals.cluster_name
+  cluster_hcl       = find_in_parent_folders("cluster_name_env.hcl")
+  cluster_config    = read_terragrunt_config(local.cluster_hcl)
+  cluster_name_full = local.cluster_config.locals.cluster_name_full
+  environment       = local.cluster_config.locals.environment
 }
 
 terraform {
@@ -24,7 +23,7 @@ dependency "vpc" {
 }
 
 inputs = {
-  name = "${local.environment}-${local.cluster_name}"
+  name = local.cluster_name_full
 
   kubernetes_version = values.kubernetes_version
 

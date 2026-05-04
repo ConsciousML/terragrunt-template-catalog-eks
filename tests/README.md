@@ -23,9 +23,9 @@ In our case, the `pipelines/examples/stacks/eks` configuration calls the units i
 This has the benefit to use environment variables specific to an `example` environment (i.e all `region.hcl`, `environment.hcl` in `pipelines/`).
 
 ## Run Terratest
-Setup the go module:
+Setup the go module, replacing `<your_github_username>` and `<your_forked_repo_name>` if you forked the repository:
 ```bash
-go mod init github.com/ConsciousML/terragrunt-template-catalog-eks
+go mod init github.com/<your_github_username>/<your_forked_repo_name>
 go get github.com/gruntwork-io/terratest@v0.56.0
 go mod tidy
 ```
