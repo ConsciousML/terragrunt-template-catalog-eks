@@ -3,11 +3,8 @@ include "root" {
 }
 
 locals {
-  environment_hcl = find_in_parent_folders("environment.hcl")
-  environment     = read_terragrunt_config(local.environment_hcl).locals.environment
-
-  cluster_config_hcl = find_in_parent_folders("cluster_config.hcl")
-  cluster_name       = read_terragrunt_config(local.cluster_config_hcl).locals.cluster_name
+  cluster_hcl       = find_in_parent_folders("cluster_name_env.hcl")
+  cluster_name_full = read_terragrunt_config(local.cluster_hcl).locals.cluster_name_full
 }
 
 terraform {
@@ -15,7 +12,7 @@ terraform {
 }
 
 inputs = {
-  description = "${local.environment}-${local.cluster_name}"
+  description = local.cluster_name_full
   scopes      = ["devices:core", "auth_keys", "services"]
   tags        = ["tag:k8s-operator"]
 }

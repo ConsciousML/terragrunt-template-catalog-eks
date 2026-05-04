@@ -10,7 +10,7 @@ A Terragrunt Template Catalog for multi-environment Infrastructure as Code (IaC)
 ## Catalog and Live Infrastructure
 
 This toolkit uses two template repositories:
-- **Catalog repository** (this repo): Defines a collection of reusable IaC building blocks: Terraform/OpenTofu [modules](./modules), Terragrunt [units](./units/), and [stacks](./stacks/)
+- **Catalog repository** (this repo): Defines a collection of reusable IaC building blocks: Terraform/OpenTofu [modules](./modules/README.md), Terragrunt [units](./units/README.md), and [stacks](./stacks/README.md)
 - [**Live repository**](https://github.com/ConsciousML/terragrunt-template-live-eks): Uses these building blocks to deploy them in a multi-environment ecosystem with production CI/CD
 
 You're new to Terragrunt best practices? Read [Gruntwork's official production patterns](https://github.com/gruntwork-io/terragrunt-infrastructure-catalog-example) to get the foundations required to use this toolkit.
@@ -27,7 +27,7 @@ Modules (modules/) → Units (units/) → Examples (pipelines/examples/)
 - **[Stacks](stacks/README.md)**: Collections of units arranged in dependency graphs for pattern level re-use across repositories
 - **[Examples](pipelines/examples/README.md)**: Configurations for testing and development
 - **[CI](docs/continuous-integration.md)**: Automated configuration validation, testing (`terratest`) and documatentation (`terraform-docs`).
-- **[Bootstrap](pipelines/bootstrap/)**: Contains pipelines that need to be run once per repository fork
+- **[Bootstrap](pipelines/bootstrap/README.md)**: Contains pipelines that need to be run once per repository fork
 
 ## Getting Started
 ### Prerequisites
