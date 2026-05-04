@@ -23,8 +23,6 @@ unit "vpc" {
 
     name = "vpc-eks"
 
-    cidr = "10.0.0.0/16"
-
     # For production, use at least 3 subnets
     private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
     public_subnets  = ["10.0.3.0/24", "10.0.4.0/24"]
@@ -203,6 +201,43 @@ unit "external_dns" {
 unit "acm_certificate" {
   source = "${get_repo_root()}/units/eks/acm_certificate"
   path   = "eks/acm_certificate"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "tailscale_oauth_client_tailscale_operator" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/oauth_client_tailscale_operator"
+  path   = "eks/addons/tailscale/oauth_client_tailscale_operator"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "tailscale_operator" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/operator"
+  path   = "eks/addons/tailscale/operator"
+
+  values = {
+    version            = local.version
+    helm_chart_version = "1.96.5"
+  }
+}
+
+unit "tailscale_connector" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/connector"
+  path   = "eks/addons/tailscale/connector"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "tailscale_split_dns" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/split_dns"
+  path   = "eks/addons/tailscale/split_dns"
 
   values = {
     version = local.version

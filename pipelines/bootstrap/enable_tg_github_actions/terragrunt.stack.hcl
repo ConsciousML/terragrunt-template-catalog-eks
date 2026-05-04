@@ -2,7 +2,7 @@ locals {
   version = "main"
 
   github_repo_name = "terragrunt-template-catalog-eks"
-  github_token     = get_env("TF_VAR_github_token")
+  github_token     = get_env("GITHUB_TOKEN")
 }
 
 stack "enable_tg_github_actions" {

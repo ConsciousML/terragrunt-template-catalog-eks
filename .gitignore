@@ -28,3 +28,6 @@ out/
 
 # AWS
 *_accessKeys.csv
+
+# Environment file
+.env

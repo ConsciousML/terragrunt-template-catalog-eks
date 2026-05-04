@@ -3,7 +3,7 @@
 ## Installation
 Follow the [installation instructions](../README.md#installation):
 
-## Write a test
+## Write a Test
 Copy `tests/stack_test.go` in the `test` directory. Use the suffix `*_test.go`.
 
 Next, change the stack directory to the path of the stack you want to test:
@@ -13,7 +13,7 @@ stackDir := "../pipelines/examples/stacks/eks"
 
 Finally, write additional tests steps. For example, you can perform health checks or make a request to an API to ensure your infrastructure was deployed properly.
 
-## Why creating an external test example?
+## Why Creating an External Test Example?
 Creating an `examples` folder is a best practice to provide complete Terraform configurations that call the module and supply any required dependencies.
 
 This makes testing easier and helps others understand how to use the module.

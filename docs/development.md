@@ -23,7 +23,7 @@ Create your infrastructure module in `modules/your_module/` with the standard Te
 - `main.tf`: Resource definitions
 - `variables.tf`: Input variables with detailed descriptions
 - `outputs.tf`: Output values (if needed)
-- `providers.tf`: Provider requirements
+- `providers.tf`: Provider requirements (if needed, as the [`root.hcl`](../pipelines/root.hcl) auto-creates some providers)
 - `header.md`: Header documentation for `terraform-docs`
 - `footer.md`: Footer documentation for `terraform-docs`
 
@@ -68,12 +68,13 @@ unit "your_module" {
 
 ### 5. Test Your Changes
 ```bash
+source .env
 cd pipelines/examples/stacks/your_stack/
 terragrunt stack generate
-terragrunt stack run init --backend-bootstrap
-terragrunt stack run validate
-terragrunt stack run plan
-terragrunt stack run apply
+terragrunt run --all init --backend-bootstrap
+terragrunt run --all validate
+terragrunt run --all plan
+terragrunt run --all apply
 ```
 
 ### 6. Create Pull Request

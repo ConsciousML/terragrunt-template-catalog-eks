@@ -6,6 +6,7 @@ resource "helm_release" "this" {
   namespace        = var.namespace
   create_namespace = var.create_namespace
 
-  values = [yamlencode(var.helm_values)]
-  set    = var.helm_set
+  values        = [yamlencode(var.helm_values)]
+  set           = var.helm_set
+  set_sensitive = var.helm_set_sensitive
 }

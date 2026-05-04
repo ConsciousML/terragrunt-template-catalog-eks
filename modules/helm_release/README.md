@@ -33,6 +33,7 @@ Generic module for installing a Helm chart on an EKS cluster.
 | <a name="input_create_namespace"></a> [create\_namespace](#input\_create\_namespace) | Create the namespace if it does not already exist | `bool` | `true` | no |
 | <a name="input_helm_chart_version"></a> [helm\_chart\_version](#input\_helm\_chart\_version) | Version of the Helm chart to install | `string` | n/a | yes |
 | <a name="input_helm_set"></a> [helm\_set](#input\_helm\_set) | Individual Helm values to set, passed as-is to the helm\_release set attribute | <pre>list(object({<br/>    name  = string<br/>    value = string<br/>    type  = optional(string)<br/>  }))</pre> | `[]` | no |
+| <a name="input_helm_set_sensitive"></a> [helm\_set\_sensitive](#input\_helm\_set\_sensitive) | Individual Helm values to set as sensitive, passed as-is to the helm\_release set\_sensitive attribute | <pre>list(object({<br/>    name  = string<br/>    value = string<br/>  }))</pre> | `[]` | no |
 | <a name="input_helm_values"></a> [helm\_values](#input\_helm\_values) | Values to pass to the Helm chart | `any` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the Helm release | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Kubernetes namespace to install the chart into | `string` | n/a | yes |

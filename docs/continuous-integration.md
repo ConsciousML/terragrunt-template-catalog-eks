@@ -12,36 +12,36 @@ The [CI](../.github/workflows/ci.yaml) consists of three main jobs:
 
 ### 1. Code Quality Checks
 Runs automatically on every PR:
-- **Format validation**: Ensures Terragrunt (TG) and Terraform (TF) files are properly formatted
-- **Linting**: Validates configuration syntax and best practices with TFLint
-- **Security scanning**: Checks for security issues and vulnerabilities with TFSec
-- **Terragrunt validation**: Ensures the TF and TG files have valid syntax
-- **Plan**: Verifies infrastructure changes without applying them
+- **Format validation**: ensures Terragrunt (TG) and Terraform (TF) files are properly formatted
+- **Linting**: validates configuration syntax and best practices with TFLint
+- **Security scanning**: checks for security issues and vulnerabilities with TFSec
+- **Terragrunt validation**: ensures the TF and TG files have valid syntax
+- **Plan**: verifies infrastructure changes without applying them
 
 **Note**: Read the [pre-commit configuration](../.pre-commit-config.yaml) to learn more about the run checks.
 
 ### 2. Terratest
 Runs when the `run-terratest` label is added to a PR:
-- **Infrastructure deployment**: Creates real AWS resources in a test environment
-- **Testing**: Runs Go to validate deployed infrastructure
-- **Cleanup**: Automatically destroys test resources
+- **Infrastructure deployment**: creates real AWS resources in a test environment
+- **Testing**: runs Go to validate deployed infrastructure
+- **Cleanup**: automatically destroys test resources
 
 ### 3. Documentation Generation
 Uses `terraform-docs` to automatically generate `README.md` in each terraform module in `modules/`.
 
-If authoring new Terraform modules in `modules/`, read the [documentation instructions](../modules/README.md#documentation)
+If you create new Terraform modules in `modules/`, read the [documentation instructions](../modules/README.md#documentation)
 
 ## Setup
 ### Initial Setup
-Follow the [bootstrap guide](../pipelines/bootstrap/enable_tg_github_actions/README.md) to configure GitHub Actions authentication with AWS.
+Follow the [bootstrap guide](../pipelines/bootstrap/README.md) once per repository fork.
 
-Then, in `.github/workflows/ci.yaml` change `TG_STACK_PATH` to the relative path of the directory containing the Terragrunt Stack (*) you want to test.
+If applicable, in `.github/workflows/ci.yaml`, change `TG_STACK_PATH` to the relative path of the directory containing the Terragrunt Stack you want to test:
+```yaml
+env:
+  TG_STACK_PATH: pipelines/examples/stacks/eks
+```
 
-Next, follow the [terratest configuration documentation](../tests/README.md) if you want to test a new stack in the CI.
-
-Lastly, in the [bootstrap pipeline configuration](../pipelines/bootstrap/enable_tg_github_actions/README.md#configuration) update the `policy_arns` so Terragrunt can run in GitHub Actions and deploy the bootstrap pipeline following the [deploy section](../pipelines/bootstrap/enable_tg_github_actions/README.md#deploy).
-
-If you don't know what `arns` you need yet and some are missing, you will get an error in the [CI](../.github/workflows/ci.yaml) in the `code-quality-checks` and `terratest` jobs.
+If applicable, follow the [terratest configuration documentation](../tests/README.md) if you want to test a new stack in the CI.
 
 ### Pre-commit Setup (Recommended)
 Install pre-commit locally to catch issues before pushing:
@@ -76,14 +76,12 @@ When your PR is ready for final validation:
 4. Address any failures and push fixes
 5. Once both jobs pass, merge your PR
 
-> **Note**: Infrastructure tests deploy AWS resources and take some time to deploy and destroy. The label check is used to run the tests only run when your PR is ready for final validation before merging.
+> **Note**: Infrastructure tests deploy AWS resources and take some time to deploy and destroy. The label check is used to run the tests only when your PR is ready for final validation before merging.
 
 ## Troubleshooting
+If you have a IAM Role error, in the [enable Terragrunt GitHub Actions bootstrap stack](../pipelines/bootstrap/enable_tg_github_actions/README.md#configuration) update the `policy_arns` so Terragrunt can run in GitHub Actions and deploy the bootstrap pipeline following the [deploy section](../pipelines/bootstrap/enable_tg_github_actions/README.md#deploy).
 
-### Pre-commit Failures
-- **Format issues**: Run `terragrunt hcl format` and `tofu fmt -recursive`, add, commit, and push
-- **Linting errors**: Check TFLint output and fix reported issues
-- **Security issues**: Review TFSec findings and address vulnerabilities
+If you don't know what `arns` you need yet and some are missing, you will get an error in the [CI](../.github/workflows/ci.yaml) in the `code-quality-checks` and `terratest` jobs.
 
 ## Tips
 - Failed workflows don't cancel automatically to prevent state corruption
