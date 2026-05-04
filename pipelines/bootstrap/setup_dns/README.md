@@ -6,7 +6,7 @@ Creates a public Route 53 hosted zone for the subdomain and outputs the nameserv
 
 Run this **once per environment** before deploying the EKS stack. The public hosted zone must exist and be authoritative for the subdomain before ACM can validate the TLS certificate.
 
-This bootstrap creates only the **public** zone. The EKS stack creates a matching **private** zone with the same domain name. The two zones serve different purposes:
+This bootstrap creates only the **public** zone. The EKS stack creates a matching **private** zone with the same domain name:
 
 | Zone | Created by | Purpose |
 |------|-----------|---------|
@@ -20,9 +20,9 @@ The full DNS flow is:
 2. **Manual step**: Add those nameservers to your domain registrar as NS records for the subdomain, delegating authority to Route 53.
 3. The EKS stack handles everything else: ACM issues the TLS certificate (validated via a CNAME in the public zone), creates the private zone associated with the VPC, and ExternalDNS writes the A record to the private zone.
 
-## Multi Environment DNS Setup
+## Multi-Environment Setup
 
-Each environment needs its own Route 53 hosted zone so that the subdomain can be deployed independently per env — `argocd.dev.yourdomain.com`, `argocd.staging.yourdomain.com`, `argocd.prod.yourdomain.com` — without zones or state clashing. Run this bootstrap once per environment, delegate the NS records, then deploy the [EKS stack](../../examples/stacks/eks/) which will pick up the public zone automatically via a data source and create the private zone.
+Each environment needs its own Route 53 hosted zone so that the subdomain can be deployed independently per env (`argocd.dev.yourdomain.com`, `argocd.staging.yourdomain.com`, `argocd.prod.yourdomain.com`, etc.) without zones or state clashing. Run this bootstrap once per environment, delegate the NS records, then deploy the [EKS stack](../../examples/stacks/eks/) which will pick up the public zone automatically via a data source and create the private zone.
 
 ## Structure
 
@@ -52,7 +52,7 @@ pipelines/bootstrap/setup_dns/
       terragrunt.stack.hcl
 ```
 
-The full domain is auto-constructed as `{subdomain}.{environment}.{base_domain}` (e.g. `argocd.dev.yourdomain.com`).
+Run this bootstrap for each environment you plan to deploy. Repeat the steps below for every directory listed above.
 
 ## Quick Start
 
@@ -63,6 +63,15 @@ The full domain is auto-constructed as `{subdomain}.{environment}.{base_domain}`
 ### Configuration
 
 In `pipelines/` change `region.hcl` to match your desired AWS region.
+
+Update the `locals` block in each `terragrunt.stack.hcl` to match your repository:
+
+```hcl
+locals {
+  github_username  = "YourGitHubUsername"
+  github_repo_name = "your-repo-name"
+}
+```
 
 Update `pipelines/dns_config.hcl` with your domain:
 
@@ -83,7 +92,7 @@ Pick an environment and run from the root of this repository:
 source .env
 cd pipelines/bootstrap/setup_dns/<env>/stack
 terragrunt stack generate
-terragrunt --all run apply --backend-bootstrap --non-interactive
+terragrunt run --all apply --backend-bootstrap --non-interactive
 ```
 
 For example, to deploy the `dev` environment:
@@ -92,7 +101,7 @@ For example, to deploy the `dev` environment:
 source .env
 cd pipelines/bootstrap/setup_dns/dev/stack
 terragrunt stack generate
-terragrunt --all run apply --backend-bootstrap --non-interactive
+terragrunt run --all apply --backend-bootstrap --non-interactive
 ```
 
 Retrieve the 4 nameservers from the output (the value of the `name_servers` key):
@@ -121,7 +130,5 @@ dig NS argocd.dev.yourdomain.com
 ```
 
 Delegation is working when 4 AWS nameservers appear in the `ANSWER SECTION`. Propagation usually completes within minutes.
-
-### Next Steps
 
 With delegation in place, deploy the EKS stack normally. ACM certificate validation, private zone creation, and the ExternalDNS A record pointing to the internal ALB are all handled automatically. No further manual DNS steps are required.

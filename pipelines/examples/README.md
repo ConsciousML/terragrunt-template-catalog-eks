@@ -40,14 +40,14 @@ unit "vpc" {
 cd pipelines/examples/stacks/eks
 
 terragrunt stack generate
-terragrunt --all run apply --backend-bootstrap
+terragrunt run --all apply --backend-bootstrap
 ```
 
 ### Destroy a Stack
 ```bash
 cd pipelines/examples/stacks/eks
 
-terragrunt stack run destroy
+terragrunt run --all destroy
 ```
 
 ## Production Setup

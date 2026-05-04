@@ -21,7 +21,7 @@ To use a stack:
 source .env
 cd pipelines/examples/stacks/<your_stack>
 terragrunt stack generate
-terragrunt --all run apply
+terragrunt run --all apply
 ```
 
 For understanding individual components, see the [units directory](../units/).

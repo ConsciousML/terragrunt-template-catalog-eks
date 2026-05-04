@@ -23,7 +23,7 @@ Create your infrastructure module in `modules/your_module/` with the standard Te
 - `main.tf`: Resource definitions
 - `variables.tf`: Input variables with detailed descriptions
 - `outputs.tf`: Output values (if needed)
-- `providers.tf`: Provider requirements
+- `providers.tf`: Provider requirements (if needed, as the [`root.hcl`](../pipelines/root.hcl) auto-creates some providers)
 - `header.md`: Header documentation for `terraform-docs`
 - `footer.md`: Footer documentation for `terraform-docs`
 

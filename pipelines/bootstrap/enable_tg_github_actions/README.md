@@ -13,7 +13,7 @@ This enables the CI to run properly without managing secrets and AWS credentials
 - Follow the [installation instructions](../../../README.md#installation):
 - Same [prerequisites](../../../README.md#prerequisites) as in the main `README.md`
 
-Autenticate with the GitHub CLI:
+Authenticate with the GitHub CLI:
 ```bash
 gh auth login --scopes "repo,admin:repo_hook"
 ```
@@ -30,29 +30,56 @@ gh auth token
 
 Add the token to your `.env` file replacing `<your_token>`:
 ```bash
-export github_token=<your_token>
+export GITHUB_TOKEN=<your_token>
 ```
 
 ### Configuration
-In `pipelines/bootstrap/` change `region.hcl` to match your desire AWS region.
-Update the following values in `terragrunt.stack.hcl`:
+In `pipelines/bootstrap/` change `region.hcl` to match your desired AWS region.
+
+Update the `locals` block in `terragrunt.stack.hcl`:
+
+```hcl
+locals {
+  github_repo_name = "your-repo-name"
+  github_token     = get_env("GITHUB_TOKEN")
+}
+```
+
+Update the following values in the `stack "enable_tg_github_actions"` block:
 
 ```hcl
 values = {
-  github_username      = "YourGitHubUsername"
-  current_repository   = "your-current-repo-name"
+  github_username = "YourGitHubUsername"
 
-  iam_role_name    = "github-actions-terragrunt-role"
+  iam_role_name = "gh-terragrunt-role-catalog"
 
-  # List of the roles necessary for Terragrunt to run in CI/CD
+  # List of the policies necessary for Terragrunt to run in CI/CD
   policy_arns = [
-    "arn:aws:iam::aws:policy/YourFirstPolicyName",
-    ...
-    "arn:aws:iam::aws:policy/YourLastPolicyName"
+    "arn:aws:iam::aws:policy/AmazonEC2FullAccess",
+    "arn:aws:iam::aws:policy/AmazonVPCFullAccess",
+    "arn:aws:iam::aws:policy/IAMFullAccess",
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
+    "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess",
+    "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
+    "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser",
+    "arn:aws:iam::aws:policy/AmazonRoute53FullAccess",
+    "arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess",
   ]
 
-  # OIDC Provider creation - set to true for first repo, false for subsequent repos
-  create_oidc_provider = true
+  # EKS permissions — add or remove actions as needed
+  inline_policies = [
+    {
+      name = "EKSFullAccess"
+      policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [{ Effect = "Allow", Action = ["eks:*"], Resource = "*" }]
+      })
+    }
+  ]
+
+  # OIDC Provider creation — set to true only for the first repo in this AWS account
+  create_oidc_provider = false
 
   # List of repository names to give read-only access to the CI
   # This is necessary for Terragrunt to pull remote source code from external repositories
@@ -62,12 +89,10 @@ values = {
     "repo_name_N"
   ]
 
-  # Attribute a secret name for each deploy key. Use the same order as the
-  # deploy_key_repositories
+  # Attribute a secret name for each deploy key. Use the same order as deploy_key_repositories
   deploy_key_secret_names = [
-    "DEPLOY_KEY_1",
+    "DEPLOY_KEY_TG_CATALOG",
     ...
-    "DEPLOY_KEY_N
   ]
 
   deploy_key_title = "Terragrunt Catalog Deploy Key"
@@ -91,6 +116,7 @@ terragrunt run --all apply --backend-bootstrap
 ```
 
 ### Update Your GitHub Actions file
+**Optional:** if you haven't changed the deploy key secret names, you can skip this step.
 
 Update your `.github/workflows/ci.yaml` to use the correct deploy key secret names in the setup action:
 
@@ -119,29 +145,32 @@ Read the [continuous integration guide](../../../docs/continuous-integration.md#
 
 ## Module Details
 
-This stack instantiates four Terraform modules that work together to run Terragrunt with GitHub Actions.
+This stack instantiates the following Terraform modules to run Terragrunt with GitHub Actions.
 
 ### 1. [GitHub OIDC Provider](../../../modules/oidc_provider/README.md)
-Creates an [AWS IAM OpenID Connect provider](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html) provider to declare the external identify provider (GitHub Actions in this case).
+Creates an [AWS IAM OpenID Connect provider](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html) to declare the external identity provider (GitHub Actions in this case).
 
-**Why**: GitHub Actions will be a known audience to AWS and will validates its token when authentication occurs.
+**Why**: GitHub Actions will be a known audience to AWS and will validate its token when authentication occurs.
 
 ### 2. [IAM Role GitHub Actions](../../../modules/iam_role_github_actions/README.md)
-Creates a IAM Role that can only be used by GitHub Actions running under this specific repository.
+Creates an IAM Role that can only be used by GitHub Actions running under this specific repository.
 
 ### 3. [GitHub Actions IAM Policies](../../../modules/iam_policies/README.md)
-Assign policies arns to 2.
-This enables the necessary policies for Terragrunt to run in GitHub Actions.
+Assigns policy ARNs to the IAM role from 2.
+This enables the necessary permissions for Terragrunt to run in GitHub Actions.
 
-### 3. [GitHub Secrets](../../../modules/github_secrets/README.md)
-Stores `AWS_REGION` and `AWS_ROLE_ARN` as GitHub secrets to be able to be retrieved in GitHub Actions workflows.
+### 4. [GitHub Secrets](../../../modules/github_secrets/README.md)
+Stores `AWS_REGION` and `AWS_ROLE_ARN` as GitHub secrets to be retrieved in GitHub Actions workflows.
 
-### 4. [Deploy Key](../../../modules/deploy_key/README.md)
-Generates SSH deploy key for repository access.
+### 5. [Deploy Key](../../../modules/deploy_key/README.md)
+Generates an SSH deploy key for repository access.
 
 Enables Terragrunt to pull code from private repositories during multi-repo deployments.
 
-# Authentication Flow:
+### 6. [Terraform Docs Deploy Key](../../../modules/deploy_key/README.md)
+Generates a separate write-access deploy key used by the `terraform-docs` CI step to commit auto-generated module documentation back to the repository.
+
+## Authentication Flow
 
 1. OIDC Provider establishes GitHub Actions as a trusted identity provider in AWS
 2. IAM Role defines who can authenticate (specific GitHub repo/branch) via trust policy
