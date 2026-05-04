@@ -1,5 +1,6 @@
 include "root" {
-  path = find_in_parent_folders("root.hcl")
+  path   = find_in_parent_folders("root.hcl")
+  expose = true
 }
 
 locals {
@@ -16,7 +17,7 @@ dependency "iam_role_github_actions" {
 }
 
 terraform {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//modules/github_secrets?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_username}/${include.root.locals.github_repo_name}.git//modules/github_secrets?ref=${values.version}"
 }
 
 inputs = {

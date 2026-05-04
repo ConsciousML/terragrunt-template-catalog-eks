@@ -1,9 +1,10 @@
 include "root" {
-  path = find_in_parent_folders("root.hcl")
+  path   = find_in_parent_folders("root.hcl")
+  expose = true
 }
 
 terraform {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//modules/tailscale_split_dns?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_username}/${include.root.locals.github_repo_name}.git//modules/tailscale_split_dns?ref=${values.version}"
 }
 
 dependency "vpc" {

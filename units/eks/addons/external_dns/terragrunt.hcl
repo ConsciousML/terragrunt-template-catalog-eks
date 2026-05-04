@@ -1,5 +1,6 @@
 include "root" {
-  path = find_in_parent_folders("root.hcl")
+  path   = find_in_parent_folders("root.hcl")
+  expose = true
 }
 
 include "provider_kubernetes" {
@@ -7,7 +8,7 @@ include "provider_kubernetes" {
 }
 
 terraform {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//modules/helm_release/?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_username}/${include.root.locals.github_repo_name}.git//modules/helm_release/?ref=${values.version}"
 
   before_hook "wait_for_dns_cleanup" {
     commands = ["destroy"]

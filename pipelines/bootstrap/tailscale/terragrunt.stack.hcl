@@ -2,16 +2,16 @@ locals {
   version  = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
   vpc_cidr = read_terragrunt_config(find_in_parent_folders("vpc.hcl")).locals.vpc_cidr
 
-  # GitHub repo that CI runs from — update these when forking
-  github_user      = "ConsciousML"
-  github_repo_name = "terragrunt-template-catalog-eks"
+  github_locals    = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
+  github_username  = local.github_locals.github_username
+  github_repo_name = local.github_locals.github_repo_name
 
   # Tailscale tag assigned to CI runner devices joining via WIF
   ci_tag = "tag:ci"
 }
 
 unit "acl" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/eks/addons/tailscale/acl?ref=${local.version}"
+  source = "git::git@github.com:${local.github_username}/${local.github_repo_name}.git//units/eks/addons/tailscale/acl?ref=${local.version}"
   path   = "tailscale/acl"
 
   values = {
@@ -35,7 +35,7 @@ unit "acl" {
 }
 
 unit "tailscale_wif" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/tailscale_wif?ref=${local.version}"
+  source = "git::git@github.com:${local.github_username}/${local.github_repo_name}.git//units/tailscale_wif?ref=${local.version}"
   path   = "tailscale/wif"
 
   values = {
@@ -48,7 +48,7 @@ unit "tailscale_wif" {
 }
 
 unit "tailscale_github_secrets" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/tailscale_github_secrets?ref=${local.version}"
+  source = "git::git@github.com:${local.github_username}/${local.github_repo_name}.git//units/tailscale_github_secrets?ref=${local.version}"
   path   = "tailscale/github_secrets"
 
   values = {

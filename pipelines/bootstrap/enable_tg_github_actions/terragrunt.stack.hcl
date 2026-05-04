@@ -1,12 +1,15 @@
 locals {
   version = "main"
 
-  github_repo_name = "terragrunt-template-catalog-eks"
-  github_token     = get_env("GITHUB_TOKEN")
+  github_locals    = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
+  github_username  = local.github_locals.github_username
+  github_repo_name = local.github_locals.github_repo_name
+
+  github_token = get_env("GITHUB_TOKEN")
 }
 
 stack "enable_tg_github_actions" {
-  source = "github.com/ConsciousML/${local.github_repo_name}//stacks/enable_tg_github_actions?ref=${local.version}"
+  source = "github.com/${local.github_username}/${local.github_repo_name}//stacks/enable_tg_github_actions?ref=${local.version}"
   path   = "github_actions_bootstrap"
   values = {
     version          = local.version
@@ -96,7 +99,7 @@ stack "enable_tg_github_actions" {
 }
 
 unit "deploy_key_terraform_docs" {
-  source = "git::git@github.com:ConsciousML/${local.github_repo_name}.git//units/deploy_key/?ref=${local.version}"
+  source = "git::git@github.com:${local.github_username}/${local.github_repo_name}.git//units/deploy_key/?ref=${local.version}"
   path   = "terraform_docs_deploy_key"
 
   values = {
