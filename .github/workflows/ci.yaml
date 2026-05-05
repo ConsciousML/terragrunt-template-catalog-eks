@@ -270,6 +270,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Request Tailscale API token using WIF credentials
         id: ts-token-exchange
         uses: ./.github/actions/tailscale-token-exchange
