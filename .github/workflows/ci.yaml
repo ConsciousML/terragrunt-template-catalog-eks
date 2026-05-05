@@ -2,6 +2,7 @@ name: CI
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
   workflow_dispatch:
@@ -30,6 +31,7 @@ env:
 jobs:
   terraform-docs:
     # Generates terraform documentation using terraform-docs
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
 
     steps:
