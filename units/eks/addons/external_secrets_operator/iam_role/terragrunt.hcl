@@ -27,8 +27,18 @@ inputs = {
     Statement = [
       {
         Effect   = "Allow"
-        Action   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
+        Action   = ["secretsmanager:ListSecrets", "secretsmanager:BatchGetSecretValue"]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetResourcePolicy",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds",
+        ]
+        Resource = ["arn:aws:secretsmanager:*:*:secret:${include.root.locals.environment}-*"]
       },
     ]
   })
