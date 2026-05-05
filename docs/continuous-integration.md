@@ -8,9 +8,12 @@ It ensures code quality and that the infrastructure can be deployed an destroyed
 
 ## How It Works
 
-The [CI](../.github/workflows/ci.yaml) consists of three main jobs:
+The [CI](../.github/workflows/ci.yaml) consists of four main jobs:
 
-### 1. Code Quality Checks
+### 1. Draft PR Check
+Runs first on every PR event and fails immediately if the PR is in draft mode. This prevents all downstream jobs from running until the PR is marked as ready for review.
+
+### 2. Code Quality Checks
 Runs automatically on every PR:
 - **Format validation**: ensures Terragrunt (TG) and Terraform (TF) files are properly formatted
 - **Linting**: validates configuration syntax and best practices with TFLint
@@ -20,13 +23,13 @@ Runs automatically on every PR:
 
 **Note**: Read the [pre-commit configuration](../.pre-commit-config.yaml) to learn more about the run checks.
 
-### 2. Terratest
+### 3. Terratest
 Runs when the `run-terratest` label is added to a PR:
 - **Infrastructure deployment**: creates real AWS resources in a test environment
 - **Testing**: runs Go to validate deployed infrastructure
 - **Cleanup**: automatically destroys test resources
 
-### 3. Documentation Generation
+### 4. Documentation Generation
 Uses `terraform-docs` to automatically generate `README.md` in each terraform module in `modules/`.
 
 If you create new Terraform modules in `modules/`, read the [documentation instructions](../modules/README.md#documentation)
@@ -63,7 +66,7 @@ This runs the same checks as CI locally, preventing CI failures.
 
 ### Standard PR Workflow
 1. Create a branch with your changes
-2. Push to GitHub and open a pull request
+2. Push to GitHub and open a pull request (must not be in draft mode)
 3. The `code-quality-checks` job runs automatically
 4. Address any failures and push fixes
 
