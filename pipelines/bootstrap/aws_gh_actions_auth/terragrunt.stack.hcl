@@ -18,17 +18,7 @@ stack "aws_gh_actions_auth" {
     github_token     = local.github_token
     iam_role_name    = "gh-terragrunt-role-catalog"
     policy_arns = [
-      "arn:aws:iam::aws:policy/AmazonEC2FullAccess",
-      "arn:aws:iam::aws:policy/AmazonVPCFullAccess",
-      "arn:aws:iam::aws:policy/IAMFullAccess",
-      "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-      "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
-      "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess",
-      "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
-      "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser",
-      "arn:aws:iam::aws:policy/AmazonRoute53FullAccess",
-      "arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess",
-      "arn:aws:iam::aws:policy/SecretsManagerReadWrite",
+      "arn:aws:iam::aws:policy/AdministratorAccess",
     ]
     inline_policies = [
       {
