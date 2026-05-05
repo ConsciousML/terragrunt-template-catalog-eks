@@ -4,7 +4,7 @@ include "root" {
 }
 
 dependency "iam_role_github_actions" {
-  config_path = "../iam_role_github_actions"
+  config_path = "../iam_role"
   mock_outputs = {
     role_name = "mock-github-actions-role"
   }

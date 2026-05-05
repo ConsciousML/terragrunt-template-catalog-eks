@@ -13,17 +13,17 @@ terraform {
 
 
 dependency "aws_load_balancer_controller" {
-  config_path  = "../aws_load_balancer_controller"
+  config_path  = "../../aws_load_balancer_controller/helm"
   skip_outputs = true
 }
 
 dependency "external_dns" {
-  config_path  = "../external_dns"
+  config_path  = "../../external_dns/helm"
   skip_outputs = true
 }
 
 dependency "acm_certificate" {
-  config_path = "../../acm_certificate"
+  config_path = "../../../acm_certificate"
   mock_outputs = {
     certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
   }
@@ -31,7 +31,7 @@ dependency "acm_certificate" {
 }
 
 dependency "route53_hosted_zone_private" {
-  config_path = "../../route53_hosted_zone_private"
+  config_path = "../../../route53/hosted_zone_private"
   mock_outputs = {
     domain_name = "mock.example.com"
   }

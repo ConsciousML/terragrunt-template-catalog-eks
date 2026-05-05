@@ -3,8 +3,8 @@ locals {
 }
 
 unit "route53_hosted_zone" {
-  source = "${get_repo_root()}/units/eks/route53_hosted_zone"
-  path   = "eks/route53_hosted_zone"
+  source = "${get_repo_root()}/units/eks/route53/hosted_zone_public"
+  path   = "eks/route53/hosted_zone_public"
 
   values = {
     version = local.version
@@ -97,8 +97,8 @@ unit "cluster" {
 }
 
 unit "iam_role_aws_lbc" {
-  source = "${get_repo_root()}/units/eks/addons/iam_role_aws_lbc"
-  path   = "eks/addons/iam_role_aws_lbc"
+  source = "${get_repo_root()}/units/eks/addons/aws_load_balancer_controller/iam_role"
+  path   = "eks/addons/aws_load_balancer_controller/iam_role"
 
   values = {
     version         = local.version
@@ -110,8 +110,8 @@ unit "iam_role_aws_lbc" {
 }
 
 unit "aws_load_balancer_controller" {
-  source = "${get_repo_root()}/units/eks/addons/aws_load_balancer_controller"
-  path   = "eks/addons/aws_load_balancer_controller"
+  source = "${get_repo_root()}/units/eks/addons/aws_load_balancer_controller/helm"
+  path   = "eks/addons/aws_load_balancer_controller/helm"
 
   values = {
     version            = local.version
@@ -119,9 +119,20 @@ unit "aws_load_balancer_controller" {
   }
 }
 
+unit "argocd_password" {
+  source = "${get_repo_root()}/units/eks/addons/argocd/aws_password_secret"
+  path   = "eks/addons/argocd/aws_password_secret"
+
+  values = {
+    version = local.version
+    length  = 16
+    tags    = {}
+  }
+}
+
 unit "argocd" {
-  source = "${get_repo_root()}/units/eks/addons/argocd"
-  path   = "eks/addons/argocd"
+  source = "${get_repo_root()}/units/eks/addons/argocd/helm"
+  path   = "eks/addons/argocd/helm"
 
   values = {
     version            = local.version
@@ -155,8 +166,8 @@ unit "argocd" {
 }
 
 unit "route53_hosted_zone_private" {
-  source = "${get_repo_root()}/units/eks/route53_hosted_zone_private"
-  path   = "eks/route53_hosted_zone_private"
+  source = "${get_repo_root()}/units/eks/route53/hosted_zone_private"
+  path   = "eks/route53/hosted_zone_private"
 
   values = {
     version = local.version
@@ -165,8 +176,8 @@ unit "route53_hosted_zone_private" {
 }
 
 unit "iam_role_external_dns" {
-  source = "${get_repo_root()}/units/eks/addons/iam_role_external_dns"
-  path   = "eks/addons/iam_role_external_dns"
+  source = "${get_repo_root()}/units/eks/addons/external_dns/iam_role"
+  path   = "eks/addons/external_dns/iam_role"
 
   values = {
     version         = local.version
@@ -177,8 +188,8 @@ unit "iam_role_external_dns" {
 }
 
 unit "external_dns" {
-  source = "${get_repo_root()}/units/eks/addons/external_dns"
-  path   = "eks/addons/external_dns"
+  source = "${get_repo_root()}/units/eks/addons/external_dns/helm"
+  path   = "eks/addons/external_dns/helm"
 
   values = {
     version            = local.version

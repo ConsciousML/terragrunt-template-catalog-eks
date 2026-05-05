@@ -1,5 +1,5 @@
 locals {
-  version = "main"
+  version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
 
   github_locals    = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
   github_username  = local.github_locals.github_username
@@ -8,8 +8,8 @@ locals {
   github_token = get_env("GITHUB_TOKEN")
 }
 
-stack "enable_tg_github_actions" {
-  source = "github.com/${local.github_username}/${local.github_repo_name}//stacks/enable_tg_github_actions?ref=${local.version}"
+stack "aws_gh_actions_auth" {
+  source = "github.com/${local.github_username}/${local.github_repo_name}//stacks/aws_gh_actions_auth?ref=${local.version}"
   path   = "github_actions_bootstrap"
   values = {
     version          = local.version
@@ -18,16 +18,7 @@ stack "enable_tg_github_actions" {
     github_token     = local.github_token
     iam_role_name    = "gh-terragrunt-role-catalog"
     policy_arns = [
-      "arn:aws:iam::aws:policy/AmazonEC2FullAccess",
-      "arn:aws:iam::aws:policy/AmazonVPCFullAccess",
-      "arn:aws:iam::aws:policy/IAMFullAccess",
-      "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-      "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
-      "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess",
-      "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
-      "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser",
-      "arn:aws:iam::aws:policy/AmazonRoute53FullAccess",
-      "arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess",
+      "arn:aws:iam::aws:policy/AdministratorAccess",
     ]
     inline_policies = [
       {
@@ -99,7 +90,7 @@ stack "enable_tg_github_actions" {
 }
 
 unit "deploy_key_terraform_docs" {
-  source = "git::git@github.com:${local.github_username}/${local.github_repo_name}.git//units/deploy_key/?ref=${local.version}"
+  source = "git::git@github.com:${local.github_username}/${local.github_repo_name}.git//units/github/deploy_key/?ref=${local.version}"
   path   = "terraform_docs_deploy_key"
 
   values = {

@@ -17,7 +17,7 @@ locals {
 }
 
 dependency "vpc" {
-  config_path = "../../../vpc"
+  config_path = "../../../../vpc"
   mock_outputs = {
     vpc_id = "mock-vpc-id"
   }
@@ -25,12 +25,12 @@ dependency "vpc" {
 }
 
 dependency "acm_certificate" {
-  config_path  = "../../acm_certificate"
+  config_path  = "../../../acm_certificate"
   skip_outputs = true
 }
 
 dependency "iam_role_aws_lbc" {
-  config_path  = "../iam_role_aws_lbc"
+  config_path  = "../iam_role"
   skip_outputs = true
 }
 

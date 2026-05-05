@@ -1,6 +1,6 @@
 unit "github_oidc_provider" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/oidc_provider?ref=${values.version}"
-  path   = "github_oidc_provider"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/github/oidc_provider?ref=${values.version}"
+  path   = "github/oidc_provider"
 
   values = {
     version         = values.version
@@ -12,8 +12,8 @@ unit "github_oidc_provider" {
 }
 
 unit "iam_role_github_actions" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/iam_role_github_actions?ref=${values.version}"
-  path   = "iam_role_github_actions"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/github/iam_role?ref=${values.version}"
+  path   = "github/iam_role"
 
   values = {
     version          = values.version
@@ -26,8 +26,8 @@ unit "iam_role_github_actions" {
 }
 
 unit "iam_policies" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/iam_policies?ref=${values.version}"
-  path   = "iam_policies"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/github/iam_policies?ref=${values.version}"
+  path   = "github/iam_policies"
 
   values = {
     version     = values.version
@@ -36,8 +36,8 @@ unit "iam_policies" {
 }
 
 unit "github_secrets" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/github_secrets?ref=${values.version}"
-  path   = "github_secrets"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/github/secrets?ref=${values.version}"
+  path   = "github/secrets"
 
   values = {
     version          = values.version
@@ -47,8 +47,8 @@ unit "github_secrets" {
 }
 
 unit "deploy_key" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/deploy_key?ref=${values.version}"
-  path   = "deploy_key"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/github/deploy_key?ref=${values.version}"
+  path   = "github/deploy_key"
 
   values = {
     version            = values.version

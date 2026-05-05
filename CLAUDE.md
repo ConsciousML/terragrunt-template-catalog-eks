@@ -32,7 +32,7 @@ A VPC is created and an EKS cluster is deployed inside it. An ACM certificate is
 
 ## Bootstrap Pipelines (run once before deploying the EKS stack)
 
-- `pipelines/bootstrap/enable_tg_github_actions/`: OIDC + IAM role for GitHub Actions CI
+- `pipelines/bootstrap/aws_gh_actions_auth/`: OIDC + IAM role for GitHub Actions CI
 - `pipelines/bootstrap/setup_dns/`: Public Route53 hosted zone per environment — outputs NS records to delegate at your registrar
 - `pipelines/bootstrap/tailscale/`: Tailscale ACL policy + OAuth client credentials
 

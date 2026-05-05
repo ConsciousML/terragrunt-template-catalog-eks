@@ -9,7 +9,7 @@ locals {
 }
 
 dependency "iam_role_github_actions" {
-  config_path = "../iam_role_github_actions"
+  config_path = "../iam_role"
   mock_outputs = {
     role_arn = "arn:aws:iam::123456789012:role/mock-github-actions-role"
   }

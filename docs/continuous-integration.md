@@ -82,7 +82,7 @@ When your PR is ready for final validation:
 > **Note**: Infrastructure tests deploy AWS resources and take some time to deploy and destroy. The label check is used to run the tests only when your PR is ready for final validation before merging.
 
 ## Troubleshooting
-If you have a IAM Role error, in the [enable Terragrunt GitHub Actions bootstrap stack](../pipelines/bootstrap/enable_tg_github_actions/README.md#configuration) update the `policy_arns` so Terragrunt can run in GitHub Actions and deploy the bootstrap pipeline following the [deploy section](../pipelines/bootstrap/enable_tg_github_actions/README.md#deploy).
+If you have a IAM Role error, in the [AWS GitHub Actions Auth bootstrap stack](../pipelines/bootstrap/aws_gh_actions_auth/README.md#configuration) update the `policy_arns` so Terragrunt can run in GitHub Actions and deploy the bootstrap pipeline following the [deploy section](../pipelines/bootstrap/aws_gh_actions_auth/README.md#deploy).
 
 If you don't know what `arns` you need yet and some are missing, you will get an error in the [CI](../.github/workflows/ci.yaml) in the `code-quality-checks` and `terratest` jobs.
 

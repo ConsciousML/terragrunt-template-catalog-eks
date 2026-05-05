@@ -35,20 +35,20 @@ unit "acl" {
 }
 
 unit "tailscale_wif" {
-  source = "git::git@github.com:${local.github_username}/${local.github_repo_name}.git//units/tailscale_wif?ref=${local.version}"
-  path   = "tailscale/wif"
+  source = "git::git@github.com:${local.github_username}/${local.github_repo_name}.git//units/tailscale/workflow_identity_federation?ref=${local.version}"
+  path   = "tailscale/workflow_identity_federation"
 
   values = {
     version = local.version
     issuer  = "https://token.actions.githubusercontent.com"
-    subject = "repo:${local.github_user}/${local.github_repo_name}:*"
+    subject = "repo:${local.github_username}/${local.github_repo_name}:*"
     scopes  = ["all"]
     tags    = [local.ci_tag]
   }
 }
 
 unit "tailscale_github_secrets" {
-  source = "git::git@github.com:${local.github_username}/${local.github_repo_name}.git//units/tailscale_github_secrets?ref=${local.version}"
+  source = "git::git@github.com:${local.github_username}/${local.github_repo_name}.git//units/tailscale/github_secrets?ref=${local.version}"
   path   = "tailscale/github_secrets"
 
   values = {

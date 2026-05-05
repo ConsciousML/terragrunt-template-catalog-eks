@@ -45,7 +45,7 @@ locals {
 }
 ```
 
-Update the following values in the `stack "enable_tg_github_actions"` block:
+Update the following values in the `stack "aws_gh_actions_auth"` block:
 
 ```hcl
 values = {
@@ -110,7 +110,7 @@ values = {
 From the root directory of this repository, run:
 ```bash
 source .env
-cd pipelines/bootstrap/enable_tg_github_actions/
+cd pipelines/bootstrap/aws_gh_actions_auth/
 terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap
 ```
