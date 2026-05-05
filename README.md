@@ -33,7 +33,7 @@ Modules (modules/) → Units (units/) → Examples (pipelines/examples/)
 ### Prerequisites
 - AWS account with billing enabled
 - GitHub account
-- AWS IAM permissions to manage IAM roles, VPC resources, EKS resources, compute resources and S3 (see `policy_arns` in the [bootstrap stack](pipelines/bootstrap/enable_tg_github_actions/terragrunt.stack.hcl) for a list of the specific IAM policies)
+- AWS IAM permissions to manage IAM roles, VPC resources, EKS resources, compute resources and S3 (see `policy_arns` in the [bootstrap stack](pipelines/bootstrap/aws_gh_actions_auth/terragrunt.stack.hcl) for a list of the specific IAM policies)
 
 ### Fork the Repository
 Click on the `Use this template` button.
@@ -100,7 +100,7 @@ For more information, read the [AWS CLI authentication documentation](https://do
 
 ### Run the Bootstrap Pipelines
 Run the following Terragrunt pipelines once per repository:
-- [Enable Terragrunt in GitHub Actions](pipelines/bootstrap/enable_tg_github_actions/README.md): authenticates GitHub Actions with AWS
+- [AWS GitHub Actions Auth](pipelines/bootstrap/aws_gh_actions_auth/README.md): authenticates GitHub Actions with AWS
 - [Setup DNS](pipelines/bootstrap/setup_dns/README.md): creates a [Route53 hosted zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html) to sign TLS certificates with ACM
 - [Tailscale](pipelines/bootstrap/tailscale/README.md): creates [Tailscale](https://tailscale.com/) resources needed to connect with tools exposed internally in your EKS cluster (ArgoCD, etc.)
 

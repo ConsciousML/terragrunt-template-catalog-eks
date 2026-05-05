@@ -8,8 +8,8 @@ locals {
   github_token = get_env("GITHUB_TOKEN")
 }
 
-stack "enable_tg_github_actions" {
-  source = "github.com/${local.github_username}/${local.github_repo_name}//stacks/enable_tg_github_actions?ref=${local.version}"
+stack "aws_gh_actions_auth" {
+  source = "github.com/${local.github_username}/${local.github_repo_name}//stacks/aws_gh_actions_auth?ref=${local.version}"
   path   = "github_actions_bootstrap"
   values = {
     version          = local.version
@@ -28,6 +28,7 @@ stack "enable_tg_github_actions" {
       "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser",
       "arn:aws:iam::aws:policy/AmazonRoute53FullAccess",
       "arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess",
+      "arn:aws:iam::aws:policy/SecretsManagerReadWrite",
     ]
     inline_policies = [
       {
