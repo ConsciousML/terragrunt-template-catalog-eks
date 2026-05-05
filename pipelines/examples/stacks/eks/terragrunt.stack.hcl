@@ -120,8 +120,8 @@ unit "aws_load_balancer_controller" {
 }
 
 unit "argocd_password" {
-  source = "${get_repo_root()}/units/eks/addons/argocd_password"
-  path   = "eks/addons/argocd_password"
+  source = "${get_repo_root()}/units/eks/addons/argocd/aws_password_secret"
+  path   = "eks/addons/argocd/aws_password_secret"
 
   values = {
     version = local.version
@@ -131,8 +131,8 @@ unit "argocd_password" {
 }
 
 unit "argocd" {
-  source = "${get_repo_root()}/units/eks/addons/argocd"
-  path   = "eks/addons/argocd"
+  source = "${get_repo_root()}/units/eks/addons/argocd/helm"
+  path   = "eks/addons/argocd/helm"
 
   values = {
     version            = local.version
