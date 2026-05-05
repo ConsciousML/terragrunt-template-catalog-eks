@@ -119,6 +119,17 @@ unit "aws_load_balancer_controller" {
   }
 }
 
+unit "argocd_password" {
+  source = "${get_repo_root()}/units/eks/addons/argocd_password"
+  path   = "eks/addons/argocd_password"
+
+  values = {
+    version = local.version
+    length  = 16
+    tags    = {}
+  }
+}
+
 unit "argocd" {
   source = "${get_repo_root()}/units/eks/addons/argocd"
   path   = "eks/addons/argocd"
