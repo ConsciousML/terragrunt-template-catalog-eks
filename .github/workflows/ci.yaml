@@ -29,9 +29,18 @@ env:
 
 
 jobs:
+  check-if-pr-is-draft:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if PR is in draft mode
+        if: github.event.pull_request.draft == true
+        run: |
+          echo "PR is in draft mode. CI does not run on draft PRs."
+          exit 1
+
   terraform-docs:
     # Generates terraform documentation using terraform-docs
-    if: github.event.pull_request.draft == false
+    needs: check-if-pr-is-draft
     runs-on: ubuntu-latest
 
     steps:
@@ -119,7 +128,7 @@ jobs:
           terragrunt stack generate
           terragrunt run --all plan --backend-bootstrap --non-interactive
 
-  check-labels:
+  check-pr-labels:
     # Gates the terratest run: ensures exactly one of 'run-terratest' or 'skip-terratest' is present on the PR
     needs: code-quality-checks
     runs-on: ubuntu-latest
@@ -131,7 +140,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check PR labels
-        id: check-labels
+        id: check-pr-labels
         run: |
           labels=$(gh pr view "$PR_NUMBER" --json labels -q '.labels[].name')
           echo "Labels on PR: $labels"
@@ -150,7 +159,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Comment on PR if 'skip-terratest' label is present
-        if: steps.check-labels.outputs.skip_present == 'true'
+        if: steps.check-pr-labels.outputs.skip_present == 'true'
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
@@ -158,7 +167,7 @@ jobs:
             infrastructure tests will not run.
 
       - name: Comment PR if missing label
-        if: steps.check-labels.outputs.run_present == 'false' && steps.check-labels.outputs.skip_present == 'false'
+        if: steps.check-pr-labels.outputs.run_present == 'false' && steps.check-pr-labels.outputs.skip_present == 'false'
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
@@ -166,14 +175,14 @@ jobs:
             Otherwise add the `skip-terratest` if you do not want to run tests.
 
       - name: Fail if label missing
-        if: steps.check-labels.outputs.run_present == 'false' && steps.check-labels.outputs.skip_present == 'false'
+        if: steps.check-pr-labels.outputs.run_present == 'false' && steps.check-pr-labels.outputs.skip_present == 'false'
         run: exit 1
 
       - name: Set should_run output
         id: set-output
         if: always()
         run: |
-          if [[ "${{ steps.check-labels.outputs.run_present }}" == "true" && "${{ steps.check-labels.outputs.skip_present }}" == "false" ]]; then
+          if [[ "${{ steps.check-pr-labels.outputs.run_present }}" == "true" && "${{ steps.check-pr-labels.outputs.skip_present }}" == "false" ]]; then
             echo "should_run=true" >> $GITHUB_OUTPUT
           else
             echo "should_run=false" >> $GITHUB_OUTPUT
@@ -182,8 +191,8 @@ jobs:
   terratest:
     # Runs Terratest to deploy the infrastructure in a separated environment
     # Performs some tests and then destroys the infra.
-    needs: check-labels
-    if: needs.check-labels.outputs.should_run == 'true'
+    needs: check-pr-labels
+    if: needs.check-pr-labels.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     outputs:
       client_id: ${{ steps.ts-oauth-create.outputs.client_id }}
@@ -256,8 +265,8 @@ jobs:
   revoke-oauth:
     # Revokes the temporary Tailscale OAuth client created during terratest.
     # Runs even when terratest fails to ensure no credentials are left behind.
-    needs: [check-labels, terratest]
-    if: always() && needs.check-labels.outputs.should_run == 'true' && needs.terratest.outputs.client_id != ''
+    needs: [check-pr-labels, terratest]
+    if: always() && needs.check-pr-labels.outputs.should_run == 'true' && needs.terratest.outputs.client_id != ''
     runs-on: ubuntu-latest
 
     steps:
