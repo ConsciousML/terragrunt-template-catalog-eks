@@ -1,6 +1,10 @@
 # Tailscale Bootstrap
 
-Sets up Tailscale access control policy, workload identity credentials, and GitHub secrets so the Tailscale Kubernetes operator can join the cluster and CI can authenticate to Tailscale without long-lived secrets.
+Sets up Tailscale as a VPN and configures the access control policy, workload identity credentials, and GitHub secrets needed to:
+
+- Allow the Tailscale Connector to expose the private VPC subnets to the Tailnet, making internal cluster resources reachable over VPN
+- Access internal cluster tools (ArgoCD, etc.) over the Tailnet without exposing them to the public internet
+- Allow CI to authenticate to Tailscale to create the Tailscale resources required to bring up the VPN
 
 ## Purpose
 
