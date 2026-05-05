@@ -47,8 +47,8 @@ unit "github_secrets" {
 }
 
 unit "deploy_key" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/deploy_key?ref=${values.version}"
-  path   = "deploy_key"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/github/deploy_key?ref=${values.version}"
+  path   = "github/deploy_key"
 
   values = {
     version            = values.version

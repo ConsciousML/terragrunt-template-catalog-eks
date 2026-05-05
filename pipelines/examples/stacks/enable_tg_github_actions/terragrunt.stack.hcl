@@ -54,8 +54,8 @@ unit "github_secrets" {
 }
 
 unit "deploy_key" {
-  source = "${get_repo_root()}/units/deploy_key"
-  path   = "deploy_key"
+  source = "${get_repo_root()}/units/github/deploy_key"
+  path   = "github/deploy_key"
 
   values = {
     version            = local.version

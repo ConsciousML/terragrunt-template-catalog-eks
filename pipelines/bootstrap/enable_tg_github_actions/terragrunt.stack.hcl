@@ -1,5 +1,5 @@
 locals {
-  version = "main"
+  version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
 
   github_locals    = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
   github_username  = local.github_locals.github_username
@@ -99,7 +99,7 @@ stack "enable_tg_github_actions" {
 }
 
 unit "deploy_key_terraform_docs" {
-  source = "git::git@github.com:${local.github_username}/${local.github_repo_name}.git//units/deploy_key/?ref=${local.version}"
+  source = "git::git@github.com:${local.github_username}/${local.github_repo_name}.git//units/github/deploy_key/?ref=${local.version}"
   path   = "terraform_docs_deploy_key"
 
   values = {
