@@ -117,17 +117,17 @@ jobs:
           terragrunt stack generate
           terragrunt run --all plan --backend-bootstrap --non-interactive
 
-  terratest:
-    # Runs Terratest to deploy the infrastructure in a separated environment
-    # Performs some tests and then destroy the infra.
+  check-labels:
+    # Gates the terratest run: ensures exactly one of 'run-terratest' or 'skip-terratest' is present on the PR
     needs: code-quality-checks
     runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.set-output.outputs.should_run }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Fails if the `run-terratest` label is not present on the PR
       - name: Check if PR has 'run-terratest' label
         id: check-label-run
         run: |
@@ -176,12 +176,34 @@ jobs:
         if: steps.check-label-run.outputs.label_present == 'false' && steps.check-label-skip.outputs.label_present == 'false'
         run: exit 1
 
+      - name: Set should_run output
+        id: set-output
+        if: always()
+        run: |
+          if [[ "${{ steps.check-label-run.outputs.label_present }}" == "true" && "${{ steps.check-label-skip.outputs.label_present }}" == "false" ]]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+
+  terratest:
+    # Runs Terratest to deploy the infrastructure in a separated environment
+    # Performs some tests and then destroys the infra.
+    needs: check-labels
+    if: needs.check-labels.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      client_id: ${{ steps.ts-oauth-create.outputs.client_id }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       # A composite action that sets up GH actions to run TG:
       # - Loads deploy keys to enable TG to pull private repositories
       # - Auth GH actions with AWS using OIDC
       # - Runs Mise to install all the tools we need (Terragrunt, OpenTofu, Go, ...)
       - uses: ./.github/actions/setup
-        if: steps.check-label-skip.outputs.label_present == 'false'
         with:
           deploy-keys: ${{ secrets.DEPLOY_KEY_TG_CATALOG }}
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
@@ -190,9 +212,8 @@ jobs:
           ts-audience: ${{ secrets.TS_AUDIENCE }}
           ts-tags: ${{ secrets.TS_TAGS }}
 
-      - name: First request Tailscale API token using WIF credentials
+      - name: Request Tailscale API token using WIF credentials
         id: ts-token-exchange
-        if: steps.check-label-skip.outputs.label_present == 'false'
         run: |
           response=$(curl -X POST https://api.tailscale.com/api/v2/oauth/token-exchange \
             -H "Content-Type: application/x-www-form-urlencoded" \
@@ -211,7 +232,6 @@ jobs:
 
       - name: Create temporary Tailscale OAuth client
         id: ts-oauth-create
-        if: steps.check-label-skip.outputs.label_present == 'false'
         env:
           TS_TOKEN: ${{ steps.ts-token-exchange.outputs.ts_token }}
           TS_TAGS: ${{ secrets.TS_TAGS }}
@@ -227,7 +247,7 @@ jobs:
                 \"$TS_TAGS\"
               ],
               \"scopes\": [\"all\"]
-            }") 
+            }")
 
           client_id=$(echo "$response" | jq -r '.id')
           client_secret=$(echo "$response" | jq -r '.key')
@@ -245,15 +265,23 @@ jobs:
       # WIF token expires after 10 min and terratest takes 30m+
       # OAuth is a long lived credential but we delete it just after terratest
       - name: Run Terratest
-        if: steps.check-label-skip.outputs.label_present == 'false'
         env:
           TAILSCALE_IDENTITY_TOKEN: ""
           TAILSCALE_OAUTH_CLIENT_ID: ${{ steps.ts-oauth-create.outputs.client_id }}
           TAILSCALE_OAUTH_CLIENT_SECRET: ${{ steps.ts-oauth-create.outputs.client_secret }}
         run: go test -v ./tests/... -timeout ${{ env.TERRATEST_TIMEOUT }}
 
+  revoke-oauth:
+    # Revokes the temporary Tailscale OAuth client created during terratest.
+    # Runs even when terratest fails to ensure no credentials are left behind.
+    needs: [check-labels, terratest]
+    if: always() && needs.check-labels.outputs.should_run == 'true' && needs.terratest.outputs.client_id != ''
+    runs-on: ubuntu-latest
+    env:
+      TAILSCALE_OAUTH_CLIENT_ID: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+
+    steps:
       - name: Refresh Tailscale identity token
-        if: always() && steps.check-label-skip.outputs.label_present == 'false'
         uses: actions/github-script@v7
         with:
           script: |
@@ -261,9 +289,8 @@ jobs:
             core.setSecret(token)
             core.exportVariable('TAILSCALE_IDENTITY_TOKEN', token)
 
-      - name: Second request Tailscale API token using WIF credentials
-        id: ts-token-exchange-2
-        if: always() && steps.check-label-skip.outputs.label_present == 'false'
+      - name: Request Tailscale API token using WIF credentials
+        id: ts-token-exchange
         run: |
           response=$(curl -X POST https://api.tailscale.com/api/v2/oauth/token-exchange \
             -H "Content-Type: application/x-www-form-urlencoded" \
@@ -281,10 +308,9 @@ jobs:
           echo "ts_token=$ts_token" >> $GITHUB_OUTPUT
 
       - name: Revoke temporary Tailscale OAuth client
-        if: always() && steps.ts-oauth-create.outputs.client_id != ''
         env:
-          TS_TOKEN: ${{ steps.ts-token-exchange-2.outputs.ts_token }}
-          CLIENT_ID: ${{ steps.ts-oauth-create.outputs.client_id }}
+          TS_TOKEN: ${{ steps.ts-token-exchange.outputs.ts_token }}
+          CLIENT_ID: ${{ needs.terratest.outputs.client_id }}
         run: |
           response=$(curl -sS "https://api.tailscale.com/api/v2/tailnet/-/keys/$CLIENT_ID" \
             --request DELETE \
