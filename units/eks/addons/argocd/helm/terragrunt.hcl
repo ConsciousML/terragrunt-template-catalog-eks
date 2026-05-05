@@ -31,7 +31,7 @@ dependency "acm_certificate" {
 }
 
 dependency "route53_hosted_zone_private" {
-  config_path = "../../../route53_hosted_zone_private"
+  config_path = "../../../route53/hosted_zone_private"
   mock_outputs = {
     domain_name = "mock.example.com"
   }

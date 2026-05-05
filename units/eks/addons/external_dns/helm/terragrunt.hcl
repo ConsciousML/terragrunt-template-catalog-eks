@@ -29,7 +29,7 @@ dependency "iam_role_external_dns" {
 }
 
 dependency "route53_hosted_zone_private" {
-  config_path = "../../../route53_hosted_zone_private"
+  config_path = "../../../route53/hosted_zone_private"
   mock_outputs = {
     domain_name = "mock.example.com"
   }

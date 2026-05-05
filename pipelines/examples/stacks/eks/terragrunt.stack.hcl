@@ -3,8 +3,8 @@ locals {
 }
 
 unit "route53_hosted_zone" {
-  source = "${get_repo_root()}/units/eks/route53_hosted_zone"
-  path   = "eks/route53_hosted_zone"
+  source = "${get_repo_root()}/units/eks/route53/hosted_zone_public"
+  path   = "eks/route53/hosted_zone_public"
 
   values = {
     version = local.version
@@ -166,8 +166,8 @@ unit "argocd" {
 }
 
 unit "route53_hosted_zone_private" {
-  source = "${get_repo_root()}/units/eks/route53_hosted_zone_private"
-  path   = "eks/route53_hosted_zone_private"
+  source = "${get_repo_root()}/units/eks/route53/hosted_zone_private"
+  path   = "eks/route53/hosted_zone_private"
 
   values = {
     version = local.version
