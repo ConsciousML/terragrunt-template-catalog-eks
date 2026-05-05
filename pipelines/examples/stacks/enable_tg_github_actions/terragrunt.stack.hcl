@@ -7,8 +7,8 @@ locals {
 }
 
 unit "github_oidc_provider" {
-  source = "${get_repo_root()}/units/oidc_provider"
-  path   = "github_oidc_provider"
+  source = "${get_repo_root()}/units/github/oidc_provider"
+  path   = "github/oidc_provider"
 
   values = {
     version         = local.version
@@ -20,8 +20,8 @@ unit "github_oidc_provider" {
 }
 
 unit "iam_role_github_actions" {
-  source = "${get_repo_root()}/units/iam_role_github_actions"
-  path   = "iam_role_github_actions"
+  source = "${get_repo_root()}/units/github/iam_role"
+  path   = "github/iam_role"
 
   values = {
     version          = local.version
@@ -33,8 +33,8 @@ unit "iam_role_github_actions" {
 }
 
 unit "iam_policies" {
-  source = "${get_repo_root()}/units/iam_policies"
-  path   = "iam_policies"
+  source = "${get_repo_root()}/units/github/iam_policies"
+  path   = "github/iam_policies"
 
   values = {
     version     = local.version
@@ -43,8 +43,8 @@ unit "iam_policies" {
 }
 
 unit "github_secrets" {
-  source = "${get_repo_root()}/units/github_secrets"
-  path   = "github_secrets"
+  source = "${get_repo_root()}/units/github/secrets"
+  path   = "github/secrets"
 
   values = {
     version          = local.version
