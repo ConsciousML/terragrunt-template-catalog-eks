@@ -8,7 +8,7 @@ terraform {
 }
 
 dependency "tailscale_wif" {
-  config_path = "../wif"
+  config_path = "../workflow_identity_federation"
   mock_outputs = {
     client_id = "mock-client-id"
     audience  = "api.tailscale.com/mock-client-id"
