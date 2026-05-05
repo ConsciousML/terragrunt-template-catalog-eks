@@ -13,12 +13,12 @@ terraform {
 
 
 dependency "aws_load_balancer_controller" {
-  config_path  = "../../aws_load_balancer_controller"
+  config_path  = "../../aws_load_balancer_controller/helm"
   skip_outputs = true
 }
 
 dependency "external_dns" {
-  config_path  = "../../external_dns"
+  config_path  = "../../external_dns/helm"
   skip_outputs = true
 }
 
