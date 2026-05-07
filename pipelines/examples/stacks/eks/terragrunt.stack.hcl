@@ -219,6 +219,27 @@ unit "acm_certificate" {
   }
 }
 
+unit "iam_role_eso" {
+  source = "${get_repo_root()}/units/eks/addons/external_secrets_operator/iam_role"
+  path   = "eks/addons/external_secrets_operator/iam_role"
+
+  values = {
+    version = local.version
+    tags    = {}
+  }
+}
+
+unit "external_secrets_operator" {
+  source = "${get_repo_root()}/units/eks/addons/external_secrets_operator/helm"
+  path   = "eks/addons/external_secrets_operator/helm"
+
+  values = {
+    version            = local.version
+    helm_chart_version = "2.4.1"
+    helm_values        = {}
+  }
+}
+
 unit "tailscale_oauth_client_tailscale_operator" {
   source = "${get_repo_root()}/units/eks/addons/tailscale/oauth_client_tailscale_operator"
   path   = "eks/addons/tailscale/oauth_client_tailscale_operator"
