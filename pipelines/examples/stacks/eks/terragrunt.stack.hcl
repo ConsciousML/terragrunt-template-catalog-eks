@@ -124,9 +124,10 @@ unit "argocd_password" {
   path   = "eks/addons/argocd/aws_password_secret"
 
   values = {
-    version = local.version
-    length  = 16
-    tags    = {}
+    version                 = local.version
+    length                  = 16
+    recovery_window_in_days = 0
+    tags                    = {}
   }
 }
 

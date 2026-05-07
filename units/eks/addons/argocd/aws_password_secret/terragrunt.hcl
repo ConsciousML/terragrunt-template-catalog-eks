@@ -8,7 +8,8 @@ terraform {
 }
 
 inputs = {
-  secret_name = "${include.root.locals.environment}-argocd-password"
-  length      = values.length
-  tags        = values.tags
+  secret_name             = "${include.root.locals.environment}-argocd-password"
+  length                  = values.length
+  recovery_window_in_days = values.recovery_window_in_days
+  tags                    = values.tags
 }
