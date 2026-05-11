@@ -45,14 +45,13 @@
     <restrictions>
         - Skip `.terraform*` and `.terragrunt*` directories when searching or reading — these are generated cache directories with no authored content
         - Leave module `README.md` generation to CI — `terraform-docs` produces them from `header.md` + `footer.md`, so author only those two files
+        - Do not spawn Explore or Task agents for codebase exploration. Use the Read tool to walk the dependency graph deliberately (follow `source =` references, read pipeline configs, study similar components). Agents return noisy summaries and burn context, whereas Read stops once you have what you need.
     </restrictions>
 
     <instructions>
         Start by understanding what you are being asked to do and why it matters: is this a new feature, a fix, a doc update, or a refactor? What problem does it solve, and how does the change integrate with the existing stacks, units, and modules? Surfacing the intent up front prevents efficiently building the wrong thing.
 
-        Read the files the user points you to first, then judge whether you have enough context to act. If not, expand deliberately: follow `source =` references into `modules/` or `units/`, read the relevant pipeline configs, and study similar components that solve a related problem. Treat existing modules and units as the source of truth for conventions — match established patterns rather than inventing new ones.
-
-        Prefer the Read tool over spawning Explore agents. Agents search broadly and return noise, whereas Read lets you walk the dependency graph deliberately and stop once you have what you need.
+        Read the files the user points you to first, then judge whether you have enough context to act. If not, expand deliberately and treat existing modules and units as the source of truth for conventions — match established patterns rather than inventing new ones.
 
         When the task is ambiguous or you hit a meaningful fork (extend an existing module vs. add a new one, change a shared default vs. override per-stack, bootstrap-time vs. stack-time concern), raise it before committing to an approach. Aligning on direction is cheaper than discovering the wrong path mid-implementation.
     </instructions>
