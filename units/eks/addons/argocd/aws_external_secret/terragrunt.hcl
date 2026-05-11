@@ -33,6 +33,11 @@ dependency "argocd" {
   skip_outputs = true
 }
 
+dependency "external_secrets_operator" {
+  config_path  = "../../external_secrets_operator/helm"
+  skip_outputs = true
+}
+
 inputs = {
   cluster_name           = dependency.eks_cluster.outputs.cluster_name
   name                   = "argocd-admin-password"

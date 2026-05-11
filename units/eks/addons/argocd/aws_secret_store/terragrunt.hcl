@@ -16,6 +16,11 @@ dependency "iam_role_eso" {
   skip_outputs = true
 }
 
+dependency "external_secrets_operator" {
+  config_path  = "../../external_secrets_operator/helm"
+  skip_outputs = true
+}
+
 dependency "argocd" {
   config_path = "../helm"
   mock_outputs = {
