@@ -12,11 +12,8 @@ terraform {
 }
 
 dependency "iam_role_eso" {
-  config_path = "../../external_secrets_operator/iam_role"
-  mock_outputs = {
-    role_arn = "arn:aws:iam::123456789012:role/mock-eso-role"
-  }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+  config_path  = "../../external_secrets_operator/iam_role"
+  skip_outputs = true
 }
 
 dependency "argocd" {
@@ -31,6 +28,5 @@ inputs = {
   cluster_name = dependency.eks_cluster.outputs.cluster_name
   name         = "${include.root.locals.environment}-aws-secrets-manager"
   namespace    = dependency.argocd.outputs.namespace
-  iam_role_arn = dependency.iam_role_eso.outputs.role_arn
   aws_region   = include.root.locals.aws_region
 }

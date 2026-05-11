@@ -240,6 +240,24 @@ unit "external_secrets_operator" {
   }
 }
 
+unit "argocd_aws_secret_store" {
+  source = "${get_repo_root()}/units/eks/addons/argocd/aws_secret_store"
+  path   = "eks/addons/argocd/aws_secret_store"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "argocd_aws_external_secret" {
+  source = "${get_repo_root()}/units/eks/addons/argocd/aws_external_secret"
+  path   = "eks/addons/argocd/aws_external_secret"
+
+  values = {
+    version = local.version
+  }
+}
+
 unit "tailscale_oauth_client_tailscale_operator" {
   source = "${get_repo_root()}/units/eks/addons/tailscale/oauth_client_tailscale_operator"
   path   = "eks/addons/tailscale/oauth_client_tailscale_operator"

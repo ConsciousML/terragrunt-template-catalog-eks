@@ -10,7 +10,6 @@ resource "kubernetes_manifest" "this" {
       provider = {
         aws = {
           service = "SecretsManager"
-          role    = var.iam_role_arn
           region  = var.aws_region
         }
       }

@@ -14,11 +14,6 @@ variable "namespace" {
   type        = string
 }
 
-variable "iam_role_arn" {
-  description = "ARN of the IAM role ESO will assume to access AWS Secrets Manager"
-  type        = string
-}
-
 variable "aws_region" {
   description = "AWS region where the Secrets Manager secrets reside"
   type        = string
