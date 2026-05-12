@@ -13,7 +13,7 @@ dependency "route53_hosted_zone" {
     domain_name = "mock.example.com"
     zone_id     = "MOCKZONEID123456"
   }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph"]
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 inputs = {
