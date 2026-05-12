@@ -29,6 +29,7 @@
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_length"></a> [length](#input\_length) | Length of the generated password | `number` | `16` | no |
+| <a name="input_recovery_window_in_days"></a> [recovery\_window\_in\_days](#input\_recovery\_window\_in\_days) | Number of days that Secrets Manager waits before deleting the secret. Set to 0 for immediate deletion. | `number` | `30` | no |
 | <a name="input_secret_name"></a> [secret\_name](#input\_secret\_name) | Name of the Secrets Manager secret | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the Secrets Manager secret | `map(string)` | `{}` | no |
 
