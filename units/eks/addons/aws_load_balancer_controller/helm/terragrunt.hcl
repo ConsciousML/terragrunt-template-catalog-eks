@@ -43,9 +43,10 @@ inputs = {
   create_namespace   = false
   helm_chart_version = values.helm_chart_version
   helm_values = {
-    clusterName = dependency.eks_cluster.outputs.cluster_name
-    region      = local.region
-    vpcId       = dependency.vpc.outputs.vpc_id
+    clusterName                 = dependency.eks_cluster.outputs.cluster_name
+    region                      = local.region
+    vpcId                       = dependency.vpc.outputs.vpc_id
+    enableServiceMutatorWebhook = values.enableServiceMutatorWebhook
   }
 }
 

@@ -33,7 +33,7 @@ Modules (modules/) → Units (units/) → Examples (pipelines/examples/)
 ### Prerequisites
 - AWS account with billing enabled
 - GitHub account
-- AWS IAM permissions to manage IAM roles, VPC resources, EKS resources, compute resources and S3 (see `policy_arns` in the [bootstrap stack](pipelines/bootstrap/aws_gh_actions_auth/terragrunt.stack.hcl) for a list of the specific IAM policies)
+- `AdministratorAccess` AWS IAM permission
 
 ### Fork the Repository
 Click on the `Use this template` button.
@@ -63,6 +63,7 @@ curl https://mise.run | MISE_VERSION=v2026.4.0 sh
 
 Then, install all the tools in the `mise.toml` file:
 ```bash
+mise trust
 mise install
 ```
 
@@ -132,6 +133,30 @@ aws-node-59ld8                 2/2     Running   0          41m
 coredns-845b86cddf-pg8hk       1/1     Running   0          40m
 eks-pod-identity-agent-9pq6k   1/1     Running   0          41m
 ...
+```
+
+### Log in to ArgoCD
+
+ArgoCD is only reachable with the Tailscale Client running. Make sure you have completed the [Tailscale prerequisites](pipelines/bootstrap/tailscale/README.md#prerequisites) before proceeding.
+
+The ArgoCD host is formed from `pipelines/dns_config.hcl` as `<subdomain>.example.<base_domain>` (replace `<subdomain>` and `<base_domain>` with the values from that file, e.g. `argocd.example.axelmendoza.com`).
+
+**Web UI**: Open `https://<subdomain>.example.<base_domain>` in your browser and log in with username `admin`. Retrieve the password with:
+```bash
+aws secretsmanager get-secret-value \
+  --secret-id example-argocd-password \
+  --query SecretString \
+  --output text | jq -r .plaintext
+```
+
+**CLI**: Log in directly in one command:
+```bash
+argocd login <subdomain>.example.<base_domain> \
+  --username admin \
+  --password $(aws secretsmanager get-secret-value \
+    --secret-id example-argocd-password \
+    --query SecretString \
+    --output text | jq -r .plaintext)
 ```
 
 Finally, cleanup by destroying the infrastructure (cwd in `pipelines/examples/stacks/eks`):

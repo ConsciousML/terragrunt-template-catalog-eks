@@ -31,3 +31,6 @@ out/
 
 # Environment file
 .env
+
+# Dev notes
+docs/dev-notes

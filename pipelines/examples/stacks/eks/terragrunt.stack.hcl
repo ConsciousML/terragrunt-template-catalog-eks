@@ -114,8 +114,9 @@ unit "aws_load_balancer_controller" {
   path   = "eks/addons/aws_load_balancer_controller/helm"
 
   values = {
-    version            = local.version
-    helm_chart_version = "3.2.1"
+    version                     = local.version
+    helm_chart_version          = "3.2.1"
+    enableServiceMutatorWebhook = false
   }
 }
 
@@ -124,9 +125,10 @@ unit "argocd_password" {
   path   = "eks/addons/argocd/aws_password_secret"
 
   values = {
-    version = local.version
-    length  = 16
-    tags    = {}
+    version                 = local.version
+    length                  = 16
+    recovery_window_in_days = 0
+    tags                    = {}
   }
 }
 
@@ -212,6 +214,45 @@ unit "external_dns" {
 unit "acm_certificate" {
   source = "${get_repo_root()}/units/eks/acm_certificate"
   path   = "eks/acm_certificate"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "iam_role_eso" {
+  source = "${get_repo_root()}/units/eks/addons/external_secrets_operator/iam_role"
+  path   = "eks/addons/external_secrets_operator/iam_role"
+
+  values = {
+    version = local.version
+    tags    = {}
+  }
+}
+
+unit "external_secrets_operator" {
+  source = "${get_repo_root()}/units/eks/addons/external_secrets_operator/helm"
+  path   = "eks/addons/external_secrets_operator/helm"
+
+  values = {
+    version            = local.version
+    helm_chart_version = "2.4.1"
+    helm_values        = {}
+  }
+}
+
+unit "argocd_aws_secret_store" {
+  source = "${get_repo_root()}/units/eks/addons/argocd/aws_secret_store"
+  path   = "eks/addons/argocd/aws_secret_store"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "argocd_aws_external_secret" {
+  source = "${get_repo_root()}/units/eks/addons/argocd/aws_external_secret"
+  path   = "eks/addons/argocd/aws_external_secret"
 
   values = {
     version = local.version
