@@ -33,7 +33,7 @@ Modules (modules/) → Units (units/) → Examples (pipelines/examples/)
 ### Prerequisites
 - AWS account with billing enabled
 - GitHub account
-- AWS IAM permissions to manage IAM roles, VPC resources, EKS resources, compute resources and S3 (see `policy_arns` in the [bootstrap stack](pipelines/bootstrap/aws_gh_actions_auth/terragrunt.stack.hcl) for a list of the specific IAM policies)
+- `AdministratorAccess` AWS IAM permission
 
 ### Fork the Repository
 Click on the `Use this template` button.
@@ -63,6 +63,7 @@ curl https://mise.run | MISE_VERSION=v2026.4.0 sh
 
 Then, install all the tools in the `mise.toml` file:
 ```bash
+mise trust
 mise install
 ```
 

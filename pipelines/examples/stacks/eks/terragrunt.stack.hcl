@@ -114,8 +114,9 @@ unit "aws_load_balancer_controller" {
   path   = "eks/addons/aws_load_balancer_controller/helm"
 
   values = {
-    version            = local.version
-    helm_chart_version = "3.2.1"
+    version                     = local.version
+    helm_chart_version          = "3.2.1"
+    enableServiceMutatorWebhook = false
   }
 }
 
