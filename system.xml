@@ -40,6 +40,7 @@
 
     <conventions>
         - Prefix all resources with `{environment}-` to avoid naming collisions across environments
+        - Always set `expose = true` on every `include` block in unit files — without it, `include.<name>.locals.*` cannot be referenced in the same file
     </conventions>
 
     <restrictions>

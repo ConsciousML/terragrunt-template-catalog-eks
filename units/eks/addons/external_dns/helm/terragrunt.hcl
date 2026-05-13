@@ -24,8 +24,11 @@ dependency "aws_load_balancer_controller" {
 }
 
 dependency "iam_role_external_dns" {
-  config_path  = "../iam_role"
-  skip_outputs = true
+  config_path = "../iam_role"
+  mock_outputs = {
+    namespace = "external-dns"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 dependency "route53_hosted_zone_private" {
@@ -41,7 +44,7 @@ inputs = {
   name               = "external-dns"
   repository         = "https://kubernetes-sigs.github.io/external-dns/"
   chart              = "external-dns"
-  namespace          = "external-dns"
+  namespace          = dependency.iam_role_external_dns.outputs.namespace
   create_namespace   = true
   helm_chart_version = values.helm_chart_version
   helm_values        = values.helm_values

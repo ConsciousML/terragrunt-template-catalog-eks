@@ -30,8 +30,11 @@ dependency "acm_certificate" {
 }
 
 dependency "iam_role_aws_lbc" {
-  config_path  = "../iam_role"
-  skip_outputs = true
+  config_path = "../iam_role"
+  mock_outputs = {
+    namespace = "kube-system"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 inputs = {
@@ -39,7 +42,7 @@ inputs = {
   name               = "aws-load-balancer-controller"
   repository         = "https://aws.github.io/eks-charts"
   chart              = "aws-load-balancer-controller"
-  namespace          = "kube-system"
+  namespace          = dependency.iam_role_aws_lbc.outputs.namespace
   create_namespace   = false
   helm_chart_version = values.helm_chart_version
   helm_values = {
