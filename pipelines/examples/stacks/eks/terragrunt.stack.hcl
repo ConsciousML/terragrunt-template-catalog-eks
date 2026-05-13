@@ -190,10 +190,8 @@ unit "iam_role_external_dns" {
   path   = "eks/addons/external_dns/iam_role"
 
   values = {
-    version         = local.version
-    iam_policy_name = "external-dns-policy"
-    iam_role_name   = "external-dns"
-    tags            = {}
+    version = local.version
+    tags    = {}
   }
 }
 

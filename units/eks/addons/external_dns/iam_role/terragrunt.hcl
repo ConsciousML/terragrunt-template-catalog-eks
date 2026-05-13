@@ -3,12 +3,8 @@ include "root" {
   expose = true
 }
 
-locals {
-  environment = include.root.locals.environment
-}
-
 terraform {
-  source = "git::git@github.com:${include.root.locals.github_username}/${include.root.locals.github_repo_name}.git//modules/iam_role_external_dns/?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_username}/${include.root.locals.github_repo_name}.git//modules/iam_pod_identity/?ref=${values.version}"
 }
 
 dependency "eks_cluster" {
@@ -21,7 +17,31 @@ dependency "eks_cluster" {
 
 inputs = {
   cluster_name    = dependency.eks_cluster.outputs.cluster_name
-  iam_policy_name = "${local.environment}-${values.iam_policy_name}"
-  iam_role_name   = "${local.environment}-${values.iam_role_name}"
-  tags            = values.tags
+  iam_policy_name = "${include.root.locals.environment}-external-dns-policy"
+  iam_role_name   = "${include.root.locals.environment}-external-dns"
+  namespace       = "external-dns"
+  service_account = "external-dns"
+
+  # tfsec:ignore:aws-iam-no-policy-wildcards - official policy from external-dns docs, already scoped to hostedzone/*
+  iam_policy_json = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "route53:ChangeResourceRecordSets",
+          "route53:ListResourceRecordSets",
+          "route53:ListTagsForResources",
+        ]
+        Resource = ["arn:aws:route53:::hostedzone/*"]
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["route53:ListHostedZones"]
+        Resource = ["*"]
+      },
+    ]
+  })
+
+  tags = values.tags
 }
