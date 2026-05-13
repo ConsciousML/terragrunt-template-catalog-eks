@@ -48,7 +48,7 @@ locals {
 }
 ```
 2. Change `pipelines/region.hcl` to match your desired AWS region
-3. Change `pipelines/dns_config.hcl` to match your domain name where you'll use ACM to sign TLS certificates (if you don't have a domain name, you'll need to register one using a domain registrar such a GoDaddy or Namecheap)
+3. Change `pipelines/dns.hcl` to match your domain name where you'll use ACM to sign TLS certificates (if you don't have a domain name, you'll need to register one using a domain registrar such a GoDaddy or Namecheap)
 
 ### Installation
 
@@ -139,7 +139,7 @@ eks-pod-identity-agent-9pq6k   1/1     Running   0          41m
 
 ArgoCD is only reachable with the Tailscale Client running. Make sure you have completed the [Tailscale prerequisites](pipelines/bootstrap/tailscale/README.md#prerequisites) before proceeding.
 
-The ArgoCD host is formed from `pipelines/dns_config.hcl` as `<subdomain>.example.<base_domain>` (replace `<subdomain>` and `<base_domain>` with the values from that file, e.g. `argocd.example.axelmendoza.com`).
+The ArgoCD host is formed from `pipelines/dns.hcl` as `<subdomain>.example.<base_domain>` (replace `<subdomain>` and `<base_domain>` with the values from that file, e.g. `argocd.example.axelmendoza.com`).
 
 **Web UI**: Open `https://<subdomain>.example.<base_domain>` in your browser and log in with username `admin`. Retrieve the password with:
 ```bash

@@ -4,10 +4,9 @@ include "root" {
 }
 
 locals {
-  environment_hcl = find_in_parent_folders("environment.hcl")
-  environment     = read_terragrunt_config(local.environment_hcl).locals.environment
+  environment = include.root.locals.environment
 
-  dns_config_hcl = find_in_parent_folders("dns_config.hcl")
+  dns_config_hcl = find_in_parent_folders("dns.hcl")
   base_domain    = read_terragrunt_config(local.dns_config_hcl).locals.base_domain
   subdomain      = read_terragrunt_config(local.dns_config_hcl).locals.subdomain
   domain_name    = "${local.subdomain}.${local.environment}.${local.base_domain}"
