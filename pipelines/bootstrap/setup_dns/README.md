@@ -73,7 +73,7 @@ locals {
 }
 ```
 
-Update `pipelines/dns_config.hcl` with your domain:
+Update `pipelines/dns.hcl` with your domain:
 
 ```hcl
 locals {

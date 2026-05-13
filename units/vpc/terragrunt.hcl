@@ -1,10 +1,10 @@
 include "root" {
-  path = find_in_parent_folders("root.hcl")
+  path   = find_in_parent_folders("root.hcl")
+  expose = true
 }
 
 locals {
-  environment_hcl = find_in_parent_folders("environment.hcl")
-  environment     = read_terragrunt_config(local.environment_hcl).locals.environment
+  environment = include.root.locals.environment
 
   region_hcl    = find_in_parent_folders("region.hcl")
   region_locals = read_terragrunt_config(local.region_hcl).locals

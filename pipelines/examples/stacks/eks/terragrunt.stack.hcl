@@ -2,7 +2,7 @@ locals {
   version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
 }
 
-unit "route53_hosted_zone" {
+unit "route53_hosted_zone_public" {
   source = "${get_repo_root()}/units/eks/route53/hosted_zone_public"
   path   = "eks/route53/hosted_zone_public"
 
