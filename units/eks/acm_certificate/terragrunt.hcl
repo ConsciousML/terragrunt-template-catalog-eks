@@ -7,7 +7,7 @@ terraform {
   source = "git::git@github.com:${include.root.locals.github_username}/${include.root.locals.github_repo_name}.git//modules/acm_certificate/?ref=${values.version}"
 }
 
-dependency "route53_hosted_zone" {
+dependency "route53_hosted_zone_public" {
   config_path = "../route53/hosted_zone_public"
   mock_outputs = {
     domain_name = "mock.example.com"
@@ -17,6 +17,6 @@ dependency "route53_hosted_zone" {
 }
 
 inputs = {
-  domain_name = dependency.route53_hosted_zone.outputs.domain_name
-  zone_id     = dependency.route53_hosted_zone.outputs.zone_id
+  domain_name = dependency.route53_hosted_zone_public.outputs.domain_name
+  zone_id     = dependency.route53_hosted_zone_public.outputs.zone_id
 }
