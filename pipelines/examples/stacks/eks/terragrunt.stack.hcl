@@ -1,5 +1,6 @@
 locals {
-  version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
+  version         = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
+  aws_lbc_version = "3.2.1"
 }
 
 unit "route53_hosted_zone_public" {
@@ -96,16 +97,23 @@ unit "cluster" {
   }
 }
 
+unit "iam_policy_aws_lbc" {
+  source = "${get_repo_root()}/units/eks/addons/aws_load_balancer_controller/iam_policy_url"
+  path   = "eks/addons/aws_load_balancer_controller/iam_policy_url"
+
+  values = {
+    version = local.version
+    url     = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v${local.aws_lbc_version}/docs/install/iam_policy.json"
+  }
+}
+
 unit "iam_role_aws_lbc" {
   source = "${get_repo_root()}/units/eks/addons/aws_load_balancer_controller/iam_role"
   path   = "eks/addons/aws_load_balancer_controller/iam_role"
 
   values = {
-    version         = local.version
-    iam_policy_name = "aws-load-balancer-controller-policy"
-    iam_policy_url  = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v3.2.1/docs/install/iam_policy.json"
-    iam_role_name   = "aws-load-balancer-controller"
-    tags            = {}
+    version = local.version
+    tags    = {}
   }
 }
 
@@ -115,7 +123,7 @@ unit "aws_load_balancer_controller" {
 
   values = {
     version                     = local.version
-    helm_chart_version          = "3.2.1"
+    helm_chart_version          = local.aws_lbc_version
     enableServiceMutatorWebhook = false
   }
 }
