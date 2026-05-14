@@ -1,9 +1,22 @@
 package tests
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"os"
 	"testing"
+	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	"github.com/gruntwork-io/terratest/modules/retry"
 	"github.com/gruntwork-io/terratest/modules/terragrunt"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLocalStack(t *testing.T) {
@@ -11,11 +24,12 @@ func TestLocalStack(t *testing.T) {
 
 	ctx := t.Context()
 
+	region := os.Getenv("AWS_REGION")
+	require.NotEmpty(t, region, "AWS_REGION must be set")
+
 	// Edit this variable to point to your stack
 	// Path is relative to the `tests/` directory.
-	// TODO: switch back to the full EKS stack once ArgoCD login test is validated
-	// stackDir := "../pipelines/examples/stacks/eks"
-	stackDir := "../pipelines/examples/stacks/vpc_only"
+	stackDir := "../pipelines/examples/stacks/eks"
 
 	options := &terragrunt.Options{
 		// Run from the examples subfolder where the terragrunt configs are
@@ -26,12 +40,78 @@ func TestLocalStack(t *testing.T) {
 
 	// Clean up all modules with "terragrunt destroy --all" at the end of the test.
 	// DestroyAll respects the reverse dependency order.
-	defer terragrunt.DestroyAllContext(t, ctx, options)
+	// TODO: uncomment before merge
+	// defer terragrunt.DestroyAllContext(t, ctx, options)
 
 	// Run "terragrunt apply --all". This applies all modules in dependency order.
 	terragrunt.ApplyAllContext(t, ctx, options)
 
 	allOutputs := terragrunt.StackOutputAllContext(t, ctx, options)
-	host := allOutputs["route53_hosted_zone_private"].(map[string]any)["domain_name"].(string)
-	t.Logf("ArgoCD host: %s", host)
+
+	testArgoCDLogin(t, ctx, region, allOutputs)
+}
+
+func testArgoCDLogin(t *testing.T, ctx context.Context, region string, allOutputs map[string]any) {
+	t.Helper()
+
+	privateZone, ok := allOutputs["route53_hosted_zone_private"].(map[string]any)
+	require.True(t, ok, "stack output 'route53_hosted_zone_private' missing or wrong type")
+
+	host, ok := privateZone["domain_name"].(string)
+	require.True(t, ok, "output 'route53_hosted_zone_private.domain_name' missing or wrong type")
+
+	// Retrieve the secret name from the argocd_password unit output instead of constructing it.
+	argocdOut, ok := allOutputs["argocd_password"].(map[string]any)
+	require.True(t, ok, "stack output 'argocd_password' missing or wrong type")
+
+	secretName, ok := argocdOut["secret_name"].(string)
+	require.True(t, ok, "output 'argocd_password.secret_name' missing or wrong type")
+
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(region))
+	require.NoError(t, err, "failed to load AWS config for region %s", region)
+
+	svc := secretsmanager.NewFromConfig(cfg)
+	secret, err := svc.GetSecretValue(ctx, &secretsmanager.GetSecretValueInput{
+		SecretId:     aws.String(secretName),
+		VersionStage: aws.String("AWSCURRENT"),
+	})
+	require.NoError(t, err, "failed to retrieve secret %q from Secrets Manager", secretName)
+
+	// Secret is stored as {"plaintext":"...","bcrypt_hash":"..."} by modules/argocd_password/main.tf.
+	var secretData struct {
+		Plaintext string `json:"plaintext"`
+	}
+	require.NoError(t, json.Unmarshal([]byte(*secret.SecretString), &secretData), "failed to unmarshal secret JSON for %q", secretName)
+	require.NotEmpty(t, secretData.Plaintext, "plaintext field is empty in secret %q", secretName)
+
+	// Poll /healthz until ArgoCD is ready before attempting login.
+	retry.DoWithRetry(t, "wait for ArgoCD to be ready", 20, 30*time.Second, func() (string, error) {
+		resp, err := http.Get("https://" + host + "/healthz")
+		if err != nil {
+			return "", fmt.Errorf("GET https://%s/healthz: %w", host, err)
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			return "", fmt.Errorf("GET https://%s/healthz: got %d, want 200", host, resp.StatusCode)
+		}
+		return "ready", nil
+	})
+
+	body, err := json.Marshal(map[string]string{
+		"username": "admin",
+		"password": secretData.Plaintext,
+	})
+	require.NoError(t, err, "failed to marshal ArgoCD login request body")
+
+	resp, err := http.Post("https://"+host+"/api/v1/session", "application/json", bytes.NewReader(body))
+	require.NoError(t, err, "POST https://%s/api/v1/session failed", host)
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusOK, resp.StatusCode, "ArgoCD login returned unexpected status: got %d, want 200", resp.StatusCode)
+
+	var session struct {
+		Token string `json:"token"`
+	}
+	require.NoError(t, json.NewDecoder(resp.Body).Decode(&session), "failed to decode ArgoCD session response")
+	assert.NotEmpty(t, session.Token, "ArgoCD session token is empty — login may have succeeded but returned no token")
 }

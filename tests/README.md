@@ -27,9 +27,15 @@ Setup the go module, replacing `<your_github_username>` and `<your_forked_repo_n
 ```bash
 go mod init github.com/<your_github_username>/<your_forked_repo_name>
 go get github.com/gruntwork-io/terratest@v1.0.0
-go get github.com/aws/aws-sdk-go-v2/config@v1.32.17
-go get github.com/aws/aws-sdk-go-v2/service/secretsmanager@v1.41.7
+go get github.com/aws/aws-sdk-go-v2/aws
+go get github.com/aws/aws-sdk-go-v2/config
+go get github.com/aws/aws-sdk-go-v2/service/secretsmanager
 go mod tidy
+```
+
+Set required environment variables before running:
+```bash
+export AWS_REGION=<your-aws-region>   # e.g. us-east-1 — required, tests fail immediately if unset
 ```
 
 Run the test:
