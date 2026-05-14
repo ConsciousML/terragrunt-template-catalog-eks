@@ -11,7 +11,7 @@ locals {
   region        = local.region_locals.region
   azs           = local.region_locals.azs
 
-  vpc_cidr = read_terragrunt_config(find_in_parent_folders("vpc.hcl")).locals.vpc_cidr
+  vpc_cidr = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_cidrs[local.environment]
 }
 
 terraform {

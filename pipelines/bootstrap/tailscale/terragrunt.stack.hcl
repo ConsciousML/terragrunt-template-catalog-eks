@@ -1,6 +1,6 @@
 locals {
-  version  = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
-  vpc_cidr = read_terragrunt_config(find_in_parent_folders("vpc.hcl")).locals.vpc_cidr
+  version   = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
+  vpc_cidrs = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_cidrs
 
   github_locals    = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
   github_username  = local.github_locals.github_username
@@ -25,7 +25,7 @@ unit "acl" {
       }
       autoApprovers = {
         routes = {
-          "${local.vpc_cidr}" = ["tag:k8s-operator", "tag:k8s"]
+          for cidr in values(local.vpc_cidrs) : cidr => ["tag:k8s-operator", "tag:k8s"]
         }
       }
     })
