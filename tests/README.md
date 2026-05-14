@@ -26,11 +26,13 @@ This has the benefit to use environment variables specific to an `example` envir
 Setup the go module, replacing `<your_github_username>` and `<your_forked_repo_name>` if you forked the repository:
 ```bash
 go mod init github.com/<your_github_username>/<your_forked_repo_name>
-go get github.com/gruntwork-io/terratest@v0.56.0
+go get github.com/gruntwork-io/terratest@v1.0.0
+go get github.com/aws/aws-sdk-go-v2/config@v1.32.17
+go get github.com/aws/aws-sdk-go-v2/service/secretsmanager@v1.41.7
 go mod tidy
 ```
 
 Run the test:
 ```bash
-go test -v ./tests/... -timeout 30m
+go test -v ./tests/... -timeout 60m
 ```

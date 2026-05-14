@@ -1,3 +1,7 @@
+locals {
+  version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
+}
+
 unit "vpc" {
   source = "${get_repo_root()}/units/vpc"
   path   = "vpc"
@@ -28,5 +32,15 @@ unit "vpc" {
     private_subnet_tags = {
       "kubernetes.io/role/internal-elb" = 1
     }
+  }
+}
+
+unit "route53_hosted_zone_private" {
+  source = "${get_repo_root()}/units/eks/route53/hosted_zone_private"
+  path   = "eks/route53/hosted_zone_private"
+
+  values = {
+    version = local.version
+    comment = "Managed by Terraform"
   }
 }
