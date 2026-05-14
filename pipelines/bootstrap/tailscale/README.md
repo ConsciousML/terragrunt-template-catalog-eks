@@ -61,7 +61,7 @@ locals {
 }
 ```
 
-The `vpc_cidr` is read automatically from `vpc.hcl` and used to configure the ACL auto-approver. The `ci_tag` can be left as the default `tag:ci`.
+All environment VPC CIDRs are read automatically from `network.hcl` and used to build the ACL `autoApprovers` dynamically. The `ci_tag` can be left as the default `tag:ci`.
 
 ### Deploy
 
