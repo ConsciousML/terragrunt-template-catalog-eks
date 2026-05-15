@@ -13,25 +13,7 @@ This enables the CI to run properly without managing secrets and AWS credentials
 - Follow the [installation instructions](../../../README.md#installation):
 - Same [prerequisites](../../../README.md#prerequisites) as in the main `README.md`
 
-Authenticate with the GitHub CLI:
-```bash
-gh auth login --scopes "repo,admin:repo_hook"
-```
-
-If you haven't already, copy the example environment file:
-```bash
-cp .env.example .env
-```
-
-Copy the GitHub fine-grained token:
-```bash
-gh auth token
-```
-
-Add the token to your `.env` file replacing `<your_token>`:
-```bash
-export GITHUB_TOKEN=<your_token>
-```
+Set up `GITHUB_TOKEN` following the [environment variables guide](../../../docs/environment-variables.md#github_token).
 
 ### Configuration
 In `pipelines/bootstrap/` change `region.hcl` to match your desired AWS region.
