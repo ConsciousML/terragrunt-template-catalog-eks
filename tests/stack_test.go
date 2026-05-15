@@ -27,23 +27,15 @@ func TestLocalStack(t *testing.T) {
 	region := os.Getenv("AWS_REGION")
 	require.NotEmpty(t, region, "AWS_REGION must be set")
 
-	// Edit this variable to point to your stack
-	// Path is relative to the `tests/` directory.
 	stackDir := "../pipelines/examples/stacks/eks"
 
 	options := &terragrunt.Options{
-		// Run from the examples subfolder where the terragrunt configs are
-		TerragruntDir: stackDir,
-		// Optional: Set log level for cleaner output
+		TerragruntDir:  stackDir,
 		TerragruntArgs: []string{"--log-level", "error"},
 	}
 
-	// Clean up all modules with "terragrunt destroy --all" at the end of the test.
-	// DestroyAll respects the reverse dependency order.
-	// TODO: uncomment before merge
-	// defer terragrunt.DestroyAllContext(t, ctx, options)
+	defer terragrunt.DestroyAllContext(t, ctx, options)
 
-	// Run "terragrunt apply --all". This applies all modules in dependency order.
 	terragrunt.ApplyAllContext(t, ctx, options)
 
 	allOutputs := terragrunt.StackOutputAllContext(t, ctx, options)
@@ -67,6 +59,9 @@ func testArgoCDLogin(t *testing.T, ctx context.Context, region string, allOutput
 	secretName, ok := argocdOut["secret_name"].(string)
 	require.True(t, ok, "output 'argocd_password.secret_name' missing or wrong type")
 
+	t.Logf("ArgoCD host: %s | password secret name: %s", host, secretName)
+
+	t.Log("retrieving ArgoCD password from Secrets Manager")
 	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(region))
 	require.NoError(t, err, "failed to load AWS config for region %s", region)
 
@@ -77,14 +72,14 @@ func testArgoCDLogin(t *testing.T, ctx context.Context, region string, allOutput
 	})
 	require.NoError(t, err, "failed to retrieve secret %q from Secrets Manager", secretName)
 
-	// Secret is stored as {"plaintext":"...","bcrypt_hash":"..."} by modules/argocd_password/main.tf.
 	var secretData struct {
 		Plaintext string `json:"plaintext"`
 	}
 	require.NoError(t, json.Unmarshal([]byte(*secret.SecretString), &secretData), "failed to unmarshal secret JSON for %q", secretName)
 	require.NotEmpty(t, secretData.Plaintext, "plaintext field is empty in secret %q", secretName)
+	t.Log("password retrieved successfully")
 
-	// Poll /healthz until ArgoCD is ready before attempting login.
+	t.Logf("polling https://%s/healthz until ArgoCD is ready", host)
 	retry.DoWithRetry(t, "wait for ArgoCD to be ready", 20, 30*time.Second, func() (string, error) {
 		resp, err := http.Get("https://" + host + "/healthz")
 		if err != nil {
@@ -96,7 +91,9 @@ func testArgoCDLogin(t *testing.T, ctx context.Context, region string, allOutput
 		}
 		return "ready", nil
 	})
+	t.Log("ArgoCD is healthy")
 
+	t.Logf("logging in to ArgoCD at https://%s/api/v1/session", host)
 	body, err := json.Marshal(map[string]string{
 		"username": "admin",
 		"password": secretData.Plaintext,
@@ -114,4 +111,5 @@ func testArgoCDLogin(t *testing.T, ctx context.Context, region string, allOutput
 	}
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&session), "failed to decode ArgoCD session response")
 	assert.NotEmpty(t, session.Token, "ArgoCD session token is empty — login may have succeeded but returned no token")
+	t.Log("ArgoCD login succeeded and session token received")
 }
