@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"runtime"
 	"testing"
 	"time"
 
@@ -53,9 +54,41 @@ func TestLocalStack(t *testing.T) {
 
 func reconnectTailscale(t *testing.T) {
 	t.Helper()
-	for _, args := range [][]string{{"tailscale", "down"}, {"tailscale", "up"}} {
+
+	out, err := exec.Command("tailscale", "down").CombinedOutput()
+	require.NoError(t, err, "tailscale down: %s", bytes.TrimSpace(out))
+	t.Log("tailscale down")
+
+	flushDNSCache(t)
+
+	out, err = exec.Command("tailscale", "up").CombinedOutput()
+	require.NoError(t, err, "tailscale up: %s", bytes.TrimSpace(out))
+	t.Log("tailscale up")
+}
+
+func flushDNSCache(t *testing.T) {
+	t.Helper()
+	var cmds [][]string
+	switch runtime.GOOS {
+	case "darwin":
+		cmds = [][]string{
+			{"dscacheutil", "-flushcache"},
+		}
+	case "linux":
+		cmds = [][]string{
+			{"sudo", "resolvectl", "flush-caches"},
+		}
+	default:
+		t.Logf("flushDNSCache: unsupported platform %s, skipping", runtime.GOOS)
+		return
+	}
+	for _, args := range cmds {
 		out, err := exec.Command(args[0], args[1:]...).CombinedOutput()
-		require.NoError(t, err, "reconnectTailscale: %v: %s", args, bytes.TrimSpace(out))
+		if err != nil {
+			t.Logf("flushDNSCache: %v: %s (non-fatal)", args, bytes.TrimSpace(out))
+		} else {
+			t.Logf("flushDNSCache: %v: ok", args)
+		}
 	}
 }
 
