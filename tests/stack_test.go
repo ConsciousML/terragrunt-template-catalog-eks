@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
 	"testing"
 	"time"
 
@@ -27,6 +28,10 @@ func TestLocalStack(t *testing.T) {
 	region := os.Getenv("AWS_REGION")
 	require.NotEmpty(t, region, "AWS_REGION must be set")
 
+	// Tailscale CLI is needed to flush DNS cache after Terragrunt apply
+	_, err := exec.LookPath("tailscale")
+	require.NoError(t, err, "tailscale CLI not found in PATH — install it before running this test")
+
 	stackDir := "../pipelines/examples/stacks/eks"
 
 	options := &terragrunt.Options{
@@ -38,9 +43,20 @@ func TestLocalStack(t *testing.T) {
 
 	terragrunt.ApplyAllContext(t, ctx, options)
 
+	// Use the Tailscae CLI to flush DNS cache
+	reconnectTailscale(t)
+
 	allOutputs := terragrunt.StackOutputAllContext(t, ctx, options)
 
 	testArgoCDLogin(t, ctx, region, allOutputs)
+}
+
+func reconnectTailscale(t *testing.T) {
+	t.Helper()
+	for _, args := range [][]string{{"tailscale", "down"}, {"tailscale", "up"}} {
+		out, err := exec.Command(args[0], args[1:]...).CombinedOutput()
+		require.NoError(t, err, "reconnectTailscale: %v: %s", args, bytes.TrimSpace(out))
+	}
 }
 
 func testArgoCDLogin(t *testing.T, ctx context.Context, region string, allOutputs map[string]any) {
