@@ -55,13 +55,13 @@ func TestLocalStack(t *testing.T) {
 func reconnectTailscale(t *testing.T) {
 	t.Helper()
 
-	out, err := exec.Command("tailscale", "down").CombinedOutput()
+	out, err := exec.Command("sudo", "tailscale", "down").CombinedOutput()
 	require.NoError(t, err, "tailscale down: %s", bytes.TrimSpace(out))
 	t.Log("tailscale down")
 
 	flushDNSCache(t)
 
-	out, err = exec.Command("tailscale", "up").CombinedOutput()
+	out, err = exec.Command("sudo", "tailscale", "up").CombinedOutput()
 	require.NoError(t, err, "tailscale up: %s", bytes.TrimSpace(out))
 	t.Log("tailscale up")
 }
