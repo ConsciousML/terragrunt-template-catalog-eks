@@ -15,13 +15,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/retry"
 	"github.com/gruntwork-io/terratest/modules/terragrunt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestLocalStack(t *testing.T) {
+func TestStack(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
@@ -47,7 +48,13 @@ func TestLocalStack(t *testing.T) {
 	// Use the Tailscae CLI to flush DNS cache
 	reconnectTailscale(t)
 
-	allOutputs := terragrunt.StackOutputAllContext(t, ctx, options)
+	// Remove logger for stack output to avoid printing sensitive information
+	silentOptions := &terragrunt.Options{
+		TerragruntDir:  stackDir,
+		TerragruntArgs: []string{"--log-level", "error"},
+		Logger:         logger.Discard,
+	}
+	allOutputs := terragrunt.StackOutputAllContext(t, ctx, silentOptions)
 
 	testArgoCDLogin(t, ctx, region, allOutputs)
 }
