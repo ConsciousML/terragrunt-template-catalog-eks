@@ -20,13 +20,9 @@ The full DNS flow is:
 2. **Manual step**: Add those nameservers to your domain registrar as NS records for the subdomain, delegating authority to Route 53.
 3. The EKS stack handles everything else: ACM issues the TLS certificate (validated via a CNAME in the public zone), creates the private zone associated with the VPC, and ExternalDNS writes the A record to the private zone.
 
-## Multi-Environment Setup
-
-Each environment needs its own Route 53 hosted zone so that the subdomain can be deployed independently per env (`argocd.dev.yourdomain.com`, `argocd.staging.yourdomain.com`, `argocd.prod.yourdomain.com`, etc.) without zones or state clashing. Run this bootstrap once per environment, delegate the NS records, then deploy the [EKS stack](../../examples/stacks/eks/) which will pick up the public zone automatically via a data source and create the private zone.
-
 ## Structure
 
-One directory per environment, each deploying an independent hosted zone:
+This catalog ships one environment (`dev`) for local testing. Staging and production are managed in the live repo under [`live/bootstrap/setup_dns/`](https://github.com/ConsciousML/terragrunt-template-live-eks/tree/main/live/bootstrap/setup_dns).
 
 ```
 pipelines/bootstrap/setup_dns/
@@ -34,25 +30,7 @@ pipelines/bootstrap/setup_dns/
     environment.hcl        ← environment = "dev"
     stack/
       terragrunt.stack.hcl
-  staging/
-    environment.hcl        ← environment = "staging"
-    stack/
-      terragrunt.stack.hcl
-  prod/
-    environment.hcl        ← environment = "prod"
-    stack/
-      terragrunt.stack.hcl
-  example/
-    environment.hcl        ← environment = "example"
-    stack/
-      terragrunt.stack.hcl
-  ci/
-    environment.hcl        ← environment = "catalog-eks-ci"
-    stack/
-      terragrunt.stack.hcl
 ```
-
-Run this bootstrap for each environment you plan to deploy. Repeat the steps below for every directory listed above.
 
 ## Quick Start
 
@@ -64,12 +42,12 @@ Run this bootstrap for each environment you plan to deploy. Repeat the steps bel
 
 In `pipelines/` change `region.hcl` to match your desired AWS region.
 
-Update the `locals` block in each `terragrunt.stack.hcl` to match your repository:
+Update `pipelines/github.hcl` to match your repository:
 
 ```hcl
 locals {
-  github_username  = "YourGitHubUsername"
-  github_repo_name = "your-repo-name"
+  github_username_catalog  = "YourGitHubUsername"
+  github_repo_name_catalog = "your-repo-name"
 }
 ```
 
@@ -86,16 +64,7 @@ You'll need to have a functional domain with access to the administrator panel. 
 
 ### Deploy
 
-Pick an environment and run from the root of this repository:
-
-```bash
-source .env
-cd pipelines/bootstrap/setup_dns/<env>/stack
-terragrunt stack generate
-terragrunt run --all apply --backend-bootstrap --non-interactive
-```
-
-For example, to deploy the `dev` environment:
+Run from the root of this repository:
 
 ```bash
 source .env
