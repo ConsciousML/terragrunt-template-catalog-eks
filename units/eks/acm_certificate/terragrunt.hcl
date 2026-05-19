@@ -4,7 +4,7 @@ include "root" {
 }
 
 terraform {
-  source = "git::git@github.com:${include.root.locals.github_username}/${include.root.locals.github_repo_name}.git//modules/acm_certificate/?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/acm_certificate/?ref=${values.version}"
 }
 
 dependency "route53_hosted_zone_public" {

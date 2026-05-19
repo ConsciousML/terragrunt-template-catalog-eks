@@ -8,7 +8,7 @@ locals {
 }
 
 terraform {
-  source = "git::git@github.com:${include.root.locals.github_username}/${include.root.locals.github_repo_name}.git//modules/iam_role_github_actions?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/iam_role_github_actions?ref=${values.version}"
 }
 
 inputs = {

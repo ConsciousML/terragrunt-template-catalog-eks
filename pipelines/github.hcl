@@ -1,4 +1,4 @@
 locals {
-  github_username  = "ConsciousML"
-  github_repo_name = "terragrunt-template-catalog-eks"
+  github_username_catalog  = "ConsciousML"
+  github_repo_name_catalog = "terragrunt-template-catalog-eks"
 }

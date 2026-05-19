@@ -43,8 +43,8 @@ In your forked repository, change the following Terragrunt configuration files:
 1. In `pipelines/github.hcl`, modify:
 ```hcl
 locals {
-  github_username  = "YourGitHubUsername"
-  github_repo_name = "the-repository-name-of-your-fork"
+  github_username_catalog  = "YourGitHubUsername"
+  github_repo_name_catalog = "the-repository-name-of-your-fork"
 }
 ```
 2. Change `pipelines/region.hcl` to match your desired AWS region
