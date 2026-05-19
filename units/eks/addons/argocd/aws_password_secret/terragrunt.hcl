@@ -4,7 +4,7 @@ include "root" {
 }
 
 terraform {
-  source = "git::git@github.com:${include.root.locals.github_username}/${include.root.locals.github_repo_name}.git//modules/argocd_password/?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/argocd_password/?ref=${values.version}"
 }
 
 dependency "external_secrets_operator" {

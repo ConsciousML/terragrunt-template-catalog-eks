@@ -8,9 +8,9 @@ locals {
   aws_region  = local.region_vars.locals.region
   environment = local.environment_vars.locals.environment
 
-  github_locals    = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
-  github_username  = local.github_locals.github_username
-  github_repo_name = local.github_locals.github_repo_name
+  github_locals            = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
+  github_username_catalog  = local.github_locals.github_username_catalog
+  github_repo_name_catalog = local.github_locals.github_repo_name_catalog
 }
 
 # Configure AWS backend for storing Terraform state files
@@ -45,7 +45,7 @@ EOF
 
 catalog {
   urls = [
-    "https://github.com/${local.github_username}/${local.github_repo_name}"
+    "https://github.com/${local.github_username_catalog}/${local.github_repo_name_catalog}"
   ]
 }
 

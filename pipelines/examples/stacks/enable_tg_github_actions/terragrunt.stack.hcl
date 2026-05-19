@@ -1,9 +1,9 @@
 locals {
   version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
 
-  github_locals    = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
-  github_username  = local.github_locals.github_username
-  github_repo_name = local.github_locals.github_repo_name
+  github_locals            = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
+  github_username_catalog  = local.github_locals.github_username_catalog
+  github_repo_name_catalog = local.github_locals.github_repo_name_catalog
 }
 
 unit "github_oidc_provider" {
@@ -26,8 +26,8 @@ unit "iam_role_github_actions" {
   values = {
     version          = local.version
     name             = "github-actions-terragrunt-role"
-    github_username  = local.github_username
-    github_repo_name = local.github_repo_name
+    github_username  = local.github_username_catalog
+    github_repo_name = local.github_repo_name_catalog
     github_branch    = "*"
   }
 }
@@ -49,7 +49,7 @@ unit "github_secrets" {
   values = {
     version          = local.version
     github_token     = get_env("GITHUB_TOKEN")
-    github_repo_name = local.github_repo_name
+    github_repo_name = local.github_repo_name_catalog
   }
 }
 
@@ -60,8 +60,8 @@ unit "deploy_key" {
   values = {
     version            = local.version
     github_token       = get_env("GITHUB_TOKEN")
-    repositories       = [local.github_repo_name]
-    current_repository = local.github_repo_name
+    repositories       = [local.github_repo_name_catalog]
+    current_repository = local.github_repo_name_catalog
     secret_names       = ["DEPLOY_KEY_TG_CATALOG"]
     deploy_key_title   = "Terragrunt Catalog Deploy Key"
   }
