@@ -1,3 +1,14 @@
+locals {
+  version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
+
+  environment = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
+  vpc_cidrs   = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_cidrs
+  vpc_cidr    = local.vpc_cidrs[local.environment]
+
+  private_subnets = [cidrsubnet(local.vpc_cidr, 8, 1), cidrsubnet(local.vpc_cidr, 8, 2)]
+  public_subnets  = [cidrsubnet(local.vpc_cidr, 8, 3), cidrsubnet(local.vpc_cidr, 8, 4)]
+}
+
 unit "vpc" {
   source = "${get_repo_root()}/units/vpc"
   path   = "vpc"
@@ -8,11 +19,9 @@ unit "vpc" {
 
     name = "vpc-eks"
 
-    cidr = "10.0.0.0/16"
-
     # For production, use at least 3 subnets
-    private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
-    public_subnets  = ["10.0.3.0/24", "10.0.4.0/24"]
+    private_subnets = local.private_subnets
+    public_subnets  = local.public_subnets
 
     enable_nat_gateway     = true
     single_nat_gateway     = false
@@ -28,5 +37,15 @@ unit "vpc" {
     private_subnet_tags = {
       "kubernetes.io/role/internal-elb" = 1
     }
+  }
+}
+
+unit "route53_hosted_zone_private" {
+  source = "${get_repo_root()}/units/eks/route53/hosted_zone_private"
+  path   = "eks/route53/hosted_zone_private"
+
+  values = {
+    version = local.version
+    comment = "Managed by Terraform"
   }
 }

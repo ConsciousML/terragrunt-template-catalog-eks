@@ -106,7 +106,10 @@ Run the following Terragrunt pipelines once per repository:
 - [Tailscale](pipelines/bootstrap/tailscale/README.md): creates [Tailscale](https://tailscale.com/) resources needed to connect with tools exposed internally in your EKS cluster (ArgoCD, etc.)
 
 ### Deploy a Dev EKS Cluster
-Deploy a stack that creates a VPC and an EKS cluster:
+Deploy a stack that creates a VPC and an EKS cluster.
+
+Ensure `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` are set in your `.env` (see the [environment variables guide](docs/environment-variables.md)).
+
 ```bash
 source .env
 cd pipelines/examples/stacks/eks
