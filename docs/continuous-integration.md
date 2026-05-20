@@ -2,13 +2,13 @@
 
 ## Overview
 
-The [CI](../.github/workflows/ci.yaml) automatically validates Terragrunt configurations and runs [Terratest](https://terratest.gruntwork.io/docs/) on every pull request.
+The [CI](../.github/workflows/ci.yaml) automatically validates Terragrunt configurations on every pull request.
 
-It ensures code quality and that the infrastructure can be deployed an destroyed correctly before merging changes.
+It ensures the code is well-formed before merging.
 
 ## How It Works
 
-The [CI](../.github/workflows/ci.yaml) consists of four main jobs:
+The [CI](../.github/workflows/ci.yaml) consists of three main jobs:
 
 ### 1. Draft PR Check
 Runs first on every PR event and fails immediately if the PR is in draft mode. This prevents all downstream jobs from running until the PR is marked as ready for review.
@@ -23,13 +23,7 @@ Runs automatically on every PR:
 
 **Note**: Read the [pre-commit configuration](../.pre-commit-config.yaml) to learn more about the run checks.
 
-### 3. Terratest
-Runs when the `run-terratest` label is added to a PR:
-- **Infrastructure deployment**: creates real AWS resources in a test environment
-- **Testing**: runs Go to validate deployed infrastructure
-- **Cleanup**: automatically destroys test resources
-
-### 4. Documentation Generation
+### 3. Documentation Generation
 Uses `terraform-docs` to automatically generate `README.md` in each terraform module in `modules/`.
 
 If you create new Terraform modules in `modules/`, read the [documentation instructions](../modules/README.md#documentation)
@@ -41,10 +35,8 @@ Follow the [bootstrap guide](../pipelines/bootstrap/README.md) once per reposito
 If applicable, in `.github/workflows/ci.yaml`, change `TG_STACK_PATH` to the relative path of the directory containing the Terragrunt Stack you want to test:
 ```yaml
 env:
-  TG_STACK_PATH: pipelines/examples/stacks/eks
+  TG_STACK_PATH: pipelines/dev/eks
 ```
-
-If applicable, follow the [terratest configuration documentation](../tests/README.md) if you want to test a new stack in the CI.
 
 ### Pre-commit Setup (Recommended)
 Install pre-commit locally to catch issues before pushing:
@@ -70,21 +62,10 @@ This runs the same checks as CI locally, preventing CI failures.
 3. The `code-quality-checks` job runs automatically
 4. Address any failures and push fixes
 
-### Running Infrastructure Tests
-When your PR is ready for final validation:
-
-1. Add the `run-terratest` label to your PR
-2. The `terratest` job will run after code quality checks pass
-3. Tests deploy infrastructure, validate it, then clean up
-4. Address any failures and push fixes
-5. Once both jobs pass, merge your PR
-
-> **Note**: Infrastructure tests deploy AWS resources and take some time to deploy and destroy. The label check is used to run the tests only when your PR is ready for final validation before merging.
-
 ## Troubleshooting
 If you have a IAM Role error, in the [AWS GitHub Actions Auth bootstrap stack](../pipelines/bootstrap/aws_gh_actions_auth/README.md#configuration) update the `policy_arns` so Terragrunt can run in GitHub Actions and deploy the bootstrap pipeline following the [deploy section](../pipelines/bootstrap/aws_gh_actions_auth/README.md#deploy).
 
-If you don't know what `arns` you need yet and some are missing, you will get an error in the [CI](../.github/workflows/ci.yaml) in the `code-quality-checks` and `terratest` jobs.
+If you don't know what `arns` you need yet and some are missing, you will get an error in the [CI](../.github/workflows/ci.yaml) in the `code-quality-checks` job.
 
 ## Tips
 - Failed workflows don't cancel automatically to prevent state corruption

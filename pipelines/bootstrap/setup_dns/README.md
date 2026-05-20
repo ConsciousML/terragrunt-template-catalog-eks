@@ -56,7 +56,7 @@ You'll need to have a functional domain with access to the administrator panel. 
 
 ### Deploy
 
-Repeat the following for each environment (replacing `<environment>` by `dev` and then `ci`):
+Repeat the following for each environment (replacing `<environment>` by `dev` and then by `ci`):
 
 ```bash
 source .env

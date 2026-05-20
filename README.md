@@ -5,9 +5,9 @@
 [![CI](https://github.com/ConsciousML/terragrunt-template-catalog-eks/actions/workflows/ci.yaml/badge.svg)](https://github.com/ConsciousML/terragrunt-template-catalog-eks/actions/workflows/ci.yaml)
 [![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
 
-A Terragrunt Template Catalog for multi-environment Infrastructure as Code (IaC) for EKS
+A reusable Terragrunt catalog of modules, units, and stacks for building EKS clusters on AWS.
 
-## Catalog and Live Infrastructure
+## Catalog vs Live Infrastructure
 
 This toolkit uses two template repositories:
 - **Catalog repository** (this repo): Defines a collection of reusable IaC building blocks: Terraform/OpenTofu [modules](./modules/README.md), Terragrunt [units](./units/README.md), and [stacks](./stacks/README.md)
@@ -17,23 +17,24 @@ You're new to Terragrunt best practices? Read [Gruntwork's official production p
 
 ## What's Inside
 
-The catalog follows a layered architecture where each layer builds upon the previous one:
+This catalog contains multiple building blocks that follow a layered architecture where each layer builds upon the previous one:
 ```
-Modules (modules/) → Units (units/) → Examples (pipelines/examples/)
+Modules (modules/) → Units (units/) → Dev (pipelines/dev/)
 ```
 
+Here are the major components of the repository:
 - **[Modules](modules/README.md)**: Reusable Terraform modules that declare AWS resources (VPC, databases, compute instances, etc.)
 - **[Units](units/README.md)**: Terragrunt wrappers around modules that add configuration and dependencies
 - **[Stacks](stacks/README.md)**: Collections of units arranged in dependency graphs for pattern level re-use across repositories
-- **[Examples](pipelines/examples/README.md)**: Configurations for testing and development
-- **[CI](docs/continuous-integration.md)**: Automated configuration validation, testing (`terratest`) and documatentation (`terraform-docs`).
+- **[Dev](pipelines/dev/README.md)**: Local development environment for iterating on catalog changes
+- **[CI](docs/continuous-integration.md)**: Automated configuration validation and documentation (`terraform-docs`).
 - **[Bootstrap](pipelines/bootstrap/README.md)**: Contains pipelines that need to be run once per repository fork
 
 ## Getting Started
 ### Prerequisites
 - AWS account with billing enabled
 - GitHub account
-- `AdministratorAccess` AWS IAM permission
+- `AdministratorAccess` AWS IAM Policy
 
 ### Fork the Repository
 Click on the `Use this template` button.
@@ -48,7 +49,6 @@ locals {
 }
 ```
 2. Change `pipelines/region.hcl` to match your desired AWS region
-3. Change `pipelines/dns.hcl` to match your domain name where you'll use ACM to sign TLS certificates (if you don't have a domain name, you'll need to register one using a domain registrar such a GoDaddy or Namecheap)
 
 ### Installation
 
@@ -85,7 +85,6 @@ For more information on how to use mise, read their [getting started guide](http
 - [Terragrunt](https://terragrunt.gruntwork.io/docs/getting-started/install/)
 - [tflint](https://github.com/terraform-linters/tflint)
 - [Python 3.14.3](https://www.python.org/downloads/)
-- [Go 1.26](https://go.dev/doc/install)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [GitHub CLI](https://github.com/cli/cli#installation)
 
@@ -112,7 +111,7 @@ Ensure `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` are set i
 
 ```bash
 source .env
-cd pipelines/examples/stacks/eks
+cd pipelines/dev/eks
 terragrunt stack run init
 terragrunt run --all apply --backend-bootstrap --non-interactive
 ```
@@ -122,6 +121,11 @@ After around 15 min, your `dev` EKS cluster will be created.
 Connect `kubectl` to your EKS cluster by creating a `kubeconfig` (replace `<region-code>` and `<cluster-name>`):
 ```bash
 aws eks update-kubeconfig --region <region-code> --name <cluster-name>
+```
+
+By default, you connect to your cluster with:
+```bash
+aws eks update-kubeconfig --region eu-west-3 --name dev-cluster
 ```
 
 Next, verify `kubectl` is connected:
@@ -140,29 +144,30 @@ eks-pod-identity-agent-9pq6k   1/1     Running   0          41m
 
 ### Log in to ArgoCD
 
-ArgoCD is only reachable with the Tailscale Client running. Make sure you have completed the [Tailscale prerequisites](pipelines/bootstrap/tailscale/README.md#prerequisites) before proceeding.
+ArgoCD is only reachable with the Tailscale. Make sure you have completed the [Tailscale prerequisites](pipelines/bootstrap/tailscale/README.md#prerequisites) and have the Tailscale client running before proceeding.
 
-The ArgoCD host is formed from `pipelines/dns.hcl` as `<subdomain>.example.<base_domain>` (replace `<subdomain>` and `<base_domain>` with the values from that file, e.g. `argocd.example.axelmendoza.com`).
+The ArgoCD host is formed from `pipelines/dns.hcl` as `<subdomain>.dev.<base_domain>` (replace `<subdomain>` and `<base_domain>` with the values from that file, e.g. `argocd.dev.axelmendoza.com`).
 
-**Web UI**: Open `https://<subdomain>.example.<base_domain>` in your browser and log in with username `admin`. Retrieve the password with:
+**Web UI**: Open `https://<subdomain>.dev.<base_domain>` in your browser and log in with username `admin`. Retrieve the password with:
 ```bash
 aws secretsmanager get-secret-value \
-  --secret-id example-argocd-password \
+  --secret-id dev-argocd-password \
   --query SecretString \
   --output text | jq -r .plaintext
 ```
 
 **CLI**: Log in directly in one command:
 ```bash
-argocd login <subdomain>.example.<base_domain> \
+argocd login <subdomain>.dev.<base_domain> \
   --username admin \
   --password $(aws secretsmanager get-secret-value \
-    --secret-id example-argocd-password \
+    --secret-id dev-argocd-password \
     --query SecretString \
     --output text | jq -r .plaintext)
 ```
 
-Finally, cleanup by destroying the infrastructure (cwd in `pipelines/examples/stacks/eks`):
+### Destroy the Infrastructure
+Finally, cleanup by destroying the infrastructure (cwd in `pipelines/dev/eks`):
 
 ```bash
 terragrunt run --all destroy --non-interactive
@@ -174,26 +179,19 @@ terragrunt run --all destroy --non-interactive
 
 1. Create a feature branch
 2. Write/modify modules, units, and stacks
-3. Test locally in the `pipelines/examples/stacks` folder
+3. Test locally in the `pipelines/dev` folder
 4. Create a pull request
 5. Merge when CI passes
 
 See the [development guide](docs/development.md) for a detailed workflow with a step-by-step example on how to modify this template.
 
 ## Continuous Integration (CI)
-The CI provides automated checks and testing:
+The CI provides automated code quality checks on every pull request:
 1. Create a branch and make changes
 2. Open a pull request to trigger code quality checks
-3. Add the `run-terratest` label for infrastructure deploy and testing with Terratest
-4. Merge when all checks pass
+3. Merge when all checks pass
 
 Read more in the [CI workflow guide](docs/continuous-integration.md).
-
-### Infrastructure Testing
-
-The `run-terratest` label triggers automated infrastructure tests that deploy real AWS resources, validate functionality, and clean up automatically.
-
-See the [testing guide](tests/README.md) for writing custom tests.
 
 ### Pre-commit Setup (recommended)
 ```bash

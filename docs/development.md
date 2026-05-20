@@ -8,17 +8,16 @@ The development process follows a structured approach with these layers:
 
 1. **Terraform Module** (`modules/`): The core infrastructure code
 2. **Terragrunt Unit** (`units/`): Wrapper that makes the module reusable
-3. **Stack** (`pipelines/examples/stacks/`): Test your changes locally before pushing
+3. **Stack** (`pipelines/dev/`): Iterate on your changes locally before pushing
 
 ## Step-by-Step Development Process
-Read the step-by-step process and then read the [practical example](#practical-example).
 
 ### 1. Create a Feature Branch
 ```bash
 git checkout -b add-new-module-feature
 ```
 
-### 2. Write the Terraform Module
+### 2. Write a Terraform Module
 Create your infrastructure module in `modules/your_module/` with the standard Terraform files:
 - `main.tf`: Resource definitions
 - `variables.tf`: Input variables with detailed descriptions
@@ -35,16 +34,16 @@ Write a terragrunt wrapper in `units/your_module/terragrunt.hcl` that:
 - Defines dependencies on other units (if needed)
 - Maps unit inputs to module variables
 
-### 4. Create a Local Stack for Testing
-Create a stack (i.e `pipelines/examples/stacks/your_stack/terragrunt.stack.hcl`) that:
+### 4. Wire Up a Dev Stack
+Either integrate your unit into the [existing EKS stack](../pipelines/dev/eks/terragrunt.stack.hcl) or create a new stack at `pipelines/dev/your_stack/terragrunt.stack.hcl` that:
 - References units using `${get_repo_root()}/units/unit_name` for local development
 - Combines multiple units into an infrastructure deployment
-- Provides configuration values for testing
+- Provides configuration values
 - Uses automatic version detection
 
 For example:
 ```hcl
-# pipelines/examples/stacks/your_stack/terragrunt.stack.hcl
+# pipelines/dev/your_stack/terragrunt.stack.hcl
 locals {
   version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
 }
@@ -63,7 +62,7 @@ unit "your_module" {
 ### 5. Test Your Changes
 ```bash
 source .env
-cd pipelines/examples/stacks/your_stack/
+cd pipelines/dev/your_stack/
 terragrunt stack generate
 terragrunt run --all init --backend-bootstrap
 terragrunt run --all validate
@@ -73,10 +72,6 @@ terragrunt run --all apply
 
 ### 6. Create Pull Request
 Once your stack works correctly, create a PR and merge it to `main`.
-
-## Practical Example
-
-Checkout the [practical example](https://github.com/ConsciousML/terragrunt-template-catalog-aws/blob/main/docs/development.md#practical-example) in the EKS agnostic template.
 
 ## Integrate In Production
 Next, tag the latest commit on main:

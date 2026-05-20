@@ -13,13 +13,13 @@ You can think of a stack as a blueprint that defines how multiple [units](https:
 **Important**: Stacks in this directory cannot be executed directly. They are templates that require input values.
 
 To use a stack:
-1. Refer to the [pipelines/examples/stacks/](../pipelines/examples/stacks/) directory for concrete usage examples
-2. Copy an example that matches your needs
+1. Refer to the [pipelines/dev/](../pipelines/dev/) directory for concrete implementations
+2. Copy a stack that matches your needs
 3. Modify the `values` block to suit your requirements
 4. Run:
 ```bash
 source .env
-cd pipelines/examples/stacks/<your_stack>
+cd pipelines/dev/<your_stack>
 terragrunt stack run init
 terragrunt run --all apply
 ```
