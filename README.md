@@ -113,7 +113,7 @@ Ensure `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` are set i
 ```bash
 source .env
 cd pipelines/examples/stacks/eks
-terragrunt stack generate
+terragrunt stack run init
 terragrunt run --all apply --backend-bootstrap --non-interactive
 ```
 

@@ -20,7 +20,7 @@ To use a stack:
 ```bash
 source .env
 cd pipelines/examples/stacks/<your_stack>
-terragrunt stack generate
+terragrunt stack run init
 terragrunt run --all apply
 ```
 

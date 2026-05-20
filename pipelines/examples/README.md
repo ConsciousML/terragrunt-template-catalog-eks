@@ -39,8 +39,8 @@ unit "vpc" {
 ```bash
 cd pipelines/examples/stacks/eks
 
-terragrunt stack generate
-terragrunt run --all apply --backend-bootstrap
+terragrunt stack run init
+terragrunt run --all apply --backend-bootstrap --non-interactive
 ```
 
 ### Destroy a Stack

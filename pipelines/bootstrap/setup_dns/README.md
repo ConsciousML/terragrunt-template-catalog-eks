@@ -61,7 +61,7 @@ Repeat the following for each environment (replacing `<environment>` by `dev` an
 ```bash
 source .env
 cd pipelines/bootstrap/setup_dns/<environment>/stack
-terragrunt stack generate
+terragrunt stack run init
 terragrunt run --all apply --backend-bootstrap --non-interactive
 ```
 
