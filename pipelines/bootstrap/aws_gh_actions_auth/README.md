@@ -1,5 +1,5 @@
 # GitHub Actions AWS Bootstrap
-Enables GitHub Actions to authenticate with AWS and enable to run Terragrunt for CI/CD.
+Authenticated GitHub Actions with AWS and enables to run Terragrunt in CI/CD.
 
 ## Purpose
 
@@ -10,57 +10,28 @@ This enables the CI to run properly without managing secrets and AWS credentials
 ## Quick Start
 
 ### Prerequisites
-- Follow the [installation instructions](../../../README.md#installation):
-- Same [prerequisites](../../../README.md#prerequisites) as in the main `README.md`
+Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate with AWS` (included).
+
+### Configuration
 
 Set up `GITHUB_TOKEN` following the [environment variables guide](../../../docs/environment-variables.md#github_token).
 
-### Configuration
-In `pipelines/bootstrap/` change `region.hcl` to match your desired AWS region.
-
-Update the `locals` block in `terragrunt.stack.hcl`:
-
-```hcl
-locals {
-  github_repo_name = "your-repo-name"
-  github_token     = get_env("GITHUB_TOKEN")
-}
-```
-
-Update the following values in the `stack "aws_gh_actions_auth"` block:
+In the `terragrunt.stack.hcl`, update the following values in the `stack "aws_gh_actions_auth"` block:
 
 ```hcl
 values = {
-  github_username = "YourGitHubUsername"
-
   iam_role_name = "gh-terragrunt-role-catalog"
 
-  # List of the policies necessary for Terragrunt to run in CI/CD
+  # Replace this by a list of fine-grained IAM policies for improved security 
   policy_arns = [
-    "arn:aws:iam::aws:policy/AmazonEC2FullAccess",
-    "arn:aws:iam::aws:policy/AmazonVPCFullAccess",
-    "arn:aws:iam::aws:policy/IAMFullAccess",
-    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
-    "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess",
-    "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
-    "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser",
-    "arn:aws:iam::aws:policy/AmazonRoute53FullAccess",
-    "arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess",
+    "arn:aws:iam::aws:policy/AdministratorAccess",
   ]
 
-  # EKS permissions — add or remove actions as needed
-  inline_policies = [
-    {
-      name = "EKSFullAccess"
-      policy = jsonencode({
-        Version = "2012-10-17"
-        Statement = [{ Effect = "Allow", Action = ["eks:*"], Resource = "*" }]
-      })
-    }
-  ]
+  # Restrict to a specific branch for tighter security (e.g. "main")
+  # Defaults to "*" which allows all branches
+  github_branch = "*"
 
-  # OIDC Provider creation — set to true only for the first repo in this AWS account
+  # OIDC Provider creation needs to be set to true only for the first repo in this AWS account
   create_oidc_provider = false
 
   # List of repository names to give read-only access to the CI
@@ -93,8 +64,8 @@ From the root directory of this repository, run:
 ```bash
 source .env
 cd pipelines/bootstrap/aws_gh_actions_auth/
-terragrunt stack generate
-terragrunt run --all apply --backend-bootstrap
+terragrunt stack run init
+terragrunt run --all apply --backend-bootstrap --non-interactive
 ```
 
 ### Update Your GitHub Actions file
@@ -109,6 +80,7 @@ For single deploy key, update the `deploy-keys` parameter to match the value in 
     deploy-keys: ${{ secrets.YOUR_DEPLOY_KEY_NAME }}
     role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
     aws-region: ${{ secrets.AWS_REGION }}
+    # other arguments are unchanged
 ```
 
 If using multiple deploy keys:
@@ -120,6 +92,7 @@ If using multiple deploy keys:
       ${{ secrets.DEPLOY_KEY_SECRET_NAME_2 }}
     role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
     aws-region: ${{ secrets.AWS_REGION }}
+    # other arguments are unchanged
 ```
 
 ### Using the CI

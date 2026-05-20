@@ -2,6 +2,7 @@
 
 This document describes every environment variable used across the bootstrap pipelines, EKS stack, and Terratest suite. It is the single reference for what each variable is, how to obtain it, and which workflows require it.
 
+## Prerequisite
 If you haven't already, copy the example file:
 ```bash
 cp .env.example .env
