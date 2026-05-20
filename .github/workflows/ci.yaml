@@ -28,7 +28,7 @@ env:
 
 jobs:
   check-if-pr-is-draft:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Fail if PR is in draft mode
         if: github.event.pull_request.draft == true
@@ -39,17 +39,17 @@ jobs:
   terraform-docs:
     # Generates terraform documentation using terraform-docs
     needs: check-if-pr-is-draft
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           ssh-key: ${{ secrets.TERRAFORM_DOCS_DEPLOY_KEY }}
 
       - name: Render terraform docs and push changes back to PR
-        uses: terraform-docs/gh-actions@main
+        uses: terraform-docs/gh-actions@v1.4.1
         with:
           working-dir: .
           config-file: .terraform-docs.yml
@@ -59,11 +59,11 @@ jobs:
     # Checks if terraform-docs created a new commit in this workflow run
     # Fails fast to prevent wasting resources on expensive tests
     needs: terraform-docs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
@@ -90,11 +90,11 @@ jobs:
     # Runs the pre-commit checks  (see `.pre-commit-config.yaml`)
     # and runs `terragrunt plan` to ensure the IaC configuration is valid
     needs: [terraform-docs, check-docs-changes]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
 
       # A composite action that sets up GH actions to run TG:
       # - Loads deploy keys to enable TG to pull private repositories
