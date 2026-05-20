@@ -13,7 +13,6 @@ This enables the CI to run properly without managing secrets and AWS credentials
 Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate with AWS` (included).
 
 ### Configuration
-
 Set up `GITHUB_TOKEN` following the [environment variables guide](../../../docs/environment-variables.md#github_token).
 
 In the `terragrunt.stack.hcl`, update the following values in the `stack "aws_gh_actions_auth"` block:

@@ -22,36 +22,28 @@ The full DNS flow is:
 
 ## Structure
 
-This catalog ships one environment (`dev`) for local testing. Staging and production are managed in the live repo under [`live/bootstrap/setup_dns/`](https://github.com/ConsciousML/terragrunt-template-live-eks/tree/main/live/bootstrap/setup_dns).
-
+This catalog ships two environments for local testing (`dev`) and CI (`ci`):
 ```
 pipelines/bootstrap/setup_dns/
   dev/
     environment.hcl        ← environment = "dev"
     stack/
       terragrunt.stack.hcl
+  ci/
+    environment.hcl        ← environment = "catalog-eks-ci"
+    stack/
+      terragrunt.stack.hcl
 ```
 
-## Quick Start
+Staging and production are managed in the live repo under [`live/bootstrap/setup_dns/`](https://github.com/ConsciousML/terragrunt-template-live-eks/tree/main/live/bootstrap/setup_dns).
+
+## Deployment 
 
 ### Prerequisites
-- Follow the [installation instructions](../../README.md#installation)
-- Same [prerequisites](../../README.md#prerequisites) as in the main `README.md`
+Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate with AWS` (included).
 
 ### Configuration
-
-In `pipelines/` change `region.hcl` to match your desired AWS region.
-
-Update `pipelines/github.hcl` to match your repository:
-
-```hcl
-locals {
-  github_username_catalog  = "YourGitHubUsername"
-  github_repo_name_catalog = "your-repo-name"
-}
-```
-
-Update `pipelines/dns.hcl` with your domain:
+Update `pipelines/dns.hcl` with your domain information:
 
 ```hcl
 locals {
@@ -64,11 +56,11 @@ You'll need to have a functional domain with access to the administrator panel. 
 
 ### Deploy
 
-Run from the root of this repository:
+Repeat the following for each environment (replacing `<environment>` by `dev` and then `ci`):
 
 ```bash
 source .env
-cd pipelines/bootstrap/setup_dns/dev/stack
+cd pipelines/bootstrap/setup_dns/<environment>/stack
 terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive
 ```
@@ -81,21 +73,23 @@ terragrunt stack output --json setup_dns.route53_hosted_zone.name_servers
 
 ### Delegate the subdomain
 
+Repeat the following for each environment.
+
 In your domain registrar, add 4 NS records for the subdomain using the nameservers from the output above.
 
 | Type | Host | Value |
 |------|------|-------|
-| NS | `argocd.dev` | `ns-123.awsdns-12.com` |
-| NS | `argocd.dev` | `ns-456.awsdns-34.net` |
-| NS | `argocd.dev` | `ns-789.awsdns-56.org` |
-| NS | `argocd.dev` | `ns-012.awsdns-78.co.uk` |
+| NS | `<subdomain>.<environment>` | `ns-123.awsdns-12.com` |
+| NS | `<subdomain>.<environment>` | `ns-456.awsdns-34.net` |
+| NS | `<subdomain>.<environment>` | `ns-789.awsdns-56.org` |
+| NS | `<subdomain>.<environment>` | `ns-012.awsdns-78.co.uk` |
 
-Replace `argocd.dev` with your actual `{subdomain}.{environment}` and each value with the nameservers from the output.
+Replace `<subdomain>.<environment>` with your actual subdomain and environment (`argocd.dev` for example).
 
 ### Verify propagation
 
 ```bash
-dig NS argocd.dev.yourdomain.com
+dig NS <subdomain>.<environment>.yourdomain.com
 ```
 
 Delegation is working when 4 AWS nameservers appear in the `ANSWER SECTION`. Propagation usually completes within minutes.
