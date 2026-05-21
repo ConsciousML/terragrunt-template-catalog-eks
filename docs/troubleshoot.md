@@ -43,3 +43,16 @@ aws dynamodb delete-item \
 terragrunt init
 terragrunt plan  # should show resources as "to be created"
 ```
+
+## Can't Connect with Tailscale to Internal Endpoints on MacOS
+MacOs doesn't automatically re-push DNS config.
+
+The fix is to force Tailscale to re-apply DNS:
+```bash
+tailscale set --accept-dns=false && tailscale set --accept-dns=true
+```
+
+Or to flush the DNS cache:
+```bash
+sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder
+```
