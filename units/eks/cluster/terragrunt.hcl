@@ -48,6 +48,8 @@ inputs = {
   # Disable EKS Auto mode
   compute_config = values.compute_config
 
+  access_entries = try(values.access_entries, {})
+
   tags = {
     environment = "${local.environment}"
   }

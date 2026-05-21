@@ -101,6 +101,11 @@ unit "cluster" {
     compute_config = {
       enabled = false
     }
+
+    # Only needed in the prod environment of the live repository when CI deployed the cluster
+    # and you need to run destroy locally. Get your ARN with:
+    # aws sts get-caller-identity --query Arn --output text
+    access_entries = {}
   }
 }
 
