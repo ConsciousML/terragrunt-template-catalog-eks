@@ -38,20 +38,6 @@ env:
   TG_STACK_PATH: pipelines/dev/eks
 ```
 
-### Pre-commit Setup (Recommended)
-Install pre-commit locally to catch issues before pushing:
-
-```bash
-# Install pre-commit
-pip install pre-commit
-
-# Install the git hooks
-pre-commit install
-
-# Test it works
-pre-commit run --all-files
-```
-
 This runs the same checks as CI locally, preventing CI failures.
 
 ## Using the CI

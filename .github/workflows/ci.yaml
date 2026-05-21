@@ -109,13 +109,10 @@ jobs:
           ts-audience: ${{ secrets.TS_AUDIENCE }}
           ts-tags: ${{ secrets.TS_TAGS }}
 
-      - name: Install pre-commit
-        run: pip install pre-commit
-
-      # Runs the checks as in pre-commits (tflint, ...)
+      # Runs the checks as in pre-commits with prek (tflint, ...)
       # This prevents any discrepancies between the pre-commit checks and the CI checks 
-      - name: Run pre-commit hooks
-        uses: pre-commit/action@v3.0.1
+      - name: Run pre-commit hooks (prek)
+        uses: j178/prek-action@v2.0.4
 
       - name: Run Terragrunt stack generate and plan
         run: |

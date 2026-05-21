@@ -84,7 +84,7 @@ For more information on how to use mise, read their [getting started guide](http
 - [OpenTofu](https://opentofu.org/docs/intro/install/) (or [Terraform](https://developer.hashicorp.com/terraform/install))
 - [Terragrunt](https://terragrunt.gruntwork.io/docs/getting-started/install/)
 - [tflint](https://github.com/terraform-linters/tflint)
-- [Python 3.14.3](https://www.python.org/downloads/)
+- [prek](https://github.com/j178/prek#installation)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [GitHub CLI](https://github.com/cli/cli#installation)
 
@@ -194,8 +194,16 @@ The CI provides automated code quality checks on every pull request:
 Read more in the [CI workflow guide](docs/continuous-integration.md).
 
 ### Pre-commit Setup (recommended)
+We use a more efficient framework than [pre-commit](https://github.com/pre-commit/pre-commit) called [prek](https://github.com/j178/prek).
+
+Wire hooks automatically into git automatically:
 ```bash
-pre-commit install
+prek install
+```
+
+Run hooks on demande:
+```bash
+prek run
 ```
 
 This runs the same checks as CI locally, catching issues before you push.
