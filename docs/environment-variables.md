@@ -1,7 +1,8 @@
 # Environment Variables
 
-This document describes every environment variable used across the bootstrap pipelines, EKS stack, and Terratest suite. It is the single reference for what each variable is, how to obtain it, and which workflows require it.
+This document describes every environment variable used across the bootstrap pipelines and EKS stack. It is the single reference for what each variable is, how to obtain it, and which workflows require it.
 
+## Prerequisite
 If you haven't already, copy the example file:
 ```bash
 cp .env.example .env
@@ -30,7 +31,7 @@ export GITHUB_TOKEN=<your_token>
 
 ## `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET`
 
-**Required by**: `pipelines/bootstrap/tailscale/`, `pipelines/examples/stacks/eks/`, `tests/`
+**Required by**: `pipelines/bootstrap/tailscale/`
 
 A Tailscale OAuth client used to authenticate to the Tailscale API and provision resources (ACL, WIF credential, subnet router, split DNS).
 
@@ -49,9 +50,9 @@ export TAILSCALE_OAUTH_CLIENT_SECRET=<your_client_secret>
 
 ## `AWS_REGION`
 
-**Required by**: `tests/`
+**Required by**: `.github/workflows/ci.yaml`
 
-The AWS region where the EKS stack is deployed. The Terratest suite fails immediately if this is unset.
+The AWS region where the EKS stack is deployed.
 
 ```bash
 export AWS_REGION=<your-region>   # e.g. us-east-1

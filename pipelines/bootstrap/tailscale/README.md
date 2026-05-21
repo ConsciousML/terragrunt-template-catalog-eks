@@ -23,27 +23,14 @@ The Kubernetes operator, subnet router, and split DNS are deployed per-cluster a
 ## Quick Start
 
 ### Prerequisites
-- Follow the [installation instructions](../../../README.md#installation)
-- Same [prerequisites](../../../README.md#prerequisites) as in the main `README.md`
+Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate with AWS` (included).
 
 Create an account and login at [https://login.tailscale.com/admin/welcome](https://login.tailscale.com/admin/welcome).
 
 Download and install the [Tailscale client](https://tailscale.com/download).
 
-Set up `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` following the [environment variables guide](../../../docs/environment-variables.md#tailscale_oauth_client_id-and-tailscale_oauth_client_secret).
-
 ### Configuration
-
-Update the `locals` block in `terragrunt.stack.hcl` to match your repository:
-
-```hcl
-locals {
-  github_user      = "YourGitHubUsername"
-  github_repo_name = "your-repo-name"
-}
-```
-
-All environment VPC CIDRs are read automatically from `network.hcl` and used to build the ACL `autoApprovers` dynamically. The `ci_tag` can be left as the default `tag:ci`.
+Set up `GITHUB_TOKEN`, `TAILSCALE_OAUTH_CLIENT_ID`, and `TAILSCALE_OAUTH_CLIENT_SECRET` following the [environment variables guide](../../../docs/environment-variables.md).
 
 ### Deploy
 
@@ -51,13 +38,15 @@ From the root directory of this repository, run:
 ```bash
 source .env
 cd pipelines/bootstrap/tailscale
-terragrunt stack generate
-terragrunt run --all apply --backend-bootstrap
+terragrunt stack run init
+terragrunt run --all apply --backend-bootstrap --non-interactive
 ```
 
 ## Module Details
 
 This stack instantiates three Terraform modules that work together to authenticate CI to Tailscale without long-lived credentials.
+
+All environment VPC CIDRs are read automatically from `network.hcl` and used to build the ACL `autoApprovers` dynamically. The `ci_tag` can be left as the default `tag:ci`.
 
 ### 1. [Tailscale ACL](../../../modules/tailscale_acl/README.md)
 Applies the Tailscale ACL policy to your Tailnet.

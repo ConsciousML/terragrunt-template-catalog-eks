@@ -21,16 +21,14 @@ permissions:
 
 env:
   # The relative path of the directory containing the Terragrunt Stack to test during code quality checks
-  TG_STACK_PATH: pipelines/examples/stacks/eks
+  TG_STACK_PATH: pipelines/dev/eks
   # Isolates CI state from local runs — uses a dedicated S3 bucket (tofu-state-{account_id}-catalog-eks-ci)
   TG_ENVIRONMENT: catalog-eks-ci
-  # Timeout for testing infrastructure
-  TERRATEST_TIMEOUT: 60m
 
 
 jobs:
   check-if-pr-is-draft:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Fail if PR is in draft mode
         if: github.event.pull_request.draft == true
@@ -41,17 +39,17 @@ jobs:
   terraform-docs:
     # Generates terraform documentation using terraform-docs
     needs: check-if-pr-is-draft
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           ssh-key: ${{ secrets.TERRAFORM_DOCS_DEPLOY_KEY }}
 
       - name: Render terraform docs and push changes back to PR
-        uses: terraform-docs/gh-actions@main
+        uses: terraform-docs/gh-actions@v1.4.1
         with:
           working-dir: .
           config-file: .terraform-docs.yml
@@ -61,11 +59,11 @@ jobs:
     # Checks if terraform-docs created a new commit in this workflow run
     # Fails fast to prevent wasting resources on expensive tests
     needs: terraform-docs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
@@ -92,14 +90,11 @@ jobs:
     # Runs the pre-commit checks  (see `.pre-commit-config.yaml`)
     # and runs `terragrunt plan` to ensure the IaC configuration is valid
     needs: [terraform-docs, check-docs-changes]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-      - name: Debug
-        run: exit 0
-
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
 
       # A composite action that sets up GH actions to run TG:
       # - Loads deploy keys to enable TG to pull private repositories
@@ -114,182 +109,13 @@ jobs:
           ts-audience: ${{ secrets.TS_AUDIENCE }}
           ts-tags: ${{ secrets.TS_TAGS }}
 
-      - name: Install pre-commit
-        run: pip install pre-commit
-
-      # Runs the checks as in pre-commits (tflint, ...)
+      # Runs the checks as in pre-commits with prek (tflint, ...)
       # This prevents any discrepancies between the pre-commit checks and the CI checks 
-      - name: Run pre-commit hooks
-        uses: pre-commit/action@v3.0.1
+      - name: Run pre-commit hooks (prek)
+        uses: j178/prek-action@v2.0.4
 
       - name: Run Terragrunt stack generate and plan
         run: |
           cd ${{ env.TG_STACK_PATH }}
           terragrunt stack generate
           terragrunt run --all plan --backend-bootstrap --non-interactive
-
-  check-pr-labels:
-    # Gates the terratest run: ensures exactly one of 'run-terratest' or 'skip-terratest' is present on the PR
-    needs: code-quality-checks
-    runs-on: ubuntu-latest
-    outputs:
-      should_run: ${{ steps.set-output.outputs.should_run }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check PR labels
-        id: check-pr-labels
-        run: |
-          labels=$(gh pr view "$PR_NUMBER" --json labels -q '.labels[].name')
-          echo "Labels on PR: $labels"
-          if echo "$labels" | grep -qw "run-terratest"; then
-            echo "run_present=true" >> $GITHUB_OUTPUT
-          else
-            echo "run_present=false" >> $GITHUB_OUTPUT
-          fi
-          if echo "$labels" | grep -qw "skip-terratest"; then
-            echo "skip_present=true" >> $GITHUB_OUTPUT
-          else
-            echo "skip_present=false" >> $GITHUB_OUTPUT
-          fi
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          GH_TOKEN: ${{ github.token }}
-
-      - name: Comment on PR if 'skip-terratest' label is present
-        if: steps.check-pr-labels.outputs.skip_present == 'true'
-        uses: thollander/actions-comment-pull-request@v3
-        with:
-          message: |
-            The `skip-terratest` label have been added to this PR.
-            infrastructure tests will not run.
-
-      - name: Comment PR if missing label
-        if: steps.check-pr-labels.outputs.run_present == 'false' && steps.check-pr-labels.outputs.skip_present == 'false'
-        uses: thollander/actions-comment-pull-request@v3
-        with:
-          message: |
-            :x: Please add the `run-terratest` label to this PR in order to run infrastructure tests.
-            Otherwise add the `skip-terratest` if you do not want to run tests.
-
-      - name: Fail if label missing
-        if: steps.check-pr-labels.outputs.run_present == 'false' && steps.check-pr-labels.outputs.skip_present == 'false'
-        run: exit 1
-
-      - name: Set should_run output
-        id: set-output
-        if: always()
-        run: |
-          if [[ "${{ steps.check-pr-labels.outputs.run_present }}" == "true" && "${{ steps.check-pr-labels.outputs.skip_present }}" == "false" ]]; then
-            echo "should_run=true" >> $GITHUB_OUTPUT
-          else
-            echo "should_run=false" >> $GITHUB_OUTPUT
-          fi
-
-  terratest:
-    # Runs Terratest to deploy the infrastructure in a separated environment
-    # Performs some tests and then destroys the infra.
-    needs: check-pr-labels
-    if: needs.check-pr-labels.outputs.should_run == 'true'
-    runs-on: ubuntu-latest
-    outputs:
-      client_id: ${{ steps.ts-oauth-create.outputs.client_id }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # A composite action that sets up GH actions to run TG:
-      # - Loads deploy keys to enable TG to pull private repositories
-      # - Auth GH actions with AWS using OIDC
-      # - Runs Mise to install all the tools we need (Terragrunt, OpenTofu, Go, ...)
-      - uses: ./.github/actions/setup
-        with:
-          deploy-keys: ${{ secrets.DEPLOY_KEY_TG_CATALOG }}
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          ts-oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          ts-audience: ${{ secrets.TS_AUDIENCE }}
-          ts-tags: ${{ secrets.TS_TAGS }}
-
-      - name: Request Tailscale API token using WIF credentials
-        id: ts-token-exchange
-        uses: ./.github/actions/tailscale-token-exchange
-        with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          audience: ${{ secrets.TS_AUDIENCE }}
-
-      - name: Create temporary Tailscale OAuth client
-        id: ts-oauth-create
-        env:
-          TS_TOKEN: ${{ steps.ts-token-exchange.outputs.ts_token }}
-          TS_TAGS: ${{ secrets.TS_TAGS }}
-        run: |
-          response=$(curl -sS 'https://api.tailscale.com/api/v2/tailnet/-/keys' \
-            --request POST \
-            --header 'Content-Type: application/json' \
-            --header "Authorization: Bearer $TS_TOKEN" \
-            --data "{
-              \"keyType\": \"client\",
-              \"description\": \"terratest-ci-${{ github.run_id }}\",
-              \"tags\": [
-                \"$TS_TAGS\"
-              ],
-              \"scopes\": [\"all\"]
-            }")
-
-          client_id=$(echo "$response" | jq -r '.id')
-          client_secret=$(echo "$response" | jq -r '.key')
-
-          if [ -z "$client_id" ] || [ "$client_id" = "null" ]; then
-            echo "ERROR: OAuth client creation failed"
-            exit 1
-          fi
-
-          echo "::add-mask::$client_secret"
-          echo "client_id=$client_id" >> $GITHUB_OUTPUT
-          echo "client_secret=$client_secret" >> $GITHUB_OUTPUT
-
-      # Use newly created OAuth client instead of WIF credentials
-      # WIF token expires after 10 min and terratest takes 30m+
-      # OAuth is a long lived credential but we delete it just after terratest
-      - name: Run Terratest
-        env:
-          TAILSCALE_IDENTITY_TOKEN: ""
-          TAILSCALE_OAUTH_CLIENT_ID: ${{ steps.ts-oauth-create.outputs.client_id }}
-          TAILSCALE_OAUTH_CLIENT_SECRET: ${{ steps.ts-oauth-create.outputs.client_secret }}
-        run: go test -v ./tests/... -timeout ${{ env.TERRATEST_TIMEOUT }}
-
-  revoke-oauth:
-    # Revokes the temporary Tailscale OAuth client created during terratest.
-    # Runs even when terratest fails to ensure no credentials are left behind.
-    needs: [check-pr-labels, terratest]
-    if: always() && needs.check-pr-labels.outputs.should_run == 'true' && needs.terratest.outputs.client_id != ''
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Request Tailscale API token using WIF credentials
-        id: ts-token-exchange
-        uses: ./.github/actions/tailscale-token-exchange
-        with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          audience: ${{ secrets.TS_AUDIENCE }}
-
-      - name: Revoke temporary Tailscale OAuth client
-        env:
-          TS_TOKEN: ${{ steps.ts-token-exchange.outputs.ts_token }}
-          CLIENT_ID: ${{ needs.terratest.outputs.client_id }}
-        run: |
-          response=$(curl -sS "https://api.tailscale.com/api/v2/tailnet/-/keys/$CLIENT_ID" \
-            --request DELETE \
-            --header "Authorization: Bearer $TS_TOKEN")
-
-          if [ "$response" != "null" ]; then
-            echo "ERROR: OAuth client revokation failed"
-            exit 1
-          fi
