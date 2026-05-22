@@ -36,8 +36,8 @@ unit "iam_policies" {
 }
 
 unit "github_secrets" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/github/secrets?ref=${values.version}"
-  path   = "github/secrets"
+  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/github/secrets/action?ref=${values.version}"
+  path   = "github/secrets/action"
 
   values = {
     version          = values.version

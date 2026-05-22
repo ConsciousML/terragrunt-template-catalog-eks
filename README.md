@@ -37,17 +37,20 @@ Here are the major components of the repository:
 - `AdministratorAccess` AWS IAM Policy
 
 ### Fork the Repository
-Click on the `Use this template` button.
+1. Click on the `Use this template` > `Create a new repository` button.
+2. Under `Repository Name`, choose a name for your repository.
 
 ### Configuration
 In your forked repository, change the following Terragrunt configuration files:
-1. In `pipelines/github.hcl`, modify:
+1. In `pipelines/github.hcl`, modify (by replacing `<YourGitHubUsername>`, `<the-repository-name-of-your-fork>`):
 ```hcl
 locals {
-  github_username_catalog  = "YourGitHubUsername"
-  github_repo_name_catalog = "the-repository-name-of-your-fork"
+  github_username_catalog  = "<YourGitHubUsername>"
+  github_repo_name_catalog = "<the-repository-name-of-your-fork>"
 }
 ```
+`<the-repository-name-of-your-fork>` should be the same name you chose in the previous section.
+
 2. Change `pipelines/region.hcl` to match your desired AWS region
 
 ### Installation

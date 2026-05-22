@@ -1,3 +1,3 @@
 # GitHub Secrets Module
 
-This module creates GitHub Actions secrets `AWS_REGION` and `AWS_ROLE_ARN`. These secrets are retrieved in GitHub Actions workflows for authentication with Amazon Web Services (AWS)
+This module creates GitHub Actions secrets from a map of name-value pairs. Use it to provision any set of secrets in a target repository.

@@ -4,7 +4,7 @@ include "root" {
 }
 
 terraform {
-  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/tailscale_github_secrets?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/github_secrets?ref=${values.version}"
 }
 
 dependency "tailscale_wif" {
@@ -19,7 +19,9 @@ dependency "tailscale_wif" {
 inputs = {
   github_token     = values.github_token
   github_repo_name = values.github_repo_name
-  oauth_client_id  = dependency.tailscale_wif.outputs.client_id
-  audience         = dependency.tailscale_wif.outputs.audience
-  tags             = values.tags
+  secrets = {
+    TS_OAUTH_CLIENT_ID = dependency.tailscale_wif.outputs.client_id
+    TS_AUDIENCE        = dependency.tailscale_wif.outputs.audience
+    TS_TAGS            = values.tags
+  }
 }
