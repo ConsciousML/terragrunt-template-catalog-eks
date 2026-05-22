@@ -59,3 +59,16 @@ export AWS_REGION=<your-region>   # e.g. us-east-1
 ```
 
 > AWS credentials themselves are not managed via `.env`. Authenticate separately with `aws configure` or an AWS profile — see [Authenticate with AWS](../README.md#authenticate-with-aws).
+
+## `EKS_LOCAL_ADMIN_ARN`
+
+**Required by**: `live/prod/eks/terragrunt.stack.hcl` and `.github/workflows/` (live repository)
+
+The ARN of the local IAM identity registered as a cluster admin so it can run operations locally against prod (e.g. `terragrunt destroy`).
+
+This variable is set automatically by the bootstrap pipeline — it captures the identity of whoever runs the bootstrap and stores it as a GitHub Actions secret. No manual configuration is needed.
+
+If you need to override it locally (e.g. to test with a different identity), add it to your `.env`:
+```bash
+export EKS_LOCAL_ADMIN_ARN=<your_arn>
+```

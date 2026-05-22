@@ -9,12 +9,7 @@ variable "github_repo_name" {
   type        = string
 }
 
-variable "aws_region" {
-  description = "AWS region where resources are deployed"
-  type        = string
-}
-
-variable "aws_role_arn" {
-  description = "ARN of the IAM role that GitHub Actions will assume"
-  type        = string
+variable "secrets" {
+  description = "Map of GitHub Actions secret names to their plaintext values"
+  type        = map(string)
 }
