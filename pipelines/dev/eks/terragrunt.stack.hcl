@@ -187,30 +187,6 @@ unit "argocd" {
   }
 }
 
-unit "argocd_server_cluster_role" {
-  source = "${get_repo_root()}/units/eks/addons/argocd/rbac/server/cluster_role"
-  path   = "eks/addons/argocd/rbac/server/cluster_role"
-  values = { version = local.version }
-}
-
-unit "argocd_server_cluster_role_binding" {
-  source = "${get_repo_root()}/units/eks/addons/argocd/rbac/server/cluster_role_binding"
-  path   = "eks/addons/argocd/rbac/server/cluster_role_binding"
-  values = { version = local.version }
-}
-
-unit "argocd_notifications_cluster_role" {
-  source = "${get_repo_root()}/units/eks/addons/argocd/rbac/notifications/cluster_role"
-  path   = "eks/addons/argocd/rbac/notifications/cluster_role"
-  values = { version = local.version }
-}
-
-unit "argocd_notifications_cluster_role_binding" {
-  source = "${get_repo_root()}/units/eks/addons/argocd/rbac/notifications/cluster_role_binding"
-  path   = "eks/addons/argocd/rbac/notifications/cluster_role_binding"
-  values = { version = local.version }
-}
-
 unit "route53_hosted_zone_private" {
   source = "${get_repo_root()}/units/eks/route53/hosted_zone_private"
   path   = "eks/route53/hosted_zone_private"
