@@ -162,8 +162,7 @@ unit "argocd" {
     helm_values = {
       configs = {
         params = {
-          "server.insecure"        = true
-          "application.namespaces" = "*"
+          "server.insecure" = true
         }
       }
       server = {
