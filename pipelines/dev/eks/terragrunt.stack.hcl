@@ -313,3 +313,22 @@ unit "tailscale_split_dns" {
     version = local.version
   }
 }
+
+unit "argocd_app_of_apps" {
+  source = "${get_repo_root()}/units/eks/addons/argocd/app_of_apps"
+  path   = "eks/addons/argocd/app_of_apps"
+
+  values = {
+    version               = local.version
+    name                  = "app-of-apps"
+    namespace             = "argocd"
+    path                  = "apps"
+    target_revision       = "main"
+    project               = "default"
+    destination_namespace = "argocd"
+    destination_server    = "https://kubernetes.default.svc"
+    finalizers            = ["resources-finalizer.argocd.argoproj.io"]
+    sync_options          = ["CreateNamespace=true"]
+    prune                 = true
+  }
+}
