@@ -45,11 +45,12 @@ In your forked repository, change the following Terragrunt configuration files:
 1. In `pipelines/github.hcl`, modify (by replacing `<YourGitHubUsername>`, `<the-repository-name-of-your-fork>`):
 ```hcl
 locals {
-  github_username_catalog  = "<YourGitHubUsername>"
-  github_repo_name_catalog = "<the-repository-name-of-your-fork>"
+  github_username_catalog      = "<YourGitHubUsername>"
+  github_repo_name_catalog     = "<the-repository-name-of-your-fork>"
+  github_repo_name_app_of_apps = "<your-app-of-apps-repo-name>"
 }
 ```
-`<the-repository-name-of-your-fork>` should be the same name you chose in the previous section.
+`<the-repository-name-of-your-fork>` should be the same name you chose in the previous section. `<your-app-of-apps-repo-name>` should match your fork of [argocd-app-of-apps-template](https://github.com/ConsciousML/argocd-app-of-apps-template).
 
 2. Change `pipelines/region.hcl` to match your desired AWS region
 
