@@ -16,7 +16,7 @@ dependency "vpc" {
 }
 
 dependency "route53_hosted_zone_private" {
-  config_path = "../../../route53/hosted_zone_private"
+  config_path = "../../../route53/argocd/hosted_zone_private"
   mock_outputs = {
     domain_name = "argocd.example.axelmendoza.com"
   }

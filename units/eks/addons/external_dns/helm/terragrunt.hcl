@@ -17,7 +17,6 @@ terraform {
   }
 }
 
-
 dependency "aws_load_balancer_controller" {
   config_path  = "../../aws_load_balancer_controller/helm"
   skip_outputs = true
@@ -32,7 +31,7 @@ dependency "iam_role_external_dns" {
 }
 
 dependency "route53_hosted_zone_private" {
-  config_path = "../../../route53/hosted_zone_private"
+  config_path = "../../../route53/argocd/hosted_zone_private"
   mock_outputs = {
     domain_name = "mock.example.com"
   }

@@ -16,9 +16,9 @@ locals {
   public_subnets  = [cidrsubnet(local.vpc_cidr, 8, 3), cidrsubnet(local.vpc_cidr, 8, 4)]
 }
 
-unit "route53_hosted_zone_public" {
-  source = "${get_repo_root()}/units/eks/route53/hosted_zone_public"
-  path   = "eks/route53/hosted_zone_public"
+unit "route53_hosted_zone_argocd_public" {
+  source = "${get_repo_root()}/units/eks/route53/argocd/hosted_zone_public"
+  path   = "eks/route53/argocd/hosted_zone_public"
 
   values = {
     version = local.version
@@ -194,9 +194,9 @@ unit "argocd" {
   }
 }
 
-unit "route53_hosted_zone_private" {
-  source = "${get_repo_root()}/units/eks/route53/hosted_zone_private"
-  path   = "eks/route53/hosted_zone_private"
+unit "route53_hosted_zone_argocd_private" {
+  source = "${get_repo_root()}/units/eks/route53/argocd/hosted_zone_private"
+  path   = "eks/route53/argocd/hosted_zone_private"
 
   values = {
     version = local.version
@@ -237,9 +237,29 @@ unit "external_dns" {
   }
 }
 
-unit "acm_certificate" {
-  source = "${get_repo_root()}/units/eks/acm_certificate"
-  path   = "eks/acm_certificate"
+unit "acm_certificate_argocd" {
+  source = "${get_repo_root()}/units/eks/route53/argocd/acm_certificate"
+  path   = "eks/route53/argocd/acm_certificate"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "route53_hosted_zone_guestbook_public" {
+  source = "${get_repo_root()}/units/eks/route53/apps/guestbook/hosted_zone_public"
+  path   = "eks/route53/apps/guestbook/hosted_zone_public"
+
+  values = {
+    version = local.version
+    comment = "Managed by Terraform"
+    create  = false
+  }
+}
+
+unit "acm_certificate_guestbook" {
+  source = "${get_repo_root()}/units/eks/route53/apps/guestbook/acm_certificate"
+  path   = "eks/route53/apps/guestbook/acm_certificate"
 
   values = {
     version = local.version

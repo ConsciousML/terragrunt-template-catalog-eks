@@ -8,7 +8,7 @@ terraform {
 }
 
 dependency "route53_hosted_zone_public" {
-  config_path = "../route53/hosted_zone_public"
+  config_path = "../hosted_zone_public"
   mock_outputs = {
     domain_name = "mock.example.com"
     zone_id     = "MOCKZONEID123456"
