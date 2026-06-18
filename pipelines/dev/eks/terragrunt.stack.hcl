@@ -222,7 +222,7 @@ unit "external_dns" {
     version            = local.version
     helm_chart_version = local.version_external_dns
     helm_values = {
-      sources = ["service", "ingress"]
+      sources = ["service", "ingress", "gateway-httproute"]
       provider = {
         name = "aws"
       }
