@@ -1,6 +1,12 @@
 locals {
-  version         = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
-  aws_lbc_version = "3.2.1"
+  version                    = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
+  version_vpc                = "6.6.0"
+  version_cluster            = "21.15.1"
+  version_aws_lbc            = "3.2.1"
+  version_argocd             = "9.5.0"
+  version_external_dns       = "1.20.0"
+  version_eso                = "2.4.1"
+  version_tailscale_operator = "1.96.5"
 
   environment = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
   vpc_cidrs   = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_cidrs
@@ -27,7 +33,7 @@ unit "vpc" {
 
   values = {
     create_vpc = true
-    version    = "6.6.0"
+    version    = local.version_vpc
 
     name = "vpc-eks"
 
@@ -57,7 +63,7 @@ unit "cluster" {
   path   = "eks/cluster"
 
   values = {
-    version = "21.15.1"
+    version = local.version_cluster
 
     kubernetes_version = "1.35"
 
@@ -115,7 +121,7 @@ unit "iam_policy_aws_lbc" {
 
   values = {
     version = local.version
-    url     = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v${local.aws_lbc_version}/docs/install/iam_policy.json"
+    url     = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v${local.version_aws_lbc}/docs/install/iam_policy.json"
   }
 }
 
@@ -135,7 +141,7 @@ unit "aws_load_balancer_controller" {
 
   values = {
     version                     = local.version
-    helm_chart_version          = local.aws_lbc_version
+    helm_chart_version          = local.version_aws_lbc
     enableServiceMutatorWebhook = false
   }
 }
@@ -158,7 +164,7 @@ unit "argocd" {
 
   values = {
     version            = local.version
-    helm_chart_version = "9.5.0"
+    helm_chart_version = local.version_argocd
     helm_values = {
       configs = {
         params = {
@@ -176,6 +182,7 @@ unit "argocd" {
             "alb.ingress.kubernetes.io/backend-protocol" = "HTTP"
             "alb.ingress.kubernetes.io/listen-ports"     = "[{\"HTTP\":80}, {\"HTTPS\":443}]"
             "alb.ingress.kubernetes.io/ssl-redirect"     = "443"
+            "external-dns.alpha.kubernetes.io/scope"     = "private"
           }
           aws = {
             serviceType            = "ClusterIP"
@@ -213,15 +220,16 @@ unit "external_dns" {
 
   values = {
     version            = local.version
-    helm_chart_version = "1.20.0"
+    helm_chart_version = local.version_external_dns
     helm_values = {
       sources = ["service", "ingress"]
       provider = {
         name = "aws"
       }
-      registry = "txt"
-      policy   = "sync"
-      logLevel = "info"
+      registry         = "txt"
+      policy           = "sync"
+      logLevel         = "info"
+      annotationFilter = "external-dns.alpha.kubernetes.io/scope=private"
       extraArgs = {
         "aws-zone-type" = "private"
       }
@@ -254,7 +262,7 @@ unit "external_secrets_operator" {
 
   values = {
     version            = local.version
-    helm_chart_version = "2.4.1"
+    helm_chart_version = local.version_eso
     helm_values        = {}
   }
 }
@@ -292,7 +300,7 @@ unit "tailscale_operator" {
 
   values = {
     version            = local.version
-    helm_chart_version = "1.96.5"
+    helm_chart_version = local.version_tailscale_operator
   }
 }
 
