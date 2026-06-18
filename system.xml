@@ -7,34 +7,41 @@
     </context>
 
     <architecture>
-        The repo follows this composition flow: modules/ → units/ → pipelines/examples/stacks/
+        The repo follows this composition flow: modules/ → units/ → pipelines/
 
         - `modules/`: Terraform modules that declare AWS resources
         - `units/`: Terragrunt wrappers around modules, one per component — reference modules via `source =`
-        - `pipelines/examples/stacks/`: Executable stack configs that compose units for testing
+        - `pipelines/dev/`: Executable stack configs per environment (e.g. `pipelines/dev/eks/terragrunt.stack.hcl`)
         - `pipelines/bootstrap/`: One-time setup pipelines (run before any stack)
         - `pipelines/root.hcl`: S3 backend + AWS provider inherited by all units
         - `pipelines/version.hcl`: Resolves current git branch → used as `?ref=` in all module sources
+        - `pipelines/dns.hcl`: Subdomain locals — `subdomain_argocd` and `subdomain_guestbook`; read by units that need the domain name
     </architecture>
 
     <eks_stack>
-        Entry point: `pipelines/examples/stacks/eks/terragrunt.stack.hcl`
+        Entry point: `pipelines/dev/eks/terragrunt.stack.hcl`
 
-        - **VPC**: hosts the EKS cluster
-        - **EKS cluster**: deployed inside the VPC
-        - **ACM certificate**: issued for the subdomain via DNS validation against a public Route53 hosted zone (created by the `setup_dns` bootstrap)
-        - **Private Route53 hosted zone**: created and associated with the VPC
-        - **AWS Load Balancer Controller**: runs in-cluster and provisions an internal ALB
-        - **ExternalDNS**: watches ingress resources and writes A records to the private zone so the domain resolves to the ALB only from within the VPC
-        - **ArgoCD**: deployed via Helm with an ALB ingress using the ACM certificate
-        - **Tailscale operator**: joins the cluster to the Tailnet, enabling VPN access to internal tools
+        - **VPC** (`units/vpc`): hosts the EKS cluster
+        - **EKS cluster** (`units/eks/cluster`): deployed inside the VPC
+        - **ArgoCD ACM certificate** (`units/eks/route53/argocd/acm_certificate`): issued for the ArgoCD subdomain via DNS validation against its public Route53 hosted zone
+        - **Guestbook ACM certificate** (`units/eks/route53/apps/guestbook/acm_certificate`): issued for the guestbook subdomain via DNS validation against its public Route53 hosted zone
+        - **ArgoCD private Route53 hosted zone** (`units/eks/route53/argocd/hosted_zone_private`): created and associated with the VPC; internal resolution only
+        - **ArgoCD public Route53 hosted zone** (`units/eks/route53/argocd/hosted_zone_public`): created by the `setup_dns/argocd` bootstrap; `create = false` in the stack (pre-created by bootstrap)
+        - **Guestbook public Route53 hosted zone** (`units/eks/route53/apps/guestbook/hosted_zone_public`): created by the `setup_dns/apps/guestbook` bootstrap; `create = false` in the stack; no private zone counterpart — guestbook is publicly reachable
+        - **AWS Load Balancer Controller** (`units/eks/addons/aws_load_balancer_controller/helm`): runs in-cluster and provisions ALBs; supporting units: IAM policy (`iam_policy_url`), IAM role (`iam_role`)
+        - **ExternalDNS** (`units/eks/addons/external_dns/helm`): watches `service`, `ingress`, and `gateway-httproute` resources annotated with `external-dns.alpha.kubernetes.io/scope=private`; writes A records to the ArgoCD private zone; supporting unit: IAM role (`units/eks/addons/external_dns/iam_role`)
+        - **External Secrets Operator** (`units/eks/addons/external_secrets_operator/helm`): syncs AWS Secrets Manager secrets into Kubernetes; supporting unit: IAM role (`units/eks/addons/external_secrets_operator/iam_role`)
+        - **ArgoCD** (`units/eks/addons/argocd/helm`): deployed via Helm with an internal ALB ingress annotated `scope=private`; supporting units: password secret (`aws_password_secret`), ESO SecretStore (`aws_secret_store`), ESO ExternalSecret (`aws_external_secret`)
+        - **ArgoCD App of Apps** (`units/eks/addons/argocd/app_of_apps`): deploys an ArgoCD Application resource pointing to a separate app-of-apps repo, bootstrapping GitOps application delivery
+        - **Tailscale operator** (`units/eks/addons/tailscale/operator`): joins the cluster to the Tailnet, enabling VPN access to internal tools; supporting units: OAuth client (`oauth_client_tailscale_operator`), connector (`connector`), split DNS (`split_dns`)
     </eks_stack>
 
     <bootstrap_pipelines>
         Run these once before deploying the EKS stack:
 
         - `pipelines/bootstrap/aws_gh_actions_auth/`: OIDC + IAM role for GitHub Actions CI
-        - `pipelines/bootstrap/setup_dns/`: Public Route53 hosted zone per environment — outputs NS records to delegate at your registrar
+        - `pipelines/bootstrap/setup_dns/argocd/`: Public Route53 hosted zone for the ArgoCD subdomain — outputs NS records to delegate at your registrar
+        - `pipelines/bootstrap/setup_dns/apps/guestbook/`: Public Route53 hosted zone for the guestbook subdomain — outputs NS records to delegate at your registrar
         - `pipelines/bootstrap/tailscale/`: Tailscale ACL policy + OAuth client credentials
     </bootstrap_pipelines>
 
