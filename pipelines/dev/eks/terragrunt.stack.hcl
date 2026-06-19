@@ -94,6 +94,11 @@ unit "cluster" {
         # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
         ami_type = "AL2023_x86_64_STANDARD"
 
+        # Pin to a specific AMI release to prevent unintended rolling node replacements on every apply.
+        # Find available versions with:
+        # aws ssm get-parameters-by-path --path /aws/service/eks/optimized-ami/1.35/amazon-linux-2023/x86_64/standard --query 'Parameters[].Name'
+        ami_release_version = "1.35.6-20260618"
+
         # Use cheapest config for testing purposes
         instance_types = ["t3.medium"]
 
