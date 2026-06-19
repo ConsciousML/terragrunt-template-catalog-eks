@@ -39,7 +39,7 @@ From the root directory of this repository, run:
 source .env
 cd pipelines/bootstrap/tailscale
 terragrunt stack run init
-terragrunt run --all apply --backend-bootstrap --non-interactive
+terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
 ## Module Details

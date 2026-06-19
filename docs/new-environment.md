@@ -38,7 +38,7 @@ The Tailscale ACL reads all VPC CIDRs from `network.hcl` automatically. Re-apply
 source .env
 cd pipelines/bootstrap/tailscale
 terragrunt stack run init
-terragrunt run --all apply --backend-bootstrap --non-interactive
+terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
 ### 3. Run the DNS bootstrap
@@ -79,5 +79,5 @@ locals {
 source .env
 cd pipelines/dev-2/eks
 terragrunt stack run init
-terragrunt run --all apply --backend-bootstrap --non-interactive
+terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```

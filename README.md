@@ -117,7 +117,7 @@ Ensure `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` are set i
 source .env
 cd pipelines/dev/eks
 terragrunt stack run init
-terragrunt run --all apply --backend-bootstrap --non-interactive
+terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
 After around 15 min, your `dev` EKS cluster will be created.
@@ -174,7 +174,7 @@ argocd login <subdomain>.dev.<base_domain> \
 Finally, cleanup by destroying the infrastructure (cwd in `pipelines/dev/eks`):
 
 ```bash
-terragrunt run --all destroy --non-interactive
+terragrunt run --all destroy --non-interactive --no-stack-generate
 ```
 
 **Caution**: This workflow is only for development and testing. Use your catalog components in the [live repository](https://github.com/ConsciousML/terragrunt-template-live-eks) for multi-environment IaC, and production CI/CD.
