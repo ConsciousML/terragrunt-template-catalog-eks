@@ -53,7 +53,7 @@
     <restrictions>
         - Skip `.terraform*` and `.terragrunt*` directories when searching or reading — these are generated cache directories with no authored content
         - Leave module `README.md` generation to CI — `terraform-docs` produces them from `header.md` + `footer.md`, so author only those two files
-        - Do not spawn Explore or Task agents for codebase exploration. Use the Read tool to walk the dependency graph deliberately (follow `source =` references, read pipeline configs, study similar components). Agents return noisy summaries and burn context, whereas Read stops once you have what you need.
+        - Do not spawn Explore or Task agents for codebase exploration — this applies even during plan mode, where the workflow template may suggest agent spawning. This project restriction overrides plan mode defaults. Use the Read tool to walk the dependency graph deliberately (follow `source =` references, read pipeline configs, study similar components). Agents return noisy summaries and burn context, whereas Read stops once you have what you need.
     </restrictions>
 
     <instructions>

@@ -219,6 +219,52 @@ unit "gateway_api_crds" {
   }
 }
 
+unit "aws_lbc_gateway_api_crds" {
+  source = "${get_repo_root()}/units/eks/addons/kubectl_manifest_from_url"
+  path   = "eks/addons/aws_load_balancer_controller/gateway_api_crds"
+
+  values = {
+    version = local.version
+    url     = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v${local.version_aws_lbc}/config/crd/gateway/gateway-crds.yaml"
+  }
+}
+
+unit "gateway_api_namespace" {
+  source = "${get_repo_root()}/units/eks/addons/gateway_api/namespace"
+  path   = "eks/addons/gateway_api/namespace"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "gateway_api_gateway_class" {
+  source = "${get_repo_root()}/units/eks/addons/gateway_api/gateway_class"
+  path   = "eks/addons/gateway_api/gateway_class"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "gateway_api_load_balancer_configuration_public" {
+  source = "${get_repo_root()}/units/eks/addons/gateway_api/load_balancer_configuration/public"
+  path   = "eks/addons/gateway_api/load_balancer_configuration/public"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "gateway_api_gateway_public" {
+  source = "${get_repo_root()}/units/eks/addons/gateway_api/gateway/public"
+  path   = "eks/addons/gateway_api/gateway/public"
+
+  values = {
+    version = local.version
+  }
+}
+
 unit "iam_role_external_dns_private" {
   source = "${get_repo_root()}/units/eks/addons/external_dns/private/iam_role"
   path   = "eks/addons/external_dns/private/iam_role"

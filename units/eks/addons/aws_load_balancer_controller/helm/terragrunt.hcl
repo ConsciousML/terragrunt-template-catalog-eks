@@ -41,6 +41,11 @@ dependency "iam_role_aws_lbc" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
+dependency "gateway_api_crds" {
+  config_path  = "../gateway_api_crds"
+  skip_outputs = true
+}
+
 inputs = {
   cluster_name       = dependency.eks_cluster.outputs.cluster_name
   name               = "aws-load-balancer-controller"
