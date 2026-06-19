@@ -214,9 +214,9 @@ unit "gateway_api_crds" {
   }
 }
 
-unit "iam_role_external_dns" {
-  source = "${get_repo_root()}/units/eks/addons/external_dns/iam_role"
-  path   = "eks/addons/external_dns/iam_role"
+unit "iam_role_external_dns_private" {
+  source = "${get_repo_root()}/units/eks/addons/external_dns/private/iam_role"
+  path   = "eks/addons/external_dns/private/iam_role"
 
   values = {
     version = local.version
@@ -224,9 +224,9 @@ unit "iam_role_external_dns" {
   }
 }
 
-unit "external_dns" {
-  source = "${get_repo_root()}/units/eks/addons/external_dns/helm"
-  path   = "eks/addons/external_dns/helm"
+unit "external_dns_private" {
+  source = "${get_repo_root()}/units/eks/addons/external_dns/private/helm"
+  path   = "eks/addons/external_dns/private/helm"
 
   values = {
     version            = local.version
@@ -242,6 +242,39 @@ unit "external_dns" {
       annotationFilter = "external-dns.alpha.kubernetes.io/scope=private"
       extraArgs = {
         "aws-zone-type" = "private"
+      }
+    }
+  }
+}
+
+unit "iam_role_external_dns_public" {
+  source = "${get_repo_root()}/units/eks/addons/external_dns/public/iam_role"
+  path   = "eks/addons/external_dns/public/iam_role"
+
+  values = {
+    version = local.version
+    tags    = {}
+  }
+}
+
+unit "external_dns_public" {
+  source = "${get_repo_root()}/units/eks/addons/external_dns/public/helm"
+  path   = "eks/addons/external_dns/public/helm"
+
+  values = {
+    version            = local.version
+    helm_chart_version = local.version_external_dns
+    helm_values = {
+      sources = ["service", "ingress", "gateway-httproute"]
+      provider = {
+        name = "aws"
+      }
+      registry         = "txt"
+      policy           = "sync"
+      logLevel         = "info"
+      annotationFilter = "external-dns.alpha.kubernetes.io/scope=public"
+      extraArgs = {
+        "aws-zone-type" = "public"
       }
     }
   }
