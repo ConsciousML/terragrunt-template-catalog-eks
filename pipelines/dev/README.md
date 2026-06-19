@@ -43,14 +43,14 @@ Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate
 cd pipelines/dev/eks
 
 terragrunt stack run init
-terragrunt run --all apply --backend-bootstrap --non-interactive
+terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
 ### Destroy a Stack
 ```bash
 cd pipelines/dev/eks
 
-terragrunt run --all destroy
+terragrunt run --all destroy --no-stack-generate
 ```
 
 ## Production Setup

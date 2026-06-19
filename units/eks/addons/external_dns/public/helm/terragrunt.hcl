@@ -21,16 +21,16 @@ terraform {
 }
 
 dependency "gateway_api_crds" {
-  config_path  = "../../gateway_api/crds"
+  config_path  = "../../../gateway_api/crds"
   skip_outputs = true
 }
 
 dependency "aws_load_balancer_controller" {
-  config_path  = "../../aws_load_balancer_controller/helm"
+  config_path  = "../../../aws_load_balancer_controller/helm"
   skip_outputs = true
 }
 
-dependency "iam_role_external_dns" {
+dependency "iam_role_external_dns_public" {
   config_path = "../iam_role"
   mock_outputs = {
     namespace = "external-dns"
@@ -38,8 +38,8 @@ dependency "iam_role_external_dns" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
-dependency "route53_hosted_zone_private" {
-  config_path = "../../../route53/argocd/hosted_zone_private"
+dependency "route53_hosted_zone_guestbook_public" {
+  config_path = "../../../../route53/apps/guestbook/hosted_zone_public"
   mock_outputs = {
     domain_name = "mock.example.com"
   }
@@ -48,33 +48,30 @@ dependency "route53_hosted_zone_private" {
 
 inputs = {
   cluster_name       = dependency.eks_cluster.outputs.cluster_name
-  name               = "external-dns"
+  name               = "external-dns-public"
   repository         = "https://kubernetes-sigs.github.io/external-dns/"
   chart              = "external-dns"
-  namespace          = dependency.iam_role_external_dns.outputs.namespace
+  namespace          = dependency.iam_role_external_dns_public.outputs.namespace
   create_namespace   = true
   helm_chart_version = values.helm_chart_version
   helm_values        = values.helm_values
   helm_set = [
     {
+      name  = "serviceAccount.name"
+      value = "external-dns-public"
+    },
+    {
       name  = "txtOwnerId"
       value = dependency.eks_cluster.outputs.cluster_name
     },
-    # Prefix or Suffix are mandatory for the external-dns to create the TXT records for ownership
-    # It is necessary for it to delete the A/AAAA records when an Ingress resource is deleted
-    # "%{record_type}" is for using the record type as prefix, i.e "cname-external-dns-your-cluster.argocd.yourdomain.com"
-    # Instead of "external-dns-your-cluster.cname-argocd.yourdomain.com". In the later case, ownership will fail cause
-    # external-dns will not find a the domain "cname-argocd.yourdomain.com" 
-
     # The %%% is for escaping Terragrunt templates
     {
       name  = "txtPrefix"
-      value = "%%%{record_type}-external-dns-${dependency.eks_cluster.outputs.cluster_name}."
+      value = "%%%{record_type}-external-dns-public-${dependency.eks_cluster.outputs.cluster_name}."
     },
     {
       name  = "domainFilters[0]"
-      value = dependency.route53_hosted_zone_private.outputs.domain_name
+      value = dependency.route53_hosted_zone_guestbook_public.outputs.domain_name
     }
   ]
 }
-

@@ -64,7 +64,7 @@ From the root directory of this repository, run:
 source .env
 cd pipelines/bootstrap/aws_gh_actions_auth/
 terragrunt stack run init
-terragrunt run --all apply --backend-bootstrap --non-interactive
+terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
 ### Update Your GitHub Actions file

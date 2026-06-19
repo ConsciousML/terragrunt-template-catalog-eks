@@ -29,7 +29,7 @@ Repeat the following for each environment (replacing `<environment>` with `dev` 
 source .env
 cd pipelines/bootstrap/setup_dns/argocd/<environment>/stack
 terragrunt stack run init
-terragrunt run --all apply --backend-bootstrap --non-interactive
+terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
 Retrieve the 4 nameservers from the output:

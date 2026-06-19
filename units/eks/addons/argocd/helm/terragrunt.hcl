@@ -22,7 +22,7 @@ dependency "aws_load_balancer_controller" {
 }
 
 dependency "external_dns" {
-  config_path  = "../../external_dns/helm"
+  config_path  = "../../external_dns/private/helm"
   skip_outputs = true
 }
 

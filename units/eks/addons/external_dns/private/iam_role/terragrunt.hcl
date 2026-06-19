@@ -8,7 +8,7 @@ terraform {
 }
 
 dependency "eks_cluster" {
-  config_path = "../../../cluster"
+  config_path = "../../../../cluster"
   mock_outputs = {
     cluster_name = "mock-cluster"
   }
@@ -17,10 +17,10 @@ dependency "eks_cluster" {
 
 inputs = {
   cluster_name    = dependency.eks_cluster.outputs.cluster_name
-  iam_policy_name = "${include.root.locals.environment}-external-dns-policy"
-  iam_role_name   = "${include.root.locals.environment}-external-dns"
+  iam_policy_name = "${include.root.locals.environment}-external-dns-private-policy"
+  iam_role_name   = "${include.root.locals.environment}-external-dns-private"
   namespace       = "external-dns"
-  service_account = "external-dns"
+  service_account = "external-dns-private"
 
   # tfsec:ignore:aws-iam-no-policy-wildcards - official policy from external-dns docs, already scoped to hostedzone/*
   iam_policy_json = jsonencode({
