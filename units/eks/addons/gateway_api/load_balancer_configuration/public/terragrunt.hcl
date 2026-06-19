@@ -1,0 +1,52 @@
+include "root" {
+  path   = find_in_parent_folders("root.hcl")
+  expose = true
+}
+
+include "provider_k8s_base" {
+  path = find_in_parent_folders("provider_k8s_base.hcl")
+}
+
+include "provider_kubernetes" {
+  path = find_in_parent_folders("provider_kubernetes.hcl")
+}
+
+terraform {
+  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/load_balancer_configuration/?ref=${values.version}"
+}
+
+dependency "namespace" {
+  config_path = "../../namespace"
+  mock_outputs = {
+    name = "gateway"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
+dependency "aws_lbc_gateway_api_crds" {
+  config_path  = "../../../aws_load_balancer_controller/gateway_api_crds"
+  skip_outputs = true
+}
+
+dependency "acm_certificate_guestbook" {
+  config_path = "../../../../route53/apps/guestbook/acm_certificate"
+  mock_outputs = {
+    certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/mock"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
+inputs = {
+  cluster_name = dependency.eks_cluster.outputs.cluster_name
+  name         = "public"
+  namespace    = dependency.namespace.outputs.name
+  spec = {
+    scheme = "internet-facing"
+    listenerConfigurations = [
+      {
+        protocolPort       = "HTTPS:443"
+        defaultCertificate = dependency.acm_certificate_guestbook.outputs.certificate_arn
+      }
+    ]
+  }
+}
