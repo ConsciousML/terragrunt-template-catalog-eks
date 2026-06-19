@@ -3,9 +3,12 @@ include "root" {
   expose = true
 }
 
+include "provider_k8s_base" {
+  path = find_in_parent_folders("provider_k8s_base.hcl")
+}
+
 include "provider_kubernetes" {
-  path   = find_in_parent_folders("provider_kubernetes.hcl")
-  expose = true
+  path = find_in_parent_folders("provider_kubernetes.hcl")
 }
 
 terraform {
@@ -28,8 +31,8 @@ dependency "tailscale_operator" {
 
 inputs = {
   cluster_name     = dependency.eks_cluster.outputs.cluster_name
-  name             = "${include.provider_kubernetes.locals.cluster_name_full}-connector"
-  hostname_prefix  = include.provider_kubernetes.locals.cluster_name_full
+  name             = "${dependency.eks_cluster.outputs.cluster_name}-connector"
+  hostname_prefix  = dependency.eks_cluster.outputs.cluster_name
   advertise_routes = [dependency.vpc.outputs.vpc_cidr_block]
   replicas         = 1
 }

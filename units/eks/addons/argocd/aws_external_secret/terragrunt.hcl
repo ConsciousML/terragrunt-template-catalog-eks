@@ -3,6 +3,10 @@ include "root" {
   expose = true
 }
 
+include "provider_k8s_base" {
+  path = find_in_parent_folders("provider_k8s_base.hcl")
+}
+
 include "provider_kubernetes" {
   path = find_in_parent_folders("provider_kubernetes.hcl")
 }

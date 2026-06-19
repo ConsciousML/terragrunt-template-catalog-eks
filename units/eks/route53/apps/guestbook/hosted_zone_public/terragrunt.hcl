@@ -6,10 +6,10 @@ include "root" {
 locals {
   environment = include.root.locals.environment
 
-  dns_config_hcl = find_in_parent_folders("dns.hcl")
-  base_domain    = read_terragrunt_config(local.dns_config_hcl).locals.base_domain
-  subdomain      = read_terragrunt_config(local.dns_config_hcl).locals.subdomain
-  domain_name    = "${local.subdomain}.${local.environment}.${local.base_domain}"
+  dns_config_hcl      = find_in_parent_folders("dns.hcl")
+  base_domain         = read_terragrunt_config(local.dns_config_hcl).locals.base_domain
+  subdomain_guestbook = read_terragrunt_config(local.dns_config_hcl).locals.subdomain_guestbook
+  domain_name         = "${local.subdomain_guestbook}.${local.environment}.${local.base_domain}"
 }
 
 terraform {
