@@ -17,6 +17,11 @@ terraform {
   }
 }
 
+dependency "gateway_api_crds" {
+  config_path  = "../../gateway_api/crds"
+  skip_outputs = true
+}
+
 dependency "aws_load_balancer_controller" {
   config_path  = "../../aws_load_balancer_controller/helm"
   skip_outputs = true

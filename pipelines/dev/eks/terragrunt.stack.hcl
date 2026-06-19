@@ -204,6 +204,16 @@ unit "route53_hosted_zone_argocd_private" {
   }
 }
 
+unit "gateway_api_crds" {
+  source = "${get_repo_root()}/units/eks/addons/kubectl_manifest_from_url"
+  path   = "eks/addons/gateway_api/crds"
+
+  values = {
+    version = local.version
+    url     = "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/standard-install.yaml"
+  }
+}
+
 unit "iam_role_external_dns" {
   source = "${get_repo_root()}/units/eks/addons/external_dns/iam_role"
   path   = "eks/addons/external_dns/iam_role"
