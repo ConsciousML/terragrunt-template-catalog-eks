@@ -20,11 +20,6 @@ dependency "argocd" {
   skip_outputs = true
 }
 
-dependency "aws_lbc_gateway_api_crds" {
-  config_path  = "../../aws_load_balancer_controller/gateway_api_crds"
-  skip_outputs = true
-}
-
 dependency "gateway_public" {
   config_path  = "../../gateway_api/gateway/public"
   skip_outputs = true

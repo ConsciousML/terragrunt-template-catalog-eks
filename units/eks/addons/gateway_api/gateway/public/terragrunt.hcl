@@ -39,11 +39,6 @@ dependency "load_balancer_configuration_public" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
-dependency "aws_lbc_gateway_api_crds" {
-  config_path  = "../../../aws_load_balancer_controller/gateway_api_crds"
-  skip_outputs = true
-}
-
 inputs = {
   cluster_name = dependency.eks_cluster.outputs.cluster_name
   name         = "public-alb"
