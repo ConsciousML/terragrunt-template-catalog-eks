@@ -56,6 +56,16 @@
         - Do not spawn Explore or Task agents for codebase exploration — this applies even during plan mode, where the workflow template may suggest agent spawning. This project restriction overrides plan mode defaults. Use the Read tool to walk the dependency graph deliberately (follow `source =` references, read pipeline configs, study similar components). Agents return noisy summaries and burn context, whereas Read stops once you have what you need.
     </restrictions>
 
+    <documentation>
+        Four levels — each covers only what the level below cannot express:
+        - EKS stack doc: full cross-addon topology, sequencing rationale, links to group READMEs for detail
+        - Addon group README (e.g. `units/eks/addons/argocd/`): internal unit chain, known extension points, group-level failure signatures
+        - Unit README: preconditions, what it produces for downstream, one-line link to its module + upstream spec, unit-level failure signatures
+        - Inline HCL: why a specific value was chosen — not cross-unit relationships
+
+        Never paraphrase upstream docs — link to them. Write only what exists at the seams: integration topology, interface contracts, and failure signatures for silent cross-tool failures (symptom at a different layer than the cause).
+    </documentation>
+
     <instructions>
         Start by understanding what you are being asked to do and why it matters: is this a new feature, a fix, a doc update, or a refactor? What problem does it solve, and how does the change integrate with the existing stacks, units, and modules? Surfacing the intent up front prevents efficiently building the wrong thing.
 
