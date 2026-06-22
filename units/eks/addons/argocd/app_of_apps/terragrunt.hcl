@@ -51,6 +51,13 @@ inputs = {
   sync_options          = values.sync_options
   prune                 = values.prune
   helm_values = {
+    config = {
+      spec = {
+        source = {
+          targetRevision = values.target_revision
+        }
+      }
+    }
     appParams = {
       "guestbook-helm" = {
         host = dependency.route53_hosted_zone_guestbook_public.outputs.domain_name
