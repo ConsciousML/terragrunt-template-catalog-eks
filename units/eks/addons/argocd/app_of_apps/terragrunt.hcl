@@ -21,8 +21,20 @@ dependency "argocd" {
 }
 
 dependency "gateway_public" {
-  config_path  = "../../gateway_api/gateway/public"
-  skip_outputs = true
+  config_path = "../../gateway_api/gateway/public"
+  mock_outputs = {
+    name      = "public-alb"
+    namespace = "gateway"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
+dependency "route53_hosted_zone_guestbook_public" {
+  config_path = "../../../route53/apps/guestbook/hosted_zone_public"
+  mock_outputs = {
+    domain_name = "mock.guestbook.example.com"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 inputs = {
@@ -38,4 +50,18 @@ inputs = {
   finalizers            = values.finalizers
   sync_options          = values.sync_options
   prune                 = values.prune
+  helm_values = {
+    appParams = {
+      "guestbook-helm" = {
+        host = dependency.route53_hosted_zone_guestbook_public.outputs.domain_name
+        gateway = {
+          name      = dependency.gateway_public.outputs.name
+          namespace = dependency.gateway_public.outputs.namespace
+        }
+        annotations = {
+          "external-dns.alpha.kubernetes.io/scope" = "public"
+        }
+      }
+    }
+  }
 }

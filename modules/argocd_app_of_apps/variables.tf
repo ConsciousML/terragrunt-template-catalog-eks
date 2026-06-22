@@ -68,3 +68,9 @@ variable "prune" {
   type        = bool
   default     = true
 }
+
+variable "helm_values" {
+  description = "Map of Helm values injected into spec.source.helm.values on the app-of-apps Application"
+  type        = map(any)
+  default     = {}
+}

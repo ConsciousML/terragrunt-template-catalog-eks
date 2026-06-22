@@ -9,11 +9,16 @@ resource "kubernetes_manifest" "this" {
     }
     spec = {
       project = var.project
-      source = {
-        repoURL        = var.repo_url
-        targetRevision = var.target_revision
-        path           = var.path
-      }
+      source = merge(
+        {
+          repoURL        = var.repo_url
+          targetRevision = var.target_revision
+          path           = var.path
+        },
+        length(var.helm_values) > 0 ? {
+          helm = { values = yamlencode(var.helm_values) }
+        } : {}
+      )
       destination = {
         server    = var.destination_server
         namespace = var.destination_namespace

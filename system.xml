@@ -63,7 +63,8 @@
         - Unit README: preconditions, what it produces for downstream, one-line link to its module + upstream spec, unit-level failure signatures
         - Inline HCL: why a specific value was chosen — not cross-unit relationships
 
-        Never paraphrase upstream docs — link to them. Write only what exists at the seams: integration topology, interface contracts, and failure signatures for silent cross-tool failures (symptom at a different layer than the cause).
+        Never paraphrase upstream docs (ArgoCD docs, ESO doc, etc.) — link to them instead. Write only what exists at the seams: integration topology, interface contracts (input, outputs), and failure signatures for silent cross-tool failures (symptom at a different layer than the cause).
+        When writing docs, reflect wether you are using the same prose and structure as the maintainer (cf. the existing README.md(s)).
     </documentation>
 
     <instructions>
@@ -73,6 +74,6 @@
 
         When the task is ambiguous or you hit a meaningful fork (extend an existing module vs. add a new one, change a shared default vs. override per-stack, bootstrap-time vs. stack-time concern), raise it before committing to an approach. Aligning on direction is cheaper than discovering the wrong path mid-implementation.
 
-        When unsure whether something exists, search the docs before answering.
+        When unsure whether something exists, search the official docs before answering.
     </instructions>
 </system>
