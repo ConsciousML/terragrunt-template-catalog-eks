@@ -6,9 +6,9 @@ locals {
   github_repo_name_catalog = local.github_locals.github_repo_name_catalog
 }
 
-stack "setup_dns_guestbook" {
-  source = "github.com/${local.github_username_catalog}/${local.github_repo_name_catalog}//stacks/setup_dns/apps/guestbook?ref=${local.version}"
-  path   = "setup_dns_guestbook"
+stack "setup_dns" {
+  source = "github.com/${local.github_username_catalog}/${local.github_repo_name_catalog}//stacks/setup_dns?ref=${local.version}"
+  path   = "setup_dns"
   values = {
     version = local.version
   }
