@@ -4,12 +4,8 @@ include "root" {
 }
 
 locals {
-  environment = include.root.locals.environment
-
-  dns_config_hcl   = find_in_parent_folders("dns.hcl")
-  base_domain      = read_terragrunt_config(local.dns_config_hcl).locals.base_domain
-  subdomain_argocd = read_terragrunt_config(local.dns_config_hcl).locals.subdomain_argocd
-  domain_name      = "${local.subdomain_argocd}.${local.environment}.${local.base_domain}"
+  domains_hcl = find_in_parent_folders("domains.hcl")
+  domain_name = read_terragrunt_config(local.domains_hcl).locals.domain_env
 }
 
 terraform {
@@ -17,7 +13,7 @@ terraform {
 }
 
 dependency "vpc" {
-  config_path = "../../../../vpc"
+  config_path = "../../../vpc"
   mock_outputs = {
     vpc_id = "mock-vpc-id"
   }
@@ -31,6 +27,6 @@ inputs = {
   name         = local.domain_name
   comment      = values.comment
   tags = {
-    environment = local.environment
+    environment = include.root.locals.environment
   }
 }

@@ -17,6 +17,6 @@ dependency "route53_hosted_zone_public" {
 }
 
 inputs = {
-  domain_name = dependency.route53_hosted_zone_public.outputs.domain_name
+  domain_name = "*.${dependency.route53_hosted_zone_public.outputs.domain_name}"
   zone_id     = dependency.route53_hosted_zone_public.outputs.zone_id
 }

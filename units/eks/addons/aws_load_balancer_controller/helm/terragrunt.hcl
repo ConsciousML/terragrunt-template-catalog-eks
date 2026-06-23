@@ -29,7 +29,7 @@ dependency "vpc" {
 }
 
 dependency "acm_certificate" {
-  config_path  = "../../../route53/argocd/acm_certificate"
+  config_path  = "../../../route53/acm_certificate"
   skip_outputs = true
 }
 
