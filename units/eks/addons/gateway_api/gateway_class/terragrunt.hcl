@@ -12,7 +12,7 @@ include "provider_kubernetes" {
 }
 
 terraform {
-  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/gateway_class/?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/k8s_manifest/?ref=${values.version}"
 }
 
 dependency "gateway_api_crds" {
@@ -21,7 +21,11 @@ dependency "gateway_api_crds" {
 }
 
 inputs = {
-  cluster_name    = dependency.eks_cluster.outputs.cluster_name
-  name            = "aws-alb"
-  controller_name = "gateway.k8s.aws/alb"
+  cluster_name = dependency.eks_cluster.outputs.cluster_name
+  api_version  = "gateway.networking.k8s.io/v1"
+  kind         = "GatewayClass"
+  name         = "aws-alb"
+  spec = {
+    controllerName = "gateway.k8s.aws/alb"
+  }
 }
