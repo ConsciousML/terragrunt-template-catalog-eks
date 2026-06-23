@@ -30,6 +30,7 @@ Creates an ArgoCD [`Application`](https://argo-cd.readthedocs.io/en/stable/opera
 | <a name="input_destination_namespace"></a> [destination\_namespace](#input\_destination\_namespace) | Kubernetes namespace ArgoCD will deploy child applications into | `string` | `"argocd"` | no |
 | <a name="input_destination_server"></a> [destination\_server](#input\_destination\_server) | Kubernetes API server URL of the destination cluster | `string` | `"https://kubernetes.default.svc"` | no |
 | <a name="input_finalizers"></a> [finalizers](#input\_finalizers) | List of finalizers applied to the Application resource | `list(string)` | <pre>[<br/>  "resources-finalizer.argocd.argoproj.io"<br/>]</pre> | no |
+| <a name="input_helm_values"></a> [helm\_values](#input\_helm\_values) | Helm values injected into spec.source.helm.values on the app-of-apps Application | `any` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the ArgoCD Application resource | `string` | `"app-of-apps"` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where the ArgoCD Application resource is created | `string` | `"argocd"` | no |
 | <a name="input_path"></a> [path](#input\_path) | Path within the repository containing the application manifests | `string` | `"apps"` | no |
