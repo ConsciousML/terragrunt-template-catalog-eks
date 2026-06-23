@@ -29,12 +29,14 @@ dependency "gateway_public" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
-dependency "route53_hosted_zone_guestbook_public" {
-  config_path = "../../../route53/apps/guestbook/hosted_zone_public"
-  mock_outputs = {
-    domain_name = "mock.guestbook.example.com"
-  }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+locals {
+  domains_hcl      = find_in_parent_folders("domains.hcl")
+  domain_guestbook = read_terragrunt_config(local.domains_hcl).locals.domain_guestbook
+}
+
+dependency "route53_hosted_zone_public" {
+  config_path  = "../../../route53/hosted_zone_public"
+  skip_outputs = true
 }
 
 inputs = {
@@ -60,7 +62,7 @@ inputs = {
     }
     appParams = {
       "guestbook-helm" = {
-        host = dependency.route53_hosted_zone_guestbook_public.outputs.domain_name
+        host = local.domain_guestbook
         gateway = {
           name      = dependency.gateway_public.outputs.name
           namespace = dependency.gateway_public.outputs.namespace

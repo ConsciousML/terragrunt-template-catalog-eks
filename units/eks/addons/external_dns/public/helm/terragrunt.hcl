@@ -38,8 +38,8 @@ dependency "iam_role_external_dns_public" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
-dependency "route53_hosted_zone_guestbook_public" {
-  config_path = "../../../../route53/apps/guestbook/hosted_zone_public"
+dependency "route53_hosted_zone_public" {
+  config_path = "../../../../route53/hosted_zone_public"
   mock_outputs = {
     domain_name = "mock.example.com"
   }
@@ -71,7 +71,7 @@ inputs = {
     },
     {
       name  = "domainFilters[0]"
-      value = dependency.route53_hosted_zone_guestbook_public.outputs.domain_name
+      value = dependency.route53_hosted_zone_public.outputs.domain_name
     }
   ]
 }

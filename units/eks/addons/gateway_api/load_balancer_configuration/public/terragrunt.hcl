@@ -36,8 +36,8 @@ dependency "target_group_configuration_public" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
-dependency "acm_certificate_guestbook" {
-  config_path = "../../../../route53/apps/guestbook/acm_certificate"
+dependency "acm_certificate" {
+  config_path = "../../../../route53/acm_certificate"
   mock_outputs = {
     certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/mock"
   }
@@ -58,7 +58,7 @@ inputs = {
     listenerConfigurations = [
       {
         protocolPort       = "HTTPS:443"
-        defaultCertificate = dependency.acm_certificate_guestbook.outputs.certificate_arn
+        defaultCertificate = dependency.acm_certificate.outputs.certificate_arn
       }
     ]
   }
