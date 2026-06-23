@@ -105,7 +105,7 @@ For more information, read the [AWS CLI authentication documentation](https://do
 ### Run the Bootstrap Pipelines
 Run the following Terragrunt pipelines once per repository:
 - [AWS GitHub Actions Auth](pipelines/bootstrap/aws_gh_actions_auth/README.md): authenticates GitHub Actions with AWS
-- [Setup DNS](pipelines/bootstrap/setup_dns/README.md): creates a [Route53 hosted zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html) to sign TLS certificates with ACM
+- [Setup DNS](pipelines/bootstrap/setup_dns/README.md): creates one public [Route53 hosted zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html) per environment, shared by all apps, delegated once at your registrar
 - [Tailscale](pipelines/bootstrap/tailscale/README.md): creates [Tailscale](https://tailscale.com/) resources needed to connect with tools exposed internally in your EKS cluster (ArgoCD, etc.)
 
 ### Deploy a Dev EKS Cluster
@@ -150,9 +150,9 @@ eks-pod-identity-agent-9pq6k   1/1     Running   0          41m
 
 ArgoCD is only reachable with the Tailscale. Make sure you have completed the [Tailscale prerequisites](pipelines/bootstrap/tailscale/README.md#prerequisites) and have the Tailscale client running before proceeding.
 
-The ArgoCD host is formed from `pipelines/dns.hcl` as `<subdomain>.dev.<base_domain>` (replace `<subdomain>` and `<base_domain>` with the values from that file, e.g. `argocd.dev.axelmendoza.com`).
+The ArgoCD host is `argocd.dev.<base_domain>` (replace `<base_domain>` with the value from `pipelines/dns.hcl`, e.g. `argocd.dev.axelmendoza.com`).
 
-**Web UI**: Open `https://<subdomain>.dev.<base_domain>` in your browser and log in with username `admin`. Retrieve the password with:
+**Web UI**: Open `https://argocd.dev.<base_domain>` in your browser and log in with username `admin`. Retrieve the password with:
 ```bash
 aws secretsmanager get-secret-value \
   --secret-id dev-argocd-password \
@@ -162,13 +162,19 @@ aws secretsmanager get-secret-value \
 
 **CLI**: Log in directly in one command:
 ```bash
-argocd login <subdomain>.dev.<base_domain> \
+argocd login argocd.dev.<base_domain> \
   --username admin \
   --password $(aws secretsmanager get-secret-value \
     --secret-id dev-argocd-password \
     --query SecretString \
     --output text | jq -r .plaintext)
 ```
+
+### Access the Guestbook App
+
+Open `https://guestbook.dev.<base_domain>` in your browser. No login required.
+
+Apps are deployed using the [App of Apps](https://github.com/ConsciousML/argocd-app-of-apps-template) pattern: a single ArgoCD Application bootstraps all child apps from that repository.
 
 ### Destroy the Infrastructure
 Finally, cleanup by destroying the infrastructure (cwd in `pipelines/dev/eks`):
@@ -188,6 +194,8 @@ terragrunt run --all destroy --non-interactive --no-stack-generate
 5. Merge when CI passes
 
 See the [development guide](docs/development.md) for a detailed workflow with a step-by-step example on how to modify this template.
+
+To modify existing applications or deploy new ones, see the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template#readme).
 
 ## Continuous Integration (CI)
 The CI provides automated code quality checks on every pull request:

@@ -19,7 +19,7 @@ Provisions a shared, internet-facing ALB via the [AWS Load Balancer Controller G
 ## Integration
 
 - **[AWS Load Balancer Controller](../aws_load_balancer_controller/)**: provisions the ALB and implements the `aws-alb` GatewayClass controller
-- **ACM**: `load_balancer_configuration/public` references the guestbook ACM certificate for TLS termination on `HTTPS:443`
+- **ACM**: `load_balancer_configuration/public` references the shared wildcard ACM certificate for TLS termination on `HTTPS:443`
 - **[ExternalDNS](../external_dns/)**: watches `HTTPRoute` resources attached to this Gateway and creates Route53 records for matching hostnames
 - **[App of Apps](../argocd/app_of_apps/)**: `gateway/public` outputs are passed as Helm values to each child app, allowing them to reference the Gateway in their `HTTPRoute`
 - **Apps**: each app creates an `HTTPRoute` bound to this Gateway. See [`guestbook-httproute.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/guestbook-helm/templates/guestbook-httproute.yaml) as a reference
