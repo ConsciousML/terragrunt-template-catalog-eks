@@ -68,3 +68,9 @@ variable "prune" {
   type        = bool
   default     = true
 }
+
+variable "helm_values" {
+  description = "Helm values injected into spec.source.helm.values on the app-of-apps Application"
+  type        = any
+  default     = {}
+}

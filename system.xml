@@ -15,7 +15,7 @@
         - `pipelines/bootstrap/`: One-time setup pipelines (run before any stack)
         - `pipelines/root.hcl`: S3 backend + AWS provider inherited by all units
         - `pipelines/version.hcl`: Resolves current git branch → used as `?ref=` in all module sources
-        - `pipelines/dns.hcl`: Subdomain locals — `subdomain_argocd` and `subdomain_guestbook`; read by units that need the domain name
+        - `pipelines/dns.hcl`: Subdomain locals (`subdomain_argocd` and `subdomain_guestbook`); read by units that need the domain name
     </architecture>
 
     <eks_stack>
@@ -27,7 +27,7 @@
         - **Guestbook ACM certificate** (`units/eks/route53/apps/guestbook/acm_certificate`): issued for the guestbook subdomain via DNS validation against its public Route53 hosted zone
         - **ArgoCD private Route53 hosted zone** (`units/eks/route53/argocd/hosted_zone_private`): created and associated with the VPC; internal resolution only
         - **ArgoCD public Route53 hosted zone** (`units/eks/route53/argocd/hosted_zone_public`): created by the `setup_dns/argocd` bootstrap; `create = false` in the stack (pre-created by bootstrap)
-        - **Guestbook public Route53 hosted zone** (`units/eks/route53/apps/guestbook/hosted_zone_public`): created by the `setup_dns/apps/guestbook` bootstrap; `create = false` in the stack; no private zone counterpart — guestbook is publicly reachable
+        - **Guestbook public Route53 hosted zone** (`units/eks/route53/apps/guestbook/hosted_zone_public`): created by the `setup_dns/apps/guestbook` bootstrap; `create = false` in the stack; no private zone counterpart (guestbook is publicly reachable)
         - **AWS Load Balancer Controller** (`units/eks/addons/aws_load_balancer_controller/helm`): runs in-cluster and provisions ALBs; supporting units: IAM policy (`iam_policy_url`), IAM role (`iam_role`)
         - **ExternalDNS** (`units/eks/addons/external_dns/helm`): watches `service`, `ingress`, and `gateway-httproute` resources annotated with `external-dns.alpha.kubernetes.io/scope=private`; writes A records to the ArgoCD private zone; supporting unit: IAM role (`units/eks/addons/external_dns/iam_role`)
         - **External Secrets Operator** (`units/eks/addons/external_secrets_operator/helm`): syncs AWS Secrets Manager secrets into Kubernetes; supporting unit: IAM role (`units/eks/addons/external_secrets_operator/iam_role`)
@@ -40,14 +40,14 @@
         Run these once before deploying the EKS stack:
 
         - `pipelines/bootstrap/aws_gh_actions_auth/`: OIDC + IAM role for GitHub Actions CI
-        - `pipelines/bootstrap/setup_dns/argocd/`: Public Route53 hosted zone for the ArgoCD subdomain — outputs NS records to delegate at your registrar
-        - `pipelines/bootstrap/setup_dns/apps/guestbook/`: Public Route53 hosted zone for the guestbook subdomain — outputs NS records to delegate at your registrar
+        - `pipelines/bootstrap/setup_dns/argocd/`: Public Route53 hosted zone for the ArgoCD subdomain, outputs NS records to delegate at your registrar
+        - `pipelines/bootstrap/setup_dns/apps/guestbook/`: Public Route53 hosted zone for the guestbook subdomain, outputs NS records to delegate at your registrar
         - `pipelines/bootstrap/tailscale/`: Tailscale ACL policy + OAuth client credentials
     </bootstrap_pipelines>
 
     <conventions>
         - Prefix all resources with `{environment}-` to avoid naming collisions across environments
-        - Always set `expose = true` on every `include` block in unit files — without it, `include.<name>.locals.*` cannot be referenced in the same file
+        - Always set `expose = true` on every `include` block in unit files (without it, `include.<name>.locals.*` cannot be referenced in the same file)
     </conventions>
 
     <restrictions>
@@ -56,6 +56,17 @@
         - Do not spawn Explore or Task agents for codebase exploration — this applies even during plan mode, where the workflow template may suggest agent spawning. This project restriction overrides plan mode defaults. Use the Read tool to walk the dependency graph deliberately (follow `source =` references, read pipeline configs, study similar components). Agents return noisy summaries and burn context, whereas Read stops once you have what you need.
     </restrictions>
 
+    <documentation>
+        Four levels — each covers only what the level below cannot express:
+        - EKS stack doc: full cross-addon topology, sequencing rationale, links to group READMEs for detail
+        - Addon group README (e.g. `units/eks/addons/argocd/`): what the group contains (units, their role and dependencies), how it integrates with the broader stack, and links to upstream concepts rather than paraphrasing them
+        - Unit README: preconditions, what it produces for downstream, one-line link to its module + upstream spec, unit-level failure signatures
+        - Inline HCL: why a specific value was chosen, not cross-unit relationships
+
+        Never paraphrase upstream docs (ArgoCD docs, ESO doc, etc.), link to them instead.
+        When writing docs, reflect whether you are using the same prose and structure as the maintainer (cf. the existing README.md(s)).
+    </documentation>
+
     <instructions>
         Start by understanding what you are being asked to do and why it matters: is this a new feature, a fix, a doc update, or a refactor? What problem does it solve, and how does the change integrate with the existing stacks, units, and modules? Surfacing the intent up front prevents efficiently building the wrong thing.
 
@@ -63,6 +74,6 @@
 
         When the task is ambiguous or you hit a meaningful fork (extend an existing module vs. add a new one, change a shared default vs. override per-stack, bootstrap-time vs. stack-time concern), raise it before committing to an approach. Aligning on direction is cheaper than discovering the wrong path mid-implementation.
 
-        When unsure whether something exists, search the docs before answering.
+        When unsure whether something exists, search the official docs before answering.
     </instructions>
 </system>
