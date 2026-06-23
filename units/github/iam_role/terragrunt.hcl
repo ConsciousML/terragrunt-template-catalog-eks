@@ -12,7 +12,7 @@ terraform {
 }
 
 inputs = {
-  name             = values.name
+  name             = "${local.environment}-${values.name}"
   github_username  = values.github_username
   github_repo_name = values.github_repo_name
   github_branch    = values.github_branch
