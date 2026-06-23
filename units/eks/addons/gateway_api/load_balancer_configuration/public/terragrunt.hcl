@@ -28,6 +28,14 @@ dependency "aws_lbc_gateway_api_crds" {
   skip_outputs = true
 }
 
+dependency "target_group_configuration_public" {
+  config_path = "../../target_group_configuration/public"
+  mock_outputs = {
+    name = "public-defaults"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
 dependency "acm_certificate_guestbook" {
   config_path = "../../../../route53/apps/guestbook/acm_certificate"
   mock_outputs = {
@@ -42,6 +50,9 @@ inputs = {
   namespace    = dependency.namespace.outputs.name
   spec = {
     scheme = "internet-facing"
+    defaultTargetGroupConfiguration = {
+      name = dependency.target_group_configuration_public.outputs.name
+    }
     listenerConfigurations = [
       {
         protocolPort       = "HTTPS:443"

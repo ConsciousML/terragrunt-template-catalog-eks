@@ -247,6 +247,15 @@ unit "gateway_api_gateway_class" {
   }
 }
 
+unit "gateway_api_target_group_configuration_public" {
+  source = "${get_repo_root()}/units/eks/addons/gateway_api/target_group_configuration/public"
+  path   = "eks/addons/gateway_api/target_group_configuration/public"
+
+  values = {
+    version = local.version
+  }
+}
+
 unit "gateway_api_load_balancer_configuration_public" {
   source = "${get_repo_root()}/units/eks/addons/gateway_api/load_balancer_configuration/public"
   path   = "eks/addons/gateway_api/load_balancer_configuration/public"

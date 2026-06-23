@@ -15,7 +15,7 @@
         - `pipelines/bootstrap/`: One-time setup pipelines (run before any stack)
         - `pipelines/root.hcl`: S3 backend + AWS provider inherited by all units
         - `pipelines/version.hcl`: Resolves current git branch → used as `?ref=` in all module sources
-        - `pipelines/dns.hcl`: Subdomain locals — `subdomain_argocd` and `subdomain_guestbook`; read by units that need the domain name
+        - `pipelines/dns.hcl`: Subdomain locals (`subdomain_argocd` and `subdomain_guestbook`); read by units that need the domain name
     </architecture>
 
     <eks_stack>
@@ -27,7 +27,7 @@
         - **Guestbook ACM certificate** (`units/eks/route53/apps/guestbook/acm_certificate`): issued for the guestbook subdomain via DNS validation against its public Route53 hosted zone
         - **ArgoCD private Route53 hosted zone** (`units/eks/route53/argocd/hosted_zone_private`): created and associated with the VPC; internal resolution only
         - **ArgoCD public Route53 hosted zone** (`units/eks/route53/argocd/hosted_zone_public`): created by the `setup_dns/argocd` bootstrap; `create = false` in the stack (pre-created by bootstrap)
-        - **Guestbook public Route53 hosted zone** (`units/eks/route53/apps/guestbook/hosted_zone_public`): created by the `setup_dns/apps/guestbook` bootstrap; `create = false` in the stack; no private zone counterpart — guestbook is publicly reachable
+        - **Guestbook public Route53 hosted zone** (`units/eks/route53/apps/guestbook/hosted_zone_public`): created by the `setup_dns/apps/guestbook` bootstrap; `create = false` in the stack; no private zone counterpart (guestbook is publicly reachable)
         - **AWS Load Balancer Controller** (`units/eks/addons/aws_load_balancer_controller/helm`): runs in-cluster and provisions ALBs; supporting units: IAM policy (`iam_policy_url`), IAM role (`iam_role`)
         - **ExternalDNS** (`units/eks/addons/external_dns/helm`): watches `service`, `ingress`, and `gateway-httproute` resources annotated with `external-dns.alpha.kubernetes.io/scope=private`; writes A records to the ArgoCD private zone; supporting unit: IAM role (`units/eks/addons/external_dns/iam_role`)
         - **External Secrets Operator** (`units/eks/addons/external_secrets_operator/helm`): syncs AWS Secrets Manager secrets into Kubernetes; supporting unit: IAM role (`units/eks/addons/external_secrets_operator/iam_role`)
@@ -40,14 +40,14 @@
         Run these once before deploying the EKS stack:
 
         - `pipelines/bootstrap/aws_gh_actions_auth/`: OIDC + IAM role for GitHub Actions CI
-        - `pipelines/bootstrap/setup_dns/argocd/`: Public Route53 hosted zone for the ArgoCD subdomain — outputs NS records to delegate at your registrar
-        - `pipelines/bootstrap/setup_dns/apps/guestbook/`: Public Route53 hosted zone for the guestbook subdomain — outputs NS records to delegate at your registrar
+        - `pipelines/bootstrap/setup_dns/argocd/`: Public Route53 hosted zone for the ArgoCD subdomain, outputs NS records to delegate at your registrar
+        - `pipelines/bootstrap/setup_dns/apps/guestbook/`: Public Route53 hosted zone for the guestbook subdomain, outputs NS records to delegate at your registrar
         - `pipelines/bootstrap/tailscale/`: Tailscale ACL policy + OAuth client credentials
     </bootstrap_pipelines>
 
     <conventions>
         - Prefix all resources with `{environment}-` to avoid naming collisions across environments
-        - Always set `expose = true` on every `include` block in unit files — without it, `include.<name>.locals.*` cannot be referenced in the same file
+        - Always set `expose = true` on every `include` block in unit files (without it, `include.<name>.locals.*` cannot be referenced in the same file)
     </conventions>
 
     <restrictions>
@@ -59,12 +59,12 @@
     <documentation>
         Four levels — each covers only what the level below cannot express:
         - EKS stack doc: full cross-addon topology, sequencing rationale, links to group READMEs for detail
-        - Addon group README (e.g. `units/eks/addons/argocd/`): internal unit chain, known extension points, group-level failure signatures
+        - Addon group README (e.g. `units/eks/addons/argocd/`): what the group contains (units, their role and dependencies), how it integrates with the broader stack, and links to upstream concepts rather than paraphrasing them
         - Unit README: preconditions, what it produces for downstream, one-line link to its module + upstream spec, unit-level failure signatures
-        - Inline HCL: why a specific value was chosen — not cross-unit relationships
+        - Inline HCL: why a specific value was chosen, not cross-unit relationships
 
-        Never paraphrase upstream docs (ArgoCD docs, ESO doc, etc.) — link to them instead. Write only what exists at the seams: integration topology, interface contracts (input, outputs), and failure signatures for silent cross-tool failures (symptom at a different layer than the cause).
-        When writing docs, reflect wether you are using the same prose and structure as the maintainer (cf. the existing README.md(s)).
+        Never paraphrase upstream docs (ArgoCD docs, ESO doc, etc.), link to them instead.
+        When writing docs, reflect whether you are using the same prose and structure as the maintainer (cf. the existing README.md(s)).
     </documentation>
 
     <instructions>
