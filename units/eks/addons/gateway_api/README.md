@@ -1,6 +1,6 @@
 # Gateway API
 
-Provisions a shared, internet-facing ALB via the [AWS Load Balancer Controller Gateway API integration](https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/gateway/l7gateway/).
+Provisions a shared, internet-facing ALB via the [AWS Load Balancer Controller Gateway API integration](https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/gateway/l7gateway/). The units in this group are split by role so platform-level defaults (target type, TLS) are owned here and app-level routing is owned by each app's `HTTPRoute`.
 
 ## Concepts
 
@@ -9,11 +9,12 @@ Provisions a shared, internet-facing ALB via the [AWS Load Balancer Controller G
 
 ## What's Inside
 
-- **[kubectl_manifest_from_url](../kubectl_manifest_from_url/)**: Installs the standard Gateway API CRDs and the AWS LBC gateway CRDs (pipelines/dev/eks/terragrunt.stack.hcl)
+- **[kubectl_manifest_from_url](../kubectl_manifest_from_url/)**: Installs the standard Gateway API CRDs and the AWS LBC gateway CRDs
 - **[namespace](namespace/)**: Creates the `gateway` Kubernetes namespace
 - **[gateway_class](gateway_class/)**: Registers `aws-alb` as the GatewayClass bound to `gateway.k8s.aws/alb`
+- **[target_group_configuration/public](target_group_configuration/public/)**: Sets `ip` as the default target type so backends are reached via pod IP, without requiring `NodePort` on backend services
 - **[load_balancer_configuration/public](load_balancer_configuration/public/)**: Configures the ALB as `internet-facing` and attaches the ACM certificate to `HTTPS:443`. TLS termination is declared here, not in the Gateway listener spec
-- **[gateway/public](gateway/public/)**: Declares `HTTP:80` (named `http`) and `HTTPS:443` (named `https`) listeners. Its `name` and `namespace` outputs flow into [`argocd/app_of_apps`](../argocd/app_of_apps/)
+- **[gateway/public](gateway/public/)**: Declares `HTTP:80` and `HTTPS:443` listeners. Its `name` and `namespace` outputs flow into [`argocd/app_of_apps`](../argocd/app_of_apps/)
 
 ## Integration
 

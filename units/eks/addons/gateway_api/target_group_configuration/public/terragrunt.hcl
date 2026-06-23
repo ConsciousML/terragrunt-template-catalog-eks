@@ -12,7 +12,7 @@ include "provider_kubernetes" {
 }
 
 terraform {
-  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/target_group_configuration/?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/k8s_manifest/?ref=${values.version}"
 }
 
 dependency "namespace" {
@@ -35,6 +35,8 @@ dependency "aws_lbc_gateway_api_crds" {
 
 inputs = {
   cluster_name = dependency.eks_cluster.outputs.cluster_name
+  api_version  = "gateway.k8s.aws/v1beta1"
+  kind         = "TargetGroupConfiguration"
   name         = "public-defaults"
   namespace    = dependency.namespace.outputs.name
   spec = {
