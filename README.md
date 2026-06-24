@@ -1,4 +1,4 @@
-# Terragrunt Template Catalog for AWS
+# Terragrunt Template Catalog for EKS
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub Release](https://img.shields.io/github/release/ConsciousML/terragrunt-template-catalog-eks.svg?style=flat)]()
@@ -6,6 +6,8 @@
 [![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
 
 A reusable Terragrunt catalog of modules, units, and stacks for building EKS clusters on AWS.
+
+Comes with a production-grade [EKS Cluster Stack](units/eks/README.md) featuring GitOps via ArgoCD and the App of Apps pattern, public traffic routing via ALB and Gateway API, automated DNS, TLS termination, and VPN access via Tailscale, deployable across `dev`, `staging`, and `prod` environments.
 
 ## Catalog vs Live Infrastructure
 
@@ -23,6 +25,7 @@ Modules (modules/) → Units (units/) → Dev (pipelines/dev/)
 ```
 
 Here are the major components of the repository:
+- **[EKS Cluster Stack](units/eks/README.md)**: the main contribution of this catalog, a production-grade EKS setup with GitOps, automated DNS, TLS, and VPN access
 - **[Modules](modules/README.md)**: Reusable Terraform modules that declare AWS resources (VPC, databases, compute instances, etc.)
 - **[Units](units/README.md)**: Terragrunt wrappers around modules that add configuration and dependencies
 - **[Stacks](stacks/README.md)**: Collections of units arranged in dependency graphs for pattern level re-use across repositories
@@ -105,7 +108,7 @@ For more information, read the [AWS CLI authentication documentation](https://do
 ### Run the Bootstrap Pipelines
 Run the following Terragrunt pipelines once per repository:
 - [AWS GitHub Actions Auth](pipelines/bootstrap/aws_gh_actions_auth/README.md): authenticates GitHub Actions with AWS
-- [Setup DNS](pipelines/bootstrap/setup_dns/README.md): creates a [Route53 hosted zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html) to sign TLS certificates with ACM
+- [Setup DNS](pipelines/bootstrap/setup_dns/README.md): creates one public [Route53 hosted zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html) per environment, shared by all apps, delegated once at your registrar
 - [Tailscale](pipelines/bootstrap/tailscale/README.md): creates [Tailscale](https://tailscale.com/) resources needed to connect with tools exposed internally in your EKS cluster (ArgoCD, etc.)
 
 ### Deploy a Dev EKS Cluster
@@ -150,9 +153,9 @@ eks-pod-identity-agent-9pq6k   1/1     Running   0          41m
 
 ArgoCD is only reachable with the Tailscale. Make sure you have completed the [Tailscale prerequisites](pipelines/bootstrap/tailscale/README.md#prerequisites) and have the Tailscale client running before proceeding.
 
-The ArgoCD host is formed from `pipelines/dns.hcl` as `<subdomain>.dev.<base_domain>` (replace `<subdomain>` and `<base_domain>` with the values from that file, e.g. `argocd.dev.axelmendoza.com`).
+The ArgoCD host is `argocd.dev.<base_domain>` (replace `<base_domain>` with the value from `pipelines/dns.hcl`, e.g. `argocd.dev.axelmendoza.com`).
 
-**Web UI**: Open `https://<subdomain>.dev.<base_domain>` in your browser and log in with username `admin`. Retrieve the password with:
+**Web UI**: Open `https://argocd.dev.<base_domain>` in your browser and log in with username `admin`. Retrieve the password with:
 ```bash
 aws secretsmanager get-secret-value \
   --secret-id dev-argocd-password \
@@ -162,13 +165,19 @@ aws secretsmanager get-secret-value \
 
 **CLI**: Log in directly in one command:
 ```bash
-argocd login <subdomain>.dev.<base_domain> \
+argocd login argocd.dev.<base_domain> \
   --username admin \
   --password $(aws secretsmanager get-secret-value \
     --secret-id dev-argocd-password \
     --query SecretString \
     --output text | jq -r .plaintext)
 ```
+
+### Access the Guestbook App
+
+Open `https://guestbook.dev.<base_domain>` in your browser. No login required.
+
+Apps are deployed using the [App of Apps](https://github.com/ConsciousML/argocd-app-of-apps-template) pattern: a single ArgoCD Application bootstraps all child apps from that repository.
 
 ### Destroy the Infrastructure
 Finally, cleanup by destroying the infrastructure (cwd in `pipelines/dev/eks`):
@@ -188,6 +197,8 @@ terragrunt run --all destroy --non-interactive --no-stack-generate
 5. Merge when CI passes
 
 See the [development guide](docs/development.md) for a detailed workflow with a step-by-step example on how to modify this template.
+
+To modify existing applications or deploy new ones, see the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template#readme).
 
 ## Continuous Integration (CI)
 The CI provides automated code quality checks on every pull request:
