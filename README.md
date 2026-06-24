@@ -1,4 +1,4 @@
-# Terragrunt Template Catalog for AWS
+# Terragrunt Template Catalog for EKS
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub Release](https://img.shields.io/github/release/ConsciousML/terragrunt-template-catalog-eks.svg?style=flat)]()
@@ -6,6 +6,8 @@
 [![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
 
 A reusable Terragrunt catalog of modules, units, and stacks for building EKS clusters on AWS.
+
+Comes with a production-grade [EKS Cluster Stack](units/eks/README.md) featuring GitOps via ArgoCD and the App of Apps pattern, public traffic routing via ALB and Gateway API, automated DNS, TLS termination, and VPN access via Tailscale, deployable across `dev`, `staging`, and `prod` environments.
 
 ## Catalog vs Live Infrastructure
 
@@ -23,6 +25,7 @@ Modules (modules/) → Units (units/) → Dev (pipelines/dev/)
 ```
 
 Here are the major components of the repository:
+- **[EKS Cluster Stack](units/eks/README.md)**: the main contribution of this catalog, a production-grade EKS setup with GitOps, automated DNS, TLS, and VPN access
 - **[Modules](modules/README.md)**: Reusable Terraform modules that declare AWS resources (VPC, databases, compute instances, etc.)
 - **[Units](units/README.md)**: Terragrunt wrappers around modules that add configuration and dependencies
 - **[Stacks](stacks/README.md)**: Collections of units arranged in dependency graphs for pattern level re-use across repositories
