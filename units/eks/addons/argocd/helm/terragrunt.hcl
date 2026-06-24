@@ -15,7 +15,6 @@ terraform {
   source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/helm_release/?ref=${values.version}"
 }
 
-
 dependency "aws_load_balancer_controller" {
   config_path  = "../../aws_load_balancer_controller/helm"
   skip_outputs = true
@@ -64,4 +63,3 @@ inputs = {
     }
   ]
 }
-

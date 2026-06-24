@@ -443,3 +443,21 @@ unit "argocd_app_of_apps" {
     prune                 = true
   }
 }
+
+unit "domain_name_argocd" {
+  source = "${get_repo_root()}/units/eks/domain_name/argocd"
+  path   = "eks/domain_name/argocd"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "domain_name_guestbook" {
+  source = "${get_repo_root()}/units/eks/domain_name/guestbook"
+  path   = "eks/domain_name/guestbook"
+
+  values = {
+    version = local.version
+  }
+}
