@@ -9,10 +9,11 @@ on:
 
 # Prevent CI to run concurrently
 # As this workflow runs Terragrunt, it would create lock states
-concurrency:
-  group: ci-${{ github.head_ref || github.run_id }}
+# Uncomment to enable concurrency limit:
+#concurrency:
+  #group: ci-${{ github.head_ref || github.run_id }}
   # Disable canceling workflows as this would also create locks
-  cancel-in-progress: false
+  #cancel-in-progress: false
 
 permissions:
   contents: 'write'

@@ -23,13 +23,12 @@
 
         - **VPC** (`units/vpc`): hosts the EKS cluster
         - **EKS cluster** (`units/eks/cluster`): deployed inside the VPC
-        - **ArgoCD ACM certificate** (`units/eks/route53/argocd/acm_certificate`): issued for the ArgoCD subdomain via DNS validation against its public Route53 hosted zone
-        - **Guestbook ACM certificate** (`units/eks/route53/apps/guestbook/acm_certificate`): issued for the guestbook subdomain via DNS validation against its public Route53 hosted zone
-        - **ArgoCD private Route53 hosted zone** (`units/eks/route53/argocd/hosted_zone_private`): created and associated with the VPC; internal resolution only
-        - **ArgoCD public Route53 hosted zone** (`units/eks/route53/argocd/hosted_zone_public`): created by the `setup_dns/argocd` bootstrap; `create = false` in the stack (pre-created by bootstrap)
-        - **Guestbook public Route53 hosted zone** (`units/eks/route53/apps/guestbook/hosted_zone_public`): created by the `setup_dns/apps/guestbook` bootstrap; `create = false` in the stack; no private zone counterpart (guestbook is publicly reachable)
+        - **Public Route53 hosted zone** (`units/eks/route53/hosted_zone_public`): one zone per environment (`{environment}.{base_domain}`); pre-created by the `setup_dns` bootstrap, `create = false` in the stack
+        - **Private Route53 hosted zone** (`units/eks/route53/hosted_zone_private`): created and associated with the VPC; internal resolution only
+        - **ACM certificate** (`units/eks/route53/acm_certificate`): wildcard certificate for `*.{environment}.{base_domain}`, validated via DNS against the public hosted zone; shared by all apps in the environment
         - **AWS Load Balancer Controller** (`units/eks/addons/aws_load_balancer_controller/helm`): runs in-cluster and provisions ALBs; supporting units: IAM policy (`iam_policy_url`), IAM role (`iam_role`)
-        - **ExternalDNS** (`units/eks/addons/external_dns/helm`): watches `service`, `ingress`, and `gateway-httproute` resources annotated with `external-dns.alpha.kubernetes.io/scope=private`; writes A records to the ArgoCD private zone; supporting unit: IAM role (`units/eks/addons/external_dns/iam_role`)
+        - **ExternalDNS private** (`units/eks/addons/external_dns/private/helm`): watches `service`, `ingress`, and `gateway-httproute` resources annotated `scope=private`; writes records to the private hosted zone; supporting unit: IAM role (`private/iam_role`)
+        - **ExternalDNS public** (`units/eks/addons/external_dns/public/helm`): watches `service`, `ingress`, and `gateway-httproute` resources annotated `scope=public`; writes records to the public hosted zone; supporting unit: IAM role (`public/iam_role`)
         - **External Secrets Operator** (`units/eks/addons/external_secrets_operator/helm`): syncs AWS Secrets Manager secrets into Kubernetes; supporting unit: IAM role (`units/eks/addons/external_secrets_operator/iam_role`)
         - **ArgoCD** (`units/eks/addons/argocd/helm`): deployed via Helm with an internal ALB ingress annotated `scope=private`; supporting units: password secret (`aws_password_secret`), ESO SecretStore (`aws_secret_store`), ESO ExternalSecret (`aws_external_secret`)
         - **ArgoCD App of Apps** (`units/eks/addons/argocd/app_of_apps`): deploys an ArgoCD Application resource pointing to a separate app-of-apps repo, bootstrapping GitOps application delivery
@@ -40,9 +39,8 @@
         Run these once before deploying the EKS stack:
 
         - `pipelines/bootstrap/aws_gh_actions_auth/`: OIDC + IAM role for GitHub Actions CI
-        - `pipelines/bootstrap/setup_dns/argocd/`: Public Route53 hosted zone for the ArgoCD subdomain, outputs NS records to delegate at your registrar
-        - `pipelines/bootstrap/setup_dns/apps/guestbook/`: Public Route53 hosted zone for the guestbook subdomain, outputs NS records to delegate at your registrar
-        - `pipelines/bootstrap/tailscale/`: Tailscale ACL policy + OAuth client credentials
+        - `pipelines/bootstrap/setup_dns/{environment}/`: one public Route53 hosted zone per environment (`dev`, `ci`); outputs NS records to delegate at your registrar
+        - `pipelines/bootstrap/tailscale/`: Tailscale ACL policy + WIF credential for CI
     </bootstrap_pipelines>
 
     <conventions>
