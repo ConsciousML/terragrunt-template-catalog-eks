@@ -13,7 +13,7 @@ on:
 #concurrency:
   #group: ci-${{ github.head_ref || github.run_id }}
   # Disable canceling workflows as this would also create locks
-  cancel-in-progress: false
+  #cancel-in-progress: false
 
 permissions:
   contents: 'write'
