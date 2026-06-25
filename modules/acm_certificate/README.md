@@ -29,6 +29,7 @@ Creates an TLS/SSL certificate using AWS Certificate Manager (ACM) and outputs i
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | The domain name for the ACM certificate (e.g. argocd.dev.yourdomain.com) | `string` | n/a | yes |
+| <a name="input_subject_alternative_names"></a> [subject\_alternative\_names](#input\_subject\_alternative\_names) | Additional domain names to include as SANs on the ACM certificate | `list(string)` | `[]` | no |
 | <a name="input_zone_id"></a> [zone\_id](#input\_zone\_id) | The Route53 hosted zone ID to create the DNS validation record in | `string` | n/a | yes |
 
 ## Outputs
