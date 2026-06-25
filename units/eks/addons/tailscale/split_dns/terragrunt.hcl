@@ -16,14 +16,16 @@ dependency "vpc" {
 }
 
 dependency "route53_hosted_zone_private" {
-  config_path = "../../../route53/hosted_zone_private"
-  mock_outputs = {
-    domain_name = "argocd.example.axelmendoza.com"
-  }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+  config_path  = "../../../route53/hosted_zone_private"
+  skip_outputs = true
+}
+
+locals {
+  domains_hcl        = find_in_parent_folders("domains.hcl")
+  domain_env_private = read_terragrunt_config(local.domains_hcl).locals.domain_env_private
 }
 
 inputs = {
-  domain      = dependency.route53_hosted_zone_private.outputs.domain_name
+  domain      = local.domain_env_private
   nameservers = [cidrhost(dependency.vpc.outputs.vpc_cidr_block, 2)]
 }

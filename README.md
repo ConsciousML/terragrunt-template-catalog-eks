@@ -153,9 +153,9 @@ eks-pod-identity-agent-9pq6k   1/1     Running   0          41m
 
 ArgoCD is only reachable with the Tailscale. Make sure you have completed the [Tailscale prerequisites](pipelines/bootstrap/tailscale/README.md#prerequisites) and have the Tailscale client running before proceeding.
 
-The ArgoCD host is `argocd.dev.<base_domain>` (replace `<base_domain>` with the value from `pipelines/dns.hcl`, e.g. `argocd.dev.axelmendoza.com`).
+The ArgoCD host is `argocd.private.dev.<base_domain>` (replace `<base_domain>` with the value from `pipelines/dns.hcl`, e.g. `argocd.private.dev.axelmendoza.com`).
 
-**Web UI**: Open `https://argocd.dev.<base_domain>` in your browser and log in with username `admin`. Retrieve the password with:
+**Web UI**: Open `https://argocd.private.dev.<base_domain>` in your browser and log in with username `admin`. Retrieve the password with:
 ```bash
 aws secretsmanager get-secret-value \
   --secret-id dev-argocd-password \
@@ -165,7 +165,7 @@ aws secretsmanager get-secret-value \
 
 **CLI**: Log in directly in one command:
 ```bash
-argocd login argocd.dev.<base_domain> \
+argocd login argocd.private.dev.<base_domain> \
   --username admin \
   --password $(aws secretsmanager get-secret-value \
     --secret-id dev-argocd-password \
@@ -175,7 +175,7 @@ argocd login argocd.dev.<base_domain> \
 
 ### Access the Guestbook App
 
-Open `https://guestbook.dev.<base_domain>` in your browser. No login required.
+Open `https://guestbook.public.dev.<base_domain>` in your browser. No login required.
 
 Apps are deployed using the [App of Apps](https://github.com/ConsciousML/argocd-app-of-apps-template) pattern: a single ArgoCD Application bootstraps all child apps from that repository.
 

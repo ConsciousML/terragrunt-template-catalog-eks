@@ -15,10 +15,10 @@ Joins the EKS cluster to a Tailnet via the Tailscale Kubernetes operator, exposi
 - **[oauth_client_tailscale_operator](oauth_client_tailscale_operator/)**: Creates a Tailscale OAuth client for the operator. Its outputs flow into `operator`
 - **[operator](operator/)**: Deploys the Tailscale Kubernetes operator via Helm, authenticated with the OAuth credentials from `oauth_client_tailscale_operator`. Registers the cluster into the Tailnet and implements the `Connector` CRD controller
 - **[connector](connector/)**: Deploys a `Connector` resource that advertises the full VPC CIDR as a subnet route to the Tailnet, making all private cluster resources reachable over VPN. Depends on `operator` and `vpc`
-- **[split_dns](split_dns/)**: Configures Tailscale split DNS to resolve the private Route53 hosted zone domain via the VPC DNS resolver, enabling short hostnames (e.g. `argocd.dev.axelmendoza.com`) to resolve over the Tailnet. Depends on `vpc` and `route53/hosted_zone_private`
+- **[split_dns](split_dns/)**: Configures Tailscale split DNS to route queries for `domain_env_private` (e.g. `private.dev.axelmendoza.com`) through the VPC DNS resolver, so private hostnames resolve over the Tailnet without intercepting public endpoints. Reads `domain_env_private` from `domains.hcl`. Depends on `vpc` and `route53/hosted_zone_private`
 
 ## Integration
 
 - **[`units/tailscale`](../../../tailscale/)**: provisions the WIF credential and GitHub secrets that allow CI to authenticate to Tailscale when deploying the operator
-- **[`units/eks/route53/hosted_zone_private`](../../route53/hosted_zone_private/)**: `split_dns` reads its `domain_name` output to set the DNS domain Tailscale will intercept
+- **[`units/eks/route53/hosted_zone_private`](../../route53/hosted_zone_private/)**: `split_dns` takes an ordering dependency to ensure the private zone exists before configuring Tailscale DNS; the intercepted domain is read from `domains.hcl` (`domain_env_private`), not from this unit's output
 - **[`units/vpc`](../../../vpc/)**: `connector` reads the VPC CIDR to advertise as a subnet route. `split_dns` derives the VPC DNS resolver address from it
