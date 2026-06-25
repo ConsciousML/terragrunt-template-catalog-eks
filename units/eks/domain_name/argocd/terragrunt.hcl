@@ -8,10 +8,10 @@ terraform {
 }
 
 locals {
-  domains_hcl   = find_in_parent_folders("domains.hcl")
-  domain_argocd = read_terragrunt_config(local.domains_hcl).locals.domain_argocd
+  domains_hcl           = find_in_parent_folders("domains.hcl")
+  domain_private_argocd = read_terragrunt_config(local.domains_hcl).locals.domain_private_argocd
 }
 
 inputs = {
-  value = local.domain_argocd
+  value = local.domain_private_argocd
 }

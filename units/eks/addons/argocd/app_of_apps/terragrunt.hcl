@@ -30,8 +30,8 @@ dependency "gateway_public" {
 }
 
 locals {
-  domains_hcl      = find_in_parent_folders("domains.hcl")
-  domain_guestbook = read_terragrunt_config(local.domains_hcl).locals.domain_guestbook
+  domains_hcl             = find_in_parent_folders("domains.hcl")
+  domain_public_guestbook = read_terragrunt_config(local.domains_hcl).locals.domain_public_guestbook
 }
 
 dependency "route53_hosted_zone_public" {
@@ -62,7 +62,7 @@ inputs = {
     }
     appParams = {
       "guestbook-helm" = {
-        host = local.domain_guestbook
+        host = local.domain_public_guestbook
         gateway = {
           name      = dependency.gateway_public.outputs.name
           namespace = dependency.gateway_public.outputs.namespace
