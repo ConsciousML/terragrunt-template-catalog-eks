@@ -50,6 +50,10 @@ inputs = {
 
   access_entries = try(values.access_entries, {})
 
+  node_security_group_tags = {
+    "karpenter.sh/discovery" = local.cluster_name_full
+  }
+
   tags = {
     environment = "${local.environment}"
   }
