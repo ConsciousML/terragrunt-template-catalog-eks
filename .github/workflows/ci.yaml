@@ -22,7 +22,7 @@ permissions:
 
 env:
   # The relative path of the directory containing the Terragrunt Stack to test during code quality checks
-  TG_STACK_PATH: pipelines/dev/eks
+  TG_STACK_PATH: pipelines/dev/eks/stack
   # Isolates CI state from local runs — uses a dedicated S3 bucket (tofu-state-{account_id}-catalog-eks-ci)
   TG_ENVIRONMENT: catalog-eks-ci
 
@@ -114,6 +114,9 @@ jobs:
       # This prevents any discrepancies between the pre-commit checks and the CI checks 
       - name: Run pre-commit hooks (prek)
         uses: j178/prek-action@v2.0.4
+
+      - name: Ensure EC2 Spot service-linked role exists
+        run: aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 
       - name: Run Terragrunt stack generate and plan
         run: |

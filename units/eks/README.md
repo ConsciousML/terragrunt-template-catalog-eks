@@ -1,6 +1,14 @@
 # EKS Cluster Stack
 
-Defines the building blocks for a production-grade EKS cluster deployed across `dev`, `staging`, and `prod` environments, with GitOps delivery via ArgoCD, automated DNS record management, TLS termination, public internet traffic routing via ALB and Gateway API, and private VPN access to internal tools via Tailscale.
+A prod-ready Terragrunt catalog of building blocks for deploying EKS clusters across `dev`, `staging`, and `prod`.
+
+The cluster comes with:
+
+- GitOps via ArgoCD and the App of Apps pattern
+- Public traffic routing via ALB and Gateway API
+- Automated DNS and TLS termination
+- VPN access via Tailscale
+- Node autoscaling via Karpenter
 
 ## Bootstrap Prerequisites
 
@@ -21,13 +29,16 @@ The following pipelines must run once before deploying this stack:
 - **[addons/argocd](addons/argocd/README.md)**: GitOps controller with admin password managed via ESO
 - **[addons/argocd/app_of_apps](addons/argocd/app_of_apps/)**: deploys the root ArgoCD `Application` that bootstraps all child apps from the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template)
 - **[addons/tailscale](addons/tailscale/README.md)**: VPN access to internal cluster services via subnet routing and split DNS
+- **[addons/karpenter](addons/karpenter/README.md)**: node autoscaler provisioning EC2 instances on demand
+
+> **Note**: Karpenter's NodePool is capped at 10 vCPUs by default and provisions `spot` instances. Raise `spec.limits.cpu` or switch `karpenter.sh/capacity-type` to `on-demand` in the [EKS stack](../../pipelines/dev/eks/stack/terragrunt.stack.hcl) for production stability.
 
 ## Dependency Graph
 
 From the root of this repository, cd into the dev stack, generate it, then render the graph:
 
 ```bash
-cd pipelines/dev/eks
+cd pipelines/dev/eks/stack
 terragrunt stack generate
 terragrunt dag graph | dot -Tpng > /tmp/graph.png && open /tmp/graph.png
 ```
@@ -36,6 +47,6 @@ terragrunt dag graph | dot -Tpng > /tmp/graph.png && open /tmp/graph.png
 
 This stack is instantiated in:
 
-- **[`pipelines/dev/eks`](../../pipelines/dev/eks/)**: local development environment for iterating on catalog changes
+- **[`pipelines/dev/eks/stack`](../../pipelines/dev/eks/stack/)**: local development environment for iterating on catalog changes
 - **[`live/prod/eks`](https://github.com/ConsciousML/terragrunt-template-live-eks/tree/main/live/prod/eks)**: production environment in the live repository
 - **[`live/staging/eks`](https://github.com/ConsciousML/terragrunt-template-live-eks/tree/main/live/staging/eks)**: staging environment in the live repository

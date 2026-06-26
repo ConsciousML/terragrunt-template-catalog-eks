@@ -35,7 +35,7 @@ Follow the [bootstrap guide](../pipelines/bootstrap/README.md) once per reposito
 If applicable, in `.github/workflows/ci.yaml`, change `TG_STACK_PATH` to the relative path of the directory containing the Terragrunt Stack you want to test:
 ```yaml
 env:
-  TG_STACK_PATH: pipelines/dev/eks
+  TG_STACK_PATH: pipelines/dev/eks/stack
 ```
 
 This runs the same checks as CI locally, preventing CI failures.

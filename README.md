@@ -7,7 +7,13 @@
 
 A reusable Terragrunt catalog of modules, units, and stacks for building EKS clusters on AWS.
 
-Comes with a production-grade [EKS Cluster Stack](units/eks/README.md) featuring GitOps via ArgoCD and the App of Apps pattern, public traffic routing via ALB and Gateway API, automated DNS, TLS termination, and VPN access via Tailscale, deployable across `dev`, `staging`, and `prod` environments.
+Comes with a production-grade [EKS Cluster](units/eks/README.md), deployable across `dev`, `staging`, and `prod` environments, that supports:
+
+- GitOps via ArgoCD and the App of Apps pattern
+- Public traffic routing via ALB and Gateway API
+- Automated DNS and TLS termination
+- VPN access via Tailscale
+- Node autoscaling via Karpenter
 
 ## Catalog vs Live Infrastructure
 
@@ -56,6 +62,10 @@ locals {
 `<the-repository-name-of-your-fork>` should be the same name you chose in the previous section. `<your-app-of-apps-repo-name>` should match your fork of [argocd-app-of-apps-template](https://github.com/ConsciousML/argocd-app-of-apps-template).
 
 2. Change `pipelines/region.hcl` to match your desired AWS region
+
+3. Set `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` in your `.env` (see the [environment variables guide](docs/environment-variables.md))
+
+4. Karpenter's NodePool is capped at 10 vCPUs by default and provisions `spot` instances. Raise `spec.limits.cpu` or switch `karpenter.sh/capacity-type` to `on-demand` in the [EKS stack](pipelines/dev/eks/stack/terragrunt.stack.hcl) for production stability.
 
 ### Installation
 
@@ -111,14 +121,18 @@ Run the following Terragrunt pipelines once per repository:
 - [Setup DNS](pipelines/bootstrap/setup_dns/README.md): creates one public [Route53 hosted zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html) per environment, shared by all apps, delegated once at your registrar
 - [Tailscale](pipelines/bootstrap/tailscale/README.md): creates [Tailscale](https://tailscale.com/) resources needed to connect with tools exposed internally in your EKS cluster (ArgoCD, etc.)
 
-### Deploy a Dev EKS Cluster
-Deploy a stack that creates a VPC and an EKS cluster.
+Also run the following once per AWS account:
+```bash
+aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
+```
+This creates the EC2 Spot service-linked role required for Karpenter to provision spot instances.
 
-Ensure `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` are set in your `.env` (see the [environment variables guide](docs/environment-variables.md)).
+### Deploy a Dev EKS Cluster
+Deploy the [EKS Cluster Stack](units/eks/README.md):
 
 ```bash
 source .env
-cd pipelines/dev/eks
+cd pipelines/dev/eks/stack
 terragrunt stack run init
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
@@ -180,7 +194,7 @@ Open `https://guestbook.public.dev.<base_domain>` in your browser. No login requ
 Apps are deployed using the [App of Apps](https://github.com/ConsciousML/argocd-app-of-apps-template) pattern: a single ArgoCD Application bootstraps all child apps from that repository.
 
 ### Destroy the Infrastructure
-Finally, cleanup by destroying the infrastructure (cwd in `pipelines/dev/eks`):
+Finally, cleanup by destroying the infrastructure (cwd in `pipelines/dev/eks/stack`):
 
 ```bash
 terragrunt run --all destroy --non-interactive --no-stack-generate

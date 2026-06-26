@@ -11,7 +11,7 @@
 
         - `modules/`: Terraform modules that declare AWS resources
         - `units/`: Terragrunt wrappers around modules, one per component — reference modules via `source =`
-        - `pipelines/dev/`: Executable stack configs per environment (e.g. `pipelines/dev/eks/terragrunt.stack.hcl`)
+        - `pipelines/dev/`: Executable stack configs per environment (e.g. `pipelines/dev/eks/stack/terragrunt.stack.hcl`)
         - `pipelines/bootstrap/`: One-time setup pipelines (run before any stack)
         - `pipelines/root.hcl`: S3 backend + AWS provider inherited by all units
         - `pipelines/version.hcl`: Resolves current git branch → used as `?ref=` in all module sources
@@ -19,7 +19,7 @@
     </architecture>
 
     <eks_stack>
-        Entry point: `pipelines/dev/eks/terragrunt.stack.hcl`
+        Entry point: `pipelines/dev/eks/stack/terragrunt.stack.hcl`
 
         - **VPC** (`units/vpc`): hosts the EKS cluster
         - **EKS cluster** (`units/eks/cluster`): deployed inside the VPC
