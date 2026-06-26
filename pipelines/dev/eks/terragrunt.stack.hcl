@@ -7,7 +7,8 @@ locals {
   version_external_dns       = "1.20.0"
   version_eso                = "2.4.1"
   version_tailscale_operator = "1.96.5"
-  version_karpenter          = "21.24.0"
+  version_karpenter_iam      = "21.24.0"
+  version_karpenter_helm     = "1.13.0"
 
   environment = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
   vpc_cidrs   = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_cidrs
@@ -126,9 +127,36 @@ unit "karpenter_iam" {
   path   = "eks/addons/karpenter/iam"
 
   values = {
-    version                 = local.version_karpenter
+    version                 = local.version_karpenter_iam
     enable_spot_termination = true
     tags                    = {}
+  }
+}
+
+unit "karpenter" {
+  source = "${get_repo_root()}/units/eks/addons/karpenter/helm"
+  path   = "eks/addons/karpenter/helm"
+
+  values = {
+    version            = local.version
+    helm_chart_version = local.version_karpenter_helm
+    helm_values = {
+      settings = {
+        enableZonalShift = false
+      }
+      controller = {
+        resources = {
+          requests = {
+            cpu    = "1"
+            memory = "1Gi"
+          }
+          limits = {
+            cpu    = "1"
+            memory = "1Gi"
+          }
+        }
+      }
+    }
   }
 }
 
