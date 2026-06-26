@@ -65,7 +65,7 @@ locals {
 
 3. Set `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` in your `.env` (see the [environment variables guide](docs/environment-variables.md))
 
-4. Karpenter's NodePool is capped at 10 vCPUs by default. Raise `spec.limits.cpu` in the [EKS stack](pipelines/dev/eks/stack/terragrunt.stack.hcl) before deploying if your workloads require more capacity.
+4. Karpenter's NodePool is capped at 10 vCPUs by default and provisions `spot` instances. Raise `spec.limits.cpu` or switch `karpenter.sh/capacity-type` to `on-demand` in the [EKS stack](pipelines/dev/eks/stack/terragrunt.stack.hcl) for production stability.
 
 ### Installation
 

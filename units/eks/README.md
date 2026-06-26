@@ -31,7 +31,7 @@ The following pipelines must run once before deploying this stack:
 - **[addons/tailscale](addons/tailscale/README.md)**: VPN access to internal cluster services via subnet routing and split DNS
 - **[addons/karpenter](addons/karpenter/README.md)**: node autoscaler provisioning EC2 instances on demand
 
-> **Note**: Karpenter's NodePool is capped at 10 vCPUs by default. Raise `spec.limits.cpu` in the [EKS stack](../../pipelines/dev/eks/stack/terragrunt.stack.hcl) before deploying if your workloads require more capacity.
+> **Note**: Karpenter's NodePool is capped at 10 vCPUs by default and provisions `spot` instances. Raise `spec.limits.cpu` or switch `karpenter.sh/capacity-type` to `on-demand` in the [EKS stack](../../pipelines/dev/eks/stack/terragrunt.stack.hcl) for production stability.
 
 ## Dependency Graph
 
