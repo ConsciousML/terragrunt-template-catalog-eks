@@ -102,7 +102,7 @@ unit "cluster" {
         # Use cheapest config for testing purposes
         instance_types = ["t3.medium"]
 
-        min_size     = 2
+        min_size     = 1
         max_size     = 10
         desired_size = 2
       }
