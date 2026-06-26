@@ -185,7 +185,7 @@ unit "karpenter_node_pool" {
           requirements = [
             { key = "kubernetes.io/arch", operator = "In", values = ["amd64"] },
             { key = "kubernetes.io/os", operator = "In", values = ["linux"] },
-            { key = "karpenter.sh/capacity-type", operator = "In", values = ["on-demand"] },
+            { key = "karpenter.sh/capacity-type", operator = "In", values = ["spot"] },
             { key = "karpenter.k8s.aws/instance-category", operator = "In", values = ["c", "m", "r"] },
             { key = "karpenter.k8s.aws/instance-generation", operator = "Gt", values = ["2"] },
           ]
