@@ -7,7 +7,13 @@
 
 A reusable Terragrunt catalog of modules, units, and stacks for building EKS clusters on AWS.
 
-Comes with a production-grade [EKS Cluster Stack](units/eks/README.md) featuring GitOps via ArgoCD and the App of Apps pattern, public traffic routing via ALB and Gateway API, automated DNS, TLS termination, and VPN access via Tailscale, deployable across `dev`, `staging`, and `prod` environments.
+Comes with a production-grade [EKS Cluster](units/eks/README.md), deployable across `dev`, `staging`, and `prod` environments, that supports:
+
+- GitOps via ArgoCD and the App of Apps pattern
+- Public traffic routing via ALB and Gateway API
+- Automated DNS and TLS termination
+- VPN access via Tailscale
+- Node autoscaling via Karpenter
 
 ## Catalog vs Live Infrastructure
 
@@ -56,6 +62,10 @@ locals {
 `<the-repository-name-of-your-fork>` should be the same name you chose in the previous section. `<your-app-of-apps-repo-name>` should match your fork of [argocd-app-of-apps-template](https://github.com/ConsciousML/argocd-app-of-apps-template).
 
 2. Change `pipelines/region.hcl` to match your desired AWS region
+
+3. Set `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` in your `.env` (see the [environment variables guide](docs/environment-variables.md))
+
+4. Karpenter's NodePool is capped at 10 vCPUs by default. Raise `spec.limits.cpu` in the [EKS stack](pipelines/dev/eks/stack/terragrunt.stack.hcl) before deploying if your workloads require more capacity.
 
 ### Installation
 
@@ -118,9 +128,7 @@ aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 This creates the EC2 Spot service-linked role required for Karpenter to provision spot instances.
 
 ### Deploy a Dev EKS Cluster
-Deploy a stack that creates a VPC and an EKS cluster.
-
-Ensure `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` are set in your `.env` (see the [environment variables guide](docs/environment-variables.md)).
+Deploy the [EKS Cluster Stack](units/eks/README.md):
 
 ```bash
 source .env

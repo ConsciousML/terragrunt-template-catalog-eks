@@ -1,6 +1,14 @@
 # EKS Cluster Stack
 
-Defines the building blocks for a production-grade EKS cluster deployed across `dev`, `staging`, and `prod` environments, with GitOps delivery via ArgoCD, automated DNS record management, TLS termination, public internet traffic routing via ALB and Gateway API, and private VPN access to internal tools via Tailscale.
+A prod-ready Terragrunt catalog of building blocks for deploying EKS clusters across `dev`, `staging`, and `prod`.
+
+The cluster comes with:
+
+- GitOps via ArgoCD and the App of Apps pattern
+- Public traffic routing via ALB and Gateway API
+- Automated DNS and TLS termination
+- VPN access via Tailscale
+- Node autoscaling via Karpenter
 
 ## Bootstrap Prerequisites
 
@@ -21,6 +29,9 @@ The following pipelines must run once before deploying this stack:
 - **[addons/argocd](addons/argocd/README.md)**: GitOps controller with admin password managed via ESO
 - **[addons/argocd/app_of_apps](addons/argocd/app_of_apps/)**: deploys the root ArgoCD `Application` that bootstraps all child apps from the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template)
 - **[addons/tailscale](addons/tailscale/README.md)**: VPN access to internal cluster services via subnet routing and split DNS
+- **[addons/karpenter](addons/karpenter/README.md)**: node autoscaler provisioning EC2 instances on demand
+
+> **Note**: Karpenter's NodePool is capped at 10 vCPUs by default. Raise `spec.limits.cpu` in the [EKS stack](../../pipelines/dev/eks/stack/terragrunt.stack.hcl) before deploying if your workloads require more capacity.
 
 ## Dependency Graph
 
