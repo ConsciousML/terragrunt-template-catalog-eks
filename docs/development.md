@@ -35,7 +35,7 @@ Write a terragrunt wrapper in `units/your_module/terragrunt.hcl` that:
 - Maps unit inputs to module variables
 
 ### 4. Wire Up a Dev Stack
-Either integrate your unit into the [existing EKS stack](../pipelines/dev/eks/terragrunt.stack.hcl) or create a new stack at `pipelines/dev/your_stack/terragrunt.stack.hcl` that:
+Either integrate your unit into the [existing EKS stack](../pipelines/dev/eks/stack/terragrunt.stack.hcl) or create a new stack at `pipelines/dev/your_stack/terragrunt.stack.hcl` that:
 - References units using `${get_repo_root()}/units/unit_name` for local development
 - Combines multiple units into an infrastructure deployment
 - Provides configuration values

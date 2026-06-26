@@ -124,7 +124,7 @@ Ensure `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` are set i
 
 ```bash
 source .env
-cd pipelines/dev/eks
+cd pipelines/dev/eks/stack
 terragrunt stack run init
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
@@ -186,7 +186,7 @@ Open `https://guestbook.public.dev.<base_domain>` in your browser. No login requ
 Apps are deployed using the [App of Apps](https://github.com/ConsciousML/argocd-app-of-apps-template) pattern: a single ArgoCD Application bootstraps all child apps from that repository.
 
 ### Destroy the Infrastructure
-Finally, cleanup by destroying the infrastructure (cwd in `pipelines/dev/eks`):
+Finally, cleanup by destroying the infrastructure (cwd in `pipelines/dev/eks/stack`):
 
 ```bash
 terragrunt run --all destroy --non-interactive --no-stack-generate

@@ -27,7 +27,7 @@ The following pipelines must run once before deploying this stack:
 From the root of this repository, cd into the dev stack, generate it, then render the graph:
 
 ```bash
-cd pipelines/dev/eks
+cd pipelines/dev/eks/stack
 terragrunt stack generate
 terragrunt dag graph | dot -Tpng > /tmp/graph.png && open /tmp/graph.png
 ```
@@ -36,6 +36,6 @@ terragrunt dag graph | dot -Tpng > /tmp/graph.png && open /tmp/graph.png
 
 This stack is instantiated in:
 
-- **[`pipelines/dev/eks`](../../pipelines/dev/eks/)**: local development environment for iterating on catalog changes
+- **[`pipelines/dev/eks/stack`](../../pipelines/dev/eks/stack/)**: local development environment for iterating on catalog changes
 - **[`live/prod/eks`](https://github.com/ConsciousML/terragrunt-template-live-eks/tree/main/live/prod/eks)**: production environment in the live repository
 - **[`live/staging/eks`](https://github.com/ConsciousML/terragrunt-template-live-eks/tree/main/live/staging/eks)**: staging environment in the live repository

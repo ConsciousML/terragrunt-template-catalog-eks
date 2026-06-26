@@ -40,7 +40,7 @@ Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate
 
 ### Deploy a Stack
 ```bash
-cd pipelines/dev/eks
+cd pipelines/dev/eks/stack
 
 terragrunt stack run init
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
@@ -48,7 +48,7 @@ terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-gene
 
 ### Destroy a Stack
 ```bash
-cd pipelines/dev/eks
+cd pipelines/dev/eks/stack
 
 terragrunt run --all destroy --no-stack-generate
 ```
