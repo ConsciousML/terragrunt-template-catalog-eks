@@ -111,6 +111,12 @@ Run the following Terragrunt pipelines once per repository:
 - [Setup DNS](pipelines/bootstrap/setup_dns/README.md): creates one public [Route53 hosted zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html) per environment, shared by all apps, delegated once at your registrar
 - [Tailscale](pipelines/bootstrap/tailscale/README.md): creates [Tailscale](https://tailscale.com/) resources needed to connect with tools exposed internally in your EKS cluster (ArgoCD, etc.)
 
+Also run the following once per AWS account:
+```bash
+aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
+```
+This creates the EC2 Spot service-linked role required for Karpenter to provision spot instances.
+
 ### Deploy a Dev EKS Cluster
 Deploy a stack that creates a VPC and an EKS cluster.
 

@@ -115,6 +115,9 @@ jobs:
       - name: Run pre-commit hooks (prek)
         uses: j178/prek-action@v2.0.4
 
+      - name: Ensure EC2 Spot service-linked role exists
+        run: aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
+
       - name: Run Terragrunt stack generate and plan
         run: |
           cd ${{ env.TG_STACK_PATH }}

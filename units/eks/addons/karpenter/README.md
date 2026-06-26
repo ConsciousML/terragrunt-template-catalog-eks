@@ -2,6 +2,14 @@
 
 Provisions the AWS resources required to run [Karpenter](https://karpenter.sh/) as the node autoscaler for the EKS cluster.
 
+## Prerequisites
+
+The EC2 Spot service-linked role must exist in your AWS account before Karpenter can provision spot instances. Create it once per account:
+
+```bash
+aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
+```
+
 ## Concepts
 
 - [Karpenter](https://karpenter.sh/docs/)
