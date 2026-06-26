@@ -7,6 +7,7 @@ locals {
   version_external_dns       = "1.20.0"
   version_eso                = "2.4.1"
   version_tailscale_operator = "1.96.5"
+  version_karpenter          = "21.24.0"
 
   environment = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
   vpc_cidrs   = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_cidrs
@@ -117,6 +118,17 @@ unit "cluster" {
     # and you need to run destroy locally. Get your ARN with:
     # aws sts get-caller-identity --query Arn --output text
     access_entries = {}
+  }
+}
+
+unit "karpenter_iam" {
+  source = "${get_repo_root()}/units/eks/addons/karpenter/iam"
+  path   = "eks/addons/karpenter/iam"
+
+  values = {
+    version                 = local.version_karpenter
+    enable_spot_termination = true
+    tags                    = {}
   }
 }
 
