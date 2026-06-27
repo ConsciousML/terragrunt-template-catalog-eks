@@ -22,6 +22,7 @@ inputs = {
   service_account = "karpenter"
 
   enable_spot_termination = values.enable_spot_termination
+  enable_inline_policy    = true
 
   tags = values.tags
 }
