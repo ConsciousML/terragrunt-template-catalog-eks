@@ -4,13 +4,23 @@ variable "cluster_name" {
 }
 
 variable "iam_policy_name" {
-  description = "Name of the IAM policy to create"
+  description = "Name of the IAM policy to create. Required when iam_policy_json is set."
   type        = string
+  default     = null
+  nullable    = true
 }
 
 variable "iam_policy_json" {
-  description = "IAM policy document as a JSON string"
+  description = "IAM policy document as a JSON string. When null, no custom policy is created and managed_policy_arns must be provided instead."
   type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "managed_policy_arns" {
+  description = "List of AWS managed policy ARNs to attach to the role"
+  type        = list(string)
+  default     = []
 }
 
 variable "iam_role_name" {

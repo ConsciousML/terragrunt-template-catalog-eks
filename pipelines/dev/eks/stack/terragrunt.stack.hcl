@@ -83,7 +83,8 @@ unit "cluster" {
     # More info:
     # https://docs.aws.amazon.com/eks/latest/userguide/workloads-add-ons-available-eks.html
     addons = {
-      coredns = {}
+      aws-ebs-csi-driver = {}
+      coredns            = {}
       eks-pod-identity-agent = {
         before_compute = true
       }
@@ -217,6 +218,16 @@ unit "karpenter_node_pool" {
         consolidateAfter    = "1m"
       }
     }
+  }
+}
+
+unit "ebs_csi_driver_iam_role" {
+  source = "${get_repo_root()}/units/eks/addons/ebs_csi_driver/iam_role"
+  path   = "eks/addons/ebs_csi_driver/iam_role"
+
+  values = {
+    version = local.version
+    tags    = {}
   }
 }
 
