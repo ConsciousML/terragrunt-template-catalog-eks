@@ -111,9 +111,9 @@ unit "cluster" {
         # Use cheapest config for testing purposes
         instance_types = ["t3.medium"]
 
-        min_size     = 1
+        min_size     = 2
         max_size     = 10
-        desired_size = 1
+        desired_size = 2
       }
     }
 
@@ -161,21 +161,6 @@ unit "karpenter" {
             cpu    = "1"
             memory = "1Gi"
           }
-        }
-      }
-      # Dev only: single managed node leaves the second replica Pending forever (#124).
-      # Prod/staging run 2 managed nodes and should keep the default requiredDuringScheduling rule.
-      affinity = {
-        podAntiAffinity = {
-          preferredDuringSchedulingIgnoredDuringExecution = [
-            {
-              # Any value 1–100 is equivalent here since there is only one preferred term.
-              weight = 1
-              podAffinityTerm = {
-                topologyKey = "kubernetes.io/hostname"
-              }
-            }
-          ]
         }
       }
     }
