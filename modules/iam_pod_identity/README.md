@@ -23,6 +23,7 @@ Creates an IAM role and policy, then binds them to a Kubernetes service account 
 | [aws_eks_pod_identity_association.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_pod_identity_association) | resource |
 | [aws_iam_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.managed](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 
 ## Inputs
@@ -30,9 +31,10 @@ Creates an IAM role and policy, then binds them to a Kubernetes service account 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the EKS cluster | `string` | n/a | yes |
-| <a name="input_iam_policy_json"></a> [iam\_policy\_json](#input\_iam\_policy\_json) | IAM policy document as a JSON string | `string` | n/a | yes |
-| <a name="input_iam_policy_name"></a> [iam\_policy\_name](#input\_iam\_policy\_name) | Name of the IAM policy to create | `string` | n/a | yes |
+| <a name="input_iam_policy_json"></a> [iam\_policy\_json](#input\_iam\_policy\_json) | IAM policy document as a JSON string. When null, no custom policy is created and managed\_policy\_arns must be provided instead. | `string` | `null` | no |
+| <a name="input_iam_policy_name"></a> [iam\_policy\_name](#input\_iam\_policy\_name) | Name of the IAM policy to create. Required when iam\_policy\_json is set. | `string` | `null` | no |
 | <a name="input_iam_role_name"></a> [iam\_role\_name](#input\_iam\_role\_name) | Name of the IAM role to create | `string` | n/a | yes |
+| <a name="input_managed_policy_arns"></a> [managed\_policy\_arns](#input\_managed\_policy\_arns) | List of AWS managed policy ARNs to attach to the role | `list(string)` | `[]` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Kubernetes namespace of the service account to associate with the role | `string` | n/a | yes |
 | <a name="input_service_account"></a> [service\_account](#input\_service\_account) | Kubernetes service account name to associate with the role | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to assign to the IAM role | `map(string)` | `{}` | no |
@@ -42,7 +44,6 @@ Creates an IAM role and policy, then binds them to a Kubernetes service account 
 | Name | Description |
 |------|-------------|
 | <a name="output_namespace"></a> [namespace](#output\_namespace) | Kubernetes namespace of the associated service account |
-| <a name="output_policy_arn"></a> [policy\_arn](#output\_policy\_arn) | ARN of the IAM policy |
 | <a name="output_role_arn"></a> [role\_arn](#output\_role\_arn) | ARN of the IAM role |
 | <a name="output_role_name"></a> [role\_name](#output\_role\_name) | Name of the IAM role |
 | <a name="output_service_account"></a> [service\_account](#output\_service\_account) | Kubernetes service account name associated with the role |

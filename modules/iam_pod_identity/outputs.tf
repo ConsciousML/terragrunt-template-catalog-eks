@@ -8,11 +8,6 @@ output "role_name" {
   value       = aws_iam_role.this.name
 }
 
-output "policy_arn" {
-  description = "ARN of the IAM policy"
-  value       = aws_iam_policy.this.arn
-}
-
 output "namespace" {
   description = "Kubernetes namespace of the associated service account"
   value       = aws_eks_pod_identity_association.this.namespace
