@@ -80,7 +80,11 @@ unit "cluster" {
       tier = "standard"
     }
 
-    # More info:
+    # Run the following command to see all the available addons:
+    # aws eks describe-addon-versions --query 'addons[*].addonName' --output text | tr '\t' '\n'
+    # Here's the argument reference for the addons:
+    # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_addon
+    # Read the following for additional information about the available addons:
     # https://docs.aws.amazon.com/eks/latest/userguide/workloads-add-ons-available-eks.html
     addons = {
       aws-ebs-csi-driver = {}

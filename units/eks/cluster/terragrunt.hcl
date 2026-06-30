@@ -13,6 +13,12 @@ terraform {
   source = "tfr:///terraform-aws-modules/eks/aws?version=${values.version}"
 }
 
+dependency "ebs_csi_driver_iam_role" {
+  config_path                             = "../addons/ebs_csi_driver/iam_role"
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+  mock_outputs                            = {}
+}
+
 dependency "vpc" {
   config_path = "../../vpc"
   mock_outputs = {
