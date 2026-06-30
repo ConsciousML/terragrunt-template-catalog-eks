@@ -158,6 +158,21 @@ unit "karpenter" {
           }
         }
       }
+      # Dev only: single managed node leaves the second replica Pending forever (#124).
+      # Prod/staging run 2 managed nodes and should keep the default requiredDuringScheduling rule.
+      affinity = {
+        podAntiAffinity = {
+          preferredDuringSchedulingIgnoredDuringExecution = [
+            {
+              # Any value 1–100 is equivalent here since there is only one preferred term.
+              weight = 1
+              podAffinityTerm = {
+                topologyKey = "kubernetes.io/hostname"
+              }
+            }
+          ]
+        }
+      }
     }
   }
 }
