@@ -9,6 +9,7 @@ locals {
   version_tailscale_operator = "1.96.5"
   version_karpenter_iam      = "21.24.0"
   version_karpenter_helm     = "1.13.0"
+  version_prometheus_stack   = "29.14.0"
 
   environment       = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
   cluster_name_full = read_terragrunt_config(find_in_parent_folders("cluster_name_env.hcl")).locals.cluster_name_full
@@ -236,6 +237,60 @@ unit "ebs_csi_driver_storage_class_gp3" {
 
   values = {
     version = local.version
+  }
+}
+
+unit "prometheus_stack" {
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/helm"
+  path   = "eks/addons/prometheus_stack/helm"
+
+  values = {
+    version            = local.version
+    helm_chart_version = local.version_prometheus_stack
+    helm_values = {
+      # These control plane components are AWS-managed on EKS and not exposed for scraping
+      kubeEtcd              = { enabled = false }
+      kubeScheduler         = { enabled = false }
+      kubeControllerManager = { enabled = false }
+
+      prometheus = {
+        prometheusSpec = {
+          # Scrape any ServiceMonitor/PodMonitor in the cluster regardless of labels, so
+          # other addons can opt into scraping just by enabling their chart's serviceMonitor
+          serviceMonitorSelectorNilUsesHelmValues = false
+          podMonitorSelectorNilUsesHelmValues     = false
+
+          storageSpec = {
+            volumeClaimTemplate = {
+              spec = {
+                storageClassName = "gp3"
+                accessModes      = ["ReadWriteOnce"]
+                resources        = { requests = { storage = "50Gi" } }
+              }
+            }
+          }
+        }
+      }
+
+      alertmanager = {
+        alertmanagerSpec = {
+          storage = {
+            volumeClaimTemplate = {
+              spec = {
+                storageClassName = "gp3"
+                accessModes      = ["ReadWriteOnce"]
+                resources        = { requests = { storage = "10Gi" } }
+              }
+            }
+          }
+        }
+      }
+
+      # Dashboards/datasources are sidecar-provisioned from ConfigMaps, nothing to persist
+      grafana = {
+        persistence = { enabled = false }
+      }
+    }
   }
 }
 
