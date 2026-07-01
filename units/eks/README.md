@@ -22,6 +22,7 @@ The following pipelines must run once before deploying this stack:
 
 - **[cluster](cluster/)**: EKS control plane and managed node groups
 - **[route53](route53/README.md)**: public and private hosted zones and wildcard ACM certificate
+- **[addons/ebs_csi_driver](addons/ebs_csi_driver/README.md)**: EKS managed addon providing `PersistentVolumeClaim` provisioning backed by EBS volumes
 - **[addons/aws_load_balancer_controller](addons/aws_load_balancer_controller/README.md)**: provisions ALBs from `Ingress` and `Gateway` resources
 - **[addons/gateway_api](addons/gateway_api/README.md)**: shared internet-facing ALB with TLS, routing owned by each app's `HTTPRoute`
 - **[addons/external_dns](addons/external_dns/README.md)**: two instances syncing DNS records to the private and public hosted zones
