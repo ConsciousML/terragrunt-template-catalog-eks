@@ -25,7 +25,9 @@ inputs = {
   api_version  = "gateway.networking.k8s.io/v1"
   kind         = "GatewayClass"
   name         = "aws-alb"
-  spec = {
-    controllerName = "gateway.k8s.aws/alb"
+  fields = {
+    spec = {
+      controllerName = "gateway.k8s.aws/alb"
+    }
   }
 }

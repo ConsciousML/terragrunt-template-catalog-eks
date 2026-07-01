@@ -31,15 +31,17 @@ inputs = {
   # nodeClassRef is injected here rather than passed via values so the NodePool always
   # references the actual EC2NodeClass name resolved from its dependency output,
   # avoiding hardcoding the name in the stack.
-  spec = merge(values.spec, {
-    template = merge(values.spec.template, {
-      spec = merge(values.spec.template.spec, {
-        nodeClassRef = {
-          group = "karpenter.k8s.aws"
-          kind  = "EC2NodeClass"
-          name  = dependency.ec2_node_class.outputs.name
-        }
+  fields = {
+    spec = merge(values.spec, {
+      template = merge(values.spec.template, {
+        spec = merge(values.spec.template.spec, {
+          nodeClassRef = {
+            group = "karpenter.k8s.aws"
+            kind  = "EC2NodeClass"
+            name  = dependency.ec2_node_class.outputs.name
+          }
+        })
       })
     })
-  })
+  }
 }

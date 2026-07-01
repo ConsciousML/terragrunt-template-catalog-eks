@@ -50,16 +50,18 @@ inputs = {
   kind         = "LoadBalancerConfiguration"
   name         = "public"
   namespace    = dependency.namespace.outputs.name
-  spec = {
-    scheme = "internet-facing"
-    defaultTargetGroupConfiguration = {
-      name = dependency.target_group_configuration_public.outputs.name
-    }
-    listenerConfigurations = [
-      {
-        protocolPort       = "HTTPS:443"
-        defaultCertificate = dependency.acm_certificate.outputs.certificate_arn
+  fields = {
+    spec = {
+      scheme = "internet-facing"
+      defaultTargetGroupConfiguration = {
+        name = dependency.target_group_configuration_public.outputs.name
       }
-    ]
+      listenerConfigurations = [
+        {
+          protocolPort       = "HTTPS:443"
+          defaultCertificate = dependency.acm_certificate.outputs.certificate_arn
+        }
+      ]
+    }
   }
 }
