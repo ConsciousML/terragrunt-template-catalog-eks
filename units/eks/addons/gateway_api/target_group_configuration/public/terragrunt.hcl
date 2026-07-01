@@ -39,9 +39,11 @@ inputs = {
   kind         = "TargetGroupConfiguration"
   name         = "public-defaults"
   namespace    = dependency.namespace.outputs.name
-  spec = {
-    defaultConfiguration = {
-      targetType = "ip"
+  fields = {
+    spec = {
+      defaultConfiguration = {
+        targetType = "ip"
+      }
     }
   }
 }

@@ -25,7 +25,13 @@ variable "namespace" {
   default     = null
 }
 
-variable "spec" {
-  description = "Full spec of the Kubernetes resource"
+variable "annotations" {
+  description = "Annotations to set on the resource's metadata"
+  type        = map(string)
+  default     = null
+}
+
+variable "fields" {
+  description = "Top-level fields merged into the manifest alongside apiVersion/kind/metadata (e.g. `{ spec = {...} }` for spec/status CRDs, or provisioner/parameters directly for built-in types like StorageClass)"
   type        = any
 }

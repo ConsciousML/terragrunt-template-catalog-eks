@@ -230,6 +230,15 @@ unit "ebs_csi_driver_addon" {
   }
 }
 
+unit "ebs_csi_driver_storage_class_gp3" {
+  source = "${get_repo_root()}/units/eks/addons/ebs_csi_driver/storage_class/gp3"
+  path   = "eks/addons/ebs_csi_driver/storage_class/gp3"
+
+  values = {
+    version = local.version
+  }
+}
+
 unit "iam_policy_aws_lbc" {
   source = "${get_repo_root()}/units/eks/addons/aws_load_balancer_controller/iam_policy_url"
   path   = "eks/addons/aws_load_balancer_controller/iam_policy_url"

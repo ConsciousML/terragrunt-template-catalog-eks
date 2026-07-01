@@ -45,36 +45,38 @@ inputs = {
   kind         = "Gateway"
   name         = "public-alb"
   namespace    = dependency.namespace.outputs.name
-  spec = {
-    gatewayClassName = dependency.gateway_class.outputs.name
-    infrastructure = {
-      parametersRef = {
-        group = "gateway.k8s.aws"
-        kind  = "LoadBalancerConfiguration"
-        name  = dependency.load_balancer_configuration_public.outputs.name
+  fields = {
+    spec = {
+      gatewayClassName = dependency.gateway_class.outputs.name
+      infrastructure = {
+        parametersRef = {
+          group = "gateway.k8s.aws"
+          kind  = "LoadBalancerConfiguration"
+          name  = dependency.load_balancer_configuration_public.outputs.name
+        }
       }
+      listeners = [
+        {
+          name     = "http"
+          protocol = "HTTP"
+          port     = 80
+          allowedRoutes = {
+            namespaces = {
+              from = "All"
+            }
+          }
+        },
+        {
+          name     = "https"
+          protocol = "HTTPS"
+          port     = 443
+          allowedRoutes = {
+            namespaces = {
+              from = "All"
+            }
+          }
+        }
+      ]
     }
-    listeners = [
-      {
-        name     = "http"
-        protocol = "HTTP"
-        port     = 80
-        allowedRoutes = {
-          namespaces = {
-            from = "All"
-          }
-        }
-      },
-      {
-        name     = "https"
-        protocol = "HTTPS"
-        port     = 443
-        allowedRoutes = {
-          namespaces = {
-            from = "All"
-          }
-        }
-      }
-    ]
   }
 }
