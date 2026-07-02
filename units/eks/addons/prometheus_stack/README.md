@@ -14,8 +14,10 @@ Deploys [kube-prometheus-stack](https://github.com/prometheus-community/helm-cha
 
 ## What's Inside
 
-- **[helm](helm/)**: Deploys the chart into the `monitoring` namespace
+- **[helm](helm/)**: Deploys the chart into the `monitoring` namespace, with `fullnameOverride` pinned so Service names are deterministic
+- **[httproute](httproute/)**: One `HTTPRoute` per UI (Prometheus, Alertmanager, Grafana), each bound to the private Gateway on its own private subdomain
 
 ## Integration
 
 - **[`units/eks/addons/ebs_csi_driver`](../ebs_csi_driver/)**: `helm` depends on the `addon` and `storage_class/gp3` units being deployed first for persistent storage
+- **[Gateway API](../gateway_api/)**: each `httproute/` unit attaches to [`gateway_api/gateway/private`](../gateway_api/gateway/private/), annotated `scope=private` so [ExternalDNS](../external_dns/) writes records to the private hosted zone

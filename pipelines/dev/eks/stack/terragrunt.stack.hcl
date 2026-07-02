@@ -262,6 +262,10 @@ unit "prometheus_stack" {
     version            = local.version
     helm_chart_version = local.version_prometheus_stack
     helm_values = {
+      # Pins the generated Service names (e.g. kube-prometheus-stack-prometheus) so the
+      # units/eks/addons/prometheus_stack/httproute/ units can target them deterministically
+      fullnameOverride = "kube-prometheus-stack"
+
       # These control plane components are AWS-managed on EKS and not exposed for scraping
       kubeEtcd              = { enabled = false }
       kubeScheduler         = { enabled = false }
@@ -681,6 +685,60 @@ unit "domain_name_argocd" {
 unit "domain_name_guestbook" {
   source = "${get_repo_root()}/units/eks/domain_name/guestbook"
   path   = "eks/domain_name/guestbook"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "domain_name_prometheus" {
+  source = "${get_repo_root()}/units/eks/domain_name/prometheus"
+  path   = "eks/domain_name/prometheus"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "domain_name_alertmanager" {
+  source = "${get_repo_root()}/units/eks/domain_name/alertmanager"
+  path   = "eks/domain_name/alertmanager"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "domain_name_grafana" {
+  source = "${get_repo_root()}/units/eks/domain_name/grafana"
+  path   = "eks/domain_name/grafana"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "prometheus_stack_httproute_prometheus" {
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/httproute/prometheus"
+  path   = "eks/addons/prometheus_stack/httproute/prometheus"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "prometheus_stack_httproute_alertmanager" {
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/httproute/alertmanager"
+  path   = "eks/addons/prometheus_stack/httproute/alertmanager"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "prometheus_stack_httproute_grafana" {
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/httproute/grafana"
+  path   = "eks/addons/prometheus_stack/httproute/grafana"
 
   values = {
     version = local.version
