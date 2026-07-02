@@ -472,6 +472,33 @@ unit "gateway_api_gateway_public" {
   }
 }
 
+unit "gateway_api_target_group_configuration_private" {
+  source = "${get_repo_root()}/units/eks/addons/gateway_api/target_group_configuration/private"
+  path   = "eks/addons/gateway_api/target_group_configuration/private"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "gateway_api_load_balancer_configuration_private" {
+  source = "${get_repo_root()}/units/eks/addons/gateway_api/load_balancer_configuration/private"
+  path   = "eks/addons/gateway_api/load_balancer_configuration/private"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "gateway_api_gateway_private" {
+  source = "${get_repo_root()}/units/eks/addons/gateway_api/gateway/private"
+  path   = "eks/addons/gateway_api/gateway/private"
+
+  values = {
+    version = local.version
+  }
+}
+
 unit "iam_role_external_dns_private" {
   source = "${get_repo_root()}/units/eks/addons/external_dns/private/iam_role"
   path   = "eks/addons/external_dns/private/iam_role"

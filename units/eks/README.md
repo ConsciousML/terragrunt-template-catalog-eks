@@ -5,7 +5,7 @@ A prod-ready Terragrunt catalog of building blocks for deploying EKS clusters ac
 The cluster comes with:
 
 - GitOps via ArgoCD and the App of Apps pattern
-- Public traffic routing via ALB and Gateway API
+- Public and private traffic routing via ALB and Gateway API
 - Automated DNS and TLS termination
 - VPN access via Tailscale
 - Node autoscaling via Karpenter
@@ -25,7 +25,7 @@ The following pipelines must run once before deploying this stack:
 - **[addons/ebs_csi_driver](addons/ebs_csi_driver/README.md)**: EKS managed addon providing `PersistentVolumeClaim` provisioning backed by EBS volumes
 - **[addons/prometheus_stack](addons/prometheus_stack/README.md)**: kube-prometheus-stack for cluster and workload metrics (Prometheus, Alertmanager, Grafana)
 - **[addons/aws_load_balancer_controller](addons/aws_load_balancer_controller/README.md)**: provisions ALBs from `Ingress` and `Gateway` resources
-- **[addons/gateway_api](addons/gateway_api/README.md)**: shared internet-facing ALB with TLS, routing owned by each app's `HTTPRoute`
+- **[addons/gateway_api](addons/gateway_api/README.md)**: shared internet-facing and internal ALBs with TLS, routing owned by each app's `HTTPRoute`
 - **[addons/external_dns](addons/external_dns/README.md)**: two instances syncing DNS records to the private and public hosted zones
 - **[addons/external_secrets_operator](addons/external_secrets_operator/README.md)**: operator that syncs secrets from AWS Secrets Manager into Kubernetes `Secret` objects, used here to inject the ArgoCD admin password into the cluster
 - **[addons/argocd](addons/argocd/README.md)**: GitOps controller with admin password managed via ESO
