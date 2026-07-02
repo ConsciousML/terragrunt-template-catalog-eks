@@ -111,7 +111,7 @@ unit "cluster" {
     }
 
     eks_managed_node_groups = {
-      "${local.environment}-default_node_group" = {
+      "${local.environment}_ng" = {
         # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
         ami_type = "AL2023_x86_64_STANDARD"
 
@@ -266,6 +266,16 @@ unit "prometheus_stack" {
       kubeEtcd              = { enabled = false }
       kubeScheduler         = { enabled = false }
       kubeControllerManager = { enabled = false }
+
+      defaultRules = {
+        disabled = {
+          # This node group intentionally runs 2 nodes; the rule can't tell EKS has no
+          # control-plane node label and treats <3 nodes as always failing N+1 tolerance.
+          # Dev-only: do not carry this disable over to staging/prod stacks, where
+          # N+1 node failure tolerance is a real concern the alert should keep catching.
+          KubeCPUOvercommit = true
+        }
+      }
 
       prometheus = {
         prometheusSpec = {
