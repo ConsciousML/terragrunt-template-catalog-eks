@@ -41,7 +41,7 @@ unit "vpc" {
 
     name = "vpc-eks"
 
-    # For production, use at least 3 subnets
+    # For production, use at least 2 subnets
     private_subnets = local.private_subnets
     public_subnets  = local.public_subnets
 
@@ -53,12 +53,15 @@ unit "vpc" {
     enable_dns_support   = true
 
     public_subnet_tags = {
+      # Tag for AWS LBC to know where to deploy external ALB
       "kubernetes.io/role/elb" = 1
     }
 
     private_subnet_tags = {
+      # Tag for AWS LBC to know where to deploy external ALB
       "kubernetes.io/role/internal-elb" = 1
-      "karpenter.sh/discovery"          = local.cluster_name_full
+      # Tag for Karpenter to discover the private subnet
+      "karpenter.sh/discovery" = local.cluster_name_full
     }
   }
 }
@@ -72,6 +75,8 @@ unit "cluster" {
 
     kubernetes_version = "1.35"
 
+    # For improved security, should be set to `false`
+    # Use Tailscale to access the private endpoint
     endpoint_public_access = true
 
     # Adds the current caller identity as an administrator via cluster access entry
@@ -118,6 +123,8 @@ unit "cluster" {
         # Use cheapest config for testing purposes
         instance_types = ["t3.medium"]
 
+        # Use at least `min_size = 2` or upgrade the `instance_types`
+        # Otherwise some important system components will be stuck in `PENDING` (too many nodes)
         min_size     = 2
         max_size     = 10
         desired_size = 2
@@ -141,7 +148,8 @@ unit "karpenter_iam" {
   path   = "eks/addons/karpenter/iam"
 
   values = {
-    version                 = local.version_karpenter_iam
+    version = local.version_karpenter_iam
+    # Set to true when using `SPOT` instances
     enable_spot_termination = true
     tags                    = {}
   }
