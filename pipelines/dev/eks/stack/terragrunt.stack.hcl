@@ -96,6 +96,12 @@ unit "cluster" {
       kube-proxy = {}
       vpc-cni = {
         before_compute = true
+        # Prefix delegation: nodes need more IPs than one-per-ENI allows
+        configuration_values = jsonencode({
+          env = {
+            ENABLE_PREFIX_DELEGATION = "true"
+          }
+        })
       }
     }
 
