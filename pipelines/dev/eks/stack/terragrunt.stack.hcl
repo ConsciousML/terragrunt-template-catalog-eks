@@ -9,7 +9,7 @@ locals {
   version_tailscale_operator = "1.96.5"
   version_karpenter_iam      = "21.24.0"
   version_karpenter_helm     = "1.13.0"
-  version_prometheus_stack   = "29.14.0"
+  version_prometheus_stack   = "87.5.0"
 
   environment       = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
   cluster_name_full = read_terragrunt_config(find_in_parent_folders("cluster_name_env.hcl")).locals.cluster_name_full
@@ -100,7 +100,7 @@ unit "cluster" {
     }
 
     eks_managed_node_groups = {
-      example = {
+      "${local.environment}-default_node_group" = {
         # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
         ami_type = "AL2023_x86_64_STANDARD"
 
