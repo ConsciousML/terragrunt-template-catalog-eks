@@ -43,5 +43,6 @@ Generic module for installing a Helm chart on an EKS cluster.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_name"></a> [name](#output\_name) | Name of the Helm release |
 | <a name="output_namespace"></a> [namespace](#output\_namespace) | Namespace the Helm release was deployed into |
 <!-- END_TF_DOCS -->
