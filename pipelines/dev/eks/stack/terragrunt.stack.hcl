@@ -254,6 +254,46 @@ unit "ebs_csi_driver_storage_class_gp3" {
   }
 }
 
+unit "prometheus_stack_namespace" {
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/namespace"
+  path   = "eks/addons/prometheus_stack/namespace"
+
+  values = {
+    version = local.version
+    name    = "monitoring"
+  }
+}
+
+unit "grafana_password" {
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/grafana/aws_password_secret"
+  path   = "eks/addons/prometheus_stack/grafana/aws_password_secret"
+
+  values = {
+    version                 = local.version
+    length                  = 16
+    recovery_window_in_days = 0
+    tags                    = {}
+  }
+}
+
+unit "prometheus_stack_aws_secret_store" {
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/aws_secret_store"
+  path   = "eks/addons/prometheus_stack/aws_secret_store"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "grafana_aws_external_secret" {
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/grafana/aws_external_secret"
+  path   = "eks/addons/prometheus_stack/grafana/aws_external_secret"
+
+  values = {
+    version = local.version
+  }
+}
+
 unit "prometheus_stack" {
   source = "${get_repo_root()}/units/eks/addons/prometheus_stack/helm"
   path   = "eks/addons/prometheus_stack/helm"
@@ -263,7 +303,7 @@ unit "prometheus_stack" {
     helm_chart_version = local.version_prometheus_stack
     helm_values = {
       # Pins the generated Service names (e.g. kube-prometheus-stack-prometheus) so the
-      # units/eks/addons/prometheus_stack/httproute/ units can target them deterministically
+      # per-tool httproute/ units (grafana/, prometheus/, alertmanager/) can target them deterministically
       fullnameOverride = "kube-prometheus-stack"
 
       # These control plane components are AWS-managed on EKS and not exposed for scraping
@@ -719,8 +759,8 @@ unit "domain_name_grafana" {
 }
 
 unit "prometheus_stack_httproute_prometheus" {
-  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/httproute/prometheus"
-  path   = "eks/addons/prometheus_stack/httproute/prometheus"
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/prometheus/httproute"
+  path   = "eks/addons/prometheus_stack/prometheus/httproute"
 
   values = {
     version = local.version
@@ -728,8 +768,8 @@ unit "prometheus_stack_httproute_prometheus" {
 }
 
 unit "prometheus_stack_httproute_alertmanager" {
-  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/httproute/alertmanager"
-  path   = "eks/addons/prometheus_stack/httproute/alertmanager"
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/alertmanager/httproute"
+  path   = "eks/addons/prometheus_stack/alertmanager/httproute"
 
   values = {
     version = local.version
@@ -737,8 +777,8 @@ unit "prometheus_stack_httproute_alertmanager" {
 }
 
 unit "prometheus_stack_httproute_grafana" {
-  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/httproute/grafana"
-  path   = "eks/addons/prometheus_stack/httproute/grafana"
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/grafana/httproute"
+  path   = "eks/addons/prometheus_stack/grafana/httproute"
 
   values = {
     version = local.version

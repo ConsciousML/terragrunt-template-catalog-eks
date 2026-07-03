@@ -38,5 +38,9 @@ Creates an ESO [`ExternalSecret`](https://external-secrets.io/latest/api/externa
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_namespace"></a> [namespace](#output\_namespace) | Namespace the Kubernetes Secret lives in |
+| <a name="output_secret_key"></a> [secret\_key](#output\_secret\_key) | Key written into the target Kubernetes Secret by the first data mapping |
+| <a name="output_target_secret_name"></a> [target\_secret\_name](#output\_target\_secret\_name) | Name of the Kubernetes Secret ESO writes into |
 <!-- END_TF_DOCS -->
