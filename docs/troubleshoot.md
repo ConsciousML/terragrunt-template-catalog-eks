@@ -56,7 +56,7 @@ plugin6.(*GRPCProvider).PlanResourceChange: rpc error: code = Unknown desc
 get OpenAPI spec: context deadline exceeded
 ```
 
-This happens when the EKS API server is slow/unresponsive, or when a stack was regenerated against a different branch/ref than what's actually deployed. Any unit using `kubernetes_manifest` or `helm_release` (SecretStore, StorageClass, ArgoCD, ExternalDNS, etc.) will hang, and `terragrunt run --all destroy` can't proceed past those units.
+This happens when the EKS API server is slow/unresponsive, or when a stack was regenerated against a different branch/ref than what's actually deployed. Any unit using `kubectl_manifest` or `helm_release` (SecretStore, StorageClass, ArgoCD, ExternalDNS, etc.) will hang, and `terragrunt run --all destroy` can't proceed past those units.
 
 If `kubectl` still responds even though the provider doesn't, work around Terragrunt entirely instead of fighting it.
 

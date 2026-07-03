@@ -1,5 +1,5 @@
-resource "kubernetes_manifest" "this" {
-  manifest = {
+resource "kubectl_manifest" "this" {
+  yaml_body = yamlencode({
     apiVersion = "external-secrets.io/v1"
     kind       = "SecretStore"
     metadata = {
@@ -14,5 +14,5 @@ resource "kubernetes_manifest" "this" {
         }
       }
     }
-  }
+  })
 }

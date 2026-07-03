@@ -1,5 +1,9 @@
-resource "kubernetes_namespace_v1" "this" {
-  metadata {
-    name = var.name
-  }
+resource "kubectl_manifest" "this" {
+  yaml_body = yamlencode({
+    apiVersion = "v1"
+    kind       = "Namespace"
+    metadata = {
+      name = var.name
+    }
+  })
 }

@@ -20,7 +20,7 @@ The dev directory uses the same configuration pattern as the live template:
 - [`version.hcl`](../version.hcl): Resolves the current git branch used as `?ref=` in all module sources
 - [`environment.hcl`](environment.hcl): Environment name (e.g., `dev`) used for resource naming and state isolation
 - [`cluster_name.hcl`](cluster_name.hcl): EKS cluster name
-- [`provider_kubernetes.hcl`](provider_kubernetes.hcl): Kubernetes provider configuration sourced from the EKS cluster output
+- [`provider_kubectl.hcl`](provider_kubectl.hcl): Kubectl provider configuration sourced from the EKS cluster output
 
 ## Stack Configuration
 

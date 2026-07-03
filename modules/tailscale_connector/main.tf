@@ -1,5 +1,5 @@
-resource "kubernetes_manifest" "connector" {
-  manifest = {
+resource "kubectl_manifest" "connector" {
+  yaml_body = yamlencode({
     apiVersion = "tailscale.com/v1alpha1"
     kind       = "Connector"
     metadata = {
@@ -12,5 +12,5 @@ resource "kubernetes_manifest" "connector" {
         advertiseRoutes = var.advertise_routes
       }
     }
-  }
+  })
 }

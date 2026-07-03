@@ -1,5 +1,5 @@
-resource "kubernetes_manifest" "this" {
-  manifest = merge(
+resource "kubectl_manifest" "this" {
+  yaml_body = yamlencode(merge(
     {
       apiVersion = var.api_version
       kind       = var.kind
@@ -10,5 +10,5 @@ resource "kubernetes_manifest" "this" {
       )
     },
     var.fields
-  )
+  ))
 }
