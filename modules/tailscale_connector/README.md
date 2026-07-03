@@ -8,19 +8,19 @@ Deploys a Tailscale `Connector` custom resource that runs a subnet router Statef
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.1 |
-| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | ~> 3.0.1 |
+| <a name="requirement_kubectl"></a> [kubectl](#requirement\_kubectl) | ~> 2.4 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | ~> 3.0.1 |
+| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | ~> 2.4 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [kubernetes_manifest.connector](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
+| [kubectl_manifest.connector](https://registry.terraform.io/providers/alekc/kubectl/latest/docs/resources/manifest) | resource |
 
 ## Inputs
 

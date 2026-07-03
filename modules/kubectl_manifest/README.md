@@ -1,26 +1,26 @@
 <!-- BEGIN_TF_DOCS -->
 # k8s Manifest
 
-Creates a generic Kubernetes manifest resource. Callers supply `api_version`, `kind`, and `fields` (merged alongside `apiVersion`/`kind`/`metadata`); the module applies them via the `kubernetes_manifest` Terraform resource. Works for both spec/status CRDs (pass `fields = { spec = {...} }`) and built-in types with top-level fields (e.g. `StorageClass`).
+Creates a generic Kubernetes manifest resource. Callers supply `api_version`, `kind`, and `fields` (merged alongside `apiVersion`/`kind`/`metadata`); the module applies them via the `kubectl_manifest` Terraform resource. Works for both spec/status CRDs (pass `fields = { spec = {...} }`) and built-in types with top-level fields (e.g. `StorageClass`).
 
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.1 |
-| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | ~> 3.0.1 |
+| <a name="requirement_kubectl"></a> [kubectl](#requirement\_kubectl) | ~> 2.4 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | ~> 3.0.1 |
+| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | ~> 2.4 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [kubernetes_manifest.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
+| [kubectl_manifest.this](https://registry.terraform.io/providers/alekc/kubectl/latest/docs/resources/manifest) | resource |
 
 ## Inputs
 
