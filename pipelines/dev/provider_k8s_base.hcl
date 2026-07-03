@@ -27,7 +27,7 @@ dependency "eks_cluster" {
 
 exclude {
   if      = !local.cluster_exists
-  actions = ["init", "validate", "plan"]
+  actions = ["init", "validate", "plan", "destroy"]
 }
 
 generate "provider_k8s_base" {
