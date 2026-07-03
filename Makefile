@@ -1,0 +1,6 @@
+.PHONY: clean
+
+clean:
+	terragrunt stack clean
+	find . -type d -name ".terraform*" -exec rm -rf {} +
+	find . -type f -name ".terraform*" ! -name ".terraform-docs.yml" -exec rm -f {} +

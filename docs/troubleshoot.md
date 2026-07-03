@@ -44,6 +44,69 @@ terragrunt init
 terragrunt plan  # should show resources as "to be created"
 ```
 
+## Manually Removing a Directory of Terragrunt States
+
+Sometimes you need to remove state for an entire subtree at once (e.g. all units under an addon group), not just a single module.
+
+This still requires deleting the state files in S3 **and** the corresponding digest entries in DynamoDB. Leaving stale digest entries behind causes every affected unit to fail `tofu init` with:
+
+```
+Error refreshing state: state data in S3 does not have the expected content.
+```
+
+### Steps
+
+Set these once, scoped to the exact bucket (environment) and path you're clearing, other environments share the same DynamoDB table and a too-broad prefix will match them too:
+
+```bash
+export BUCKET="<bucket>"
+export PREFIX="<path/to/directory>"  # no leading/trailing slash
+```
+
+**1. Delete the state files in S3:**
+
+```bash
+aws s3 rm "s3://${BUCKET}/${PREFIX}/" --recursive --exclude "*" --include "*/tofu.tfstate"
+```
+
+**2. Find the stale DynamoDB entries under that prefix:**
+
+```bash
+aws dynamodb scan \
+  --table-name terragrunt_lock_table \
+  --filter-expression "contains(LockID, :fragment)" \
+  --expression-attribute-values "{\":fragment\": {\"S\": \"${BUCKET}/${PREFIX}/\"}}" \
+  --query "Items[*].LockID.S" \
+  --output text
+```
+
+**3. Delete each digest entry** (the ones ending in `-md5`):
+
+```bash
+aws dynamodb scan \
+  --table-name terragrunt_lock_table \
+  --filter-expression "contains(LockID, :fragment)" \
+  --expression-attribute-values "{\":fragment\": {\"S\": \"${BUCKET}/${PREFIX}/\"}}" \
+  --query "Items[*].LockID.S" \
+  --output text | tr '\t' '\n' | while read -r id; do
+    [ -z "$id" ] && continue
+    aws dynamodb delete-item \
+      --table-name terragrunt_lock_table \
+      --key "{\"LockID\": {\"S\": \"$id\"}}"
+    echo "deleted: $id"
+  done
+```
+
+**4. Verify the state is gone:**
+
+```bash
+aws s3 ls "s3://${BUCKET}/${PREFIX}/" --recursive | grep tofu.tfstate | grep -v '\-md5\|\.tflock'
+# should print nothing
+
+terragrunt init
+terragrunt plan  # should show resources as "to be created"
+```
+
 ## Destroying a Cluster When the Kubernetes Provider Is Stuck
 
 Sometimes the `kubernetes`/`helm` provider can't complete an apply or destroy, e.g.:
@@ -117,11 +180,11 @@ terragrunt run --all destroy --no-stack-generate
 
 ### 5. Wipe the addon units' state
 
-Excluded units keep their state file, which now points to resources that no longer exist. Remove it wholesale rather than per-resource (see [Manually Removing a Terragrunt State](#manually-removing-a-terragrunt-state) for the single-module version):
+Excluded units keep their state file, which now points to resources that no longer exist. Remove it wholesale rather than per-resource by following [Manually Removing a Directory of Terragrunt States](#manually-removing-a-directory-of-terragrunt-states) with:
 
 ```bash
-STACK_PATH=dev/eks/stack/.terragrunt-stack
-aws s3 rm "s3://${BUCKET}/${STACK_PATH}/eks/addons/" --recursive
+export BUCKET="tofu-state-${ACCOUNT_ID}-${ENVIRONMENT}"
+export PREFIX="dev/eks/stack/.terragrunt-stack/eks/addons"
 ```
 
 ### 6. Verify manually in the AWS console
