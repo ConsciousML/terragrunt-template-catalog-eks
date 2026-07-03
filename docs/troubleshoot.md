@@ -127,23 +127,34 @@ cd pipelines/dev/eks/stack/.terragrunt-stack/eks/cluster
 terragrunt destroy
 ```
 
-### 5. Wipe the orphaned addon units' state
+### 5. Run the full stack destroy
 
-Their state now references resources on a cluster that no longer exists, so reconciling them is pointless — remove the state wholesale rather than per-resource (see [Manually Removing a Terragrunt State](#manually-removing-a-terragrunt-state) for the single-module version):
+Addon units are excluded automatically once the cluster is gone (see `provider_k8s_base.hcl`'s `exclude` block), so the rest of the stack (VPC, Route53 zones, ACM certificate, IAM) destroys cleanly:
+
+```bash
+cd pipelines/dev/eks/stack
+terragrunt run --all destroy --no-stack-generate
+```
+
+### 6. Wipe the addon units' state
+
+Excluded units keep their state file, which now points to resources that no longer exist. Remove it wholesale rather than per-resource (see [Manually Removing a Terragrunt State](#manually-removing-a-terragrunt-state) for the single-module version):
 
 ```bash
 STACK_PATH=dev/eks/stack/.terragrunt-stack
 aws s3 rm "s3://${BUCKET}/${STACK_PATH}/eks/addons/" --recursive
 ```
 
-### 6. Finish the teardown normally
+### 7. Verify manually in the AWS console
 
-With the cluster and addon state gone, the rest (VPC, Route53 zones, ACM certificate, IAM) has no more stuck dependencies:
-
-```bash
-cd pipelines/dev/eks/stack
-terragrunt run --all destroy --no-stack-generate
-```
+- **VPC**: no orphaned VPC/subnets/security groups
+- **NAT Gateways / Elastic IPs**: billed hourly even if idle — the most expensive thing to miss
+- **Load Balancers**: no ALB/NLB left over (would respawn if an Ingress/Service survived)
+- **EBS volumes**: no orphaned volumes from PVCs (`reclaimPolicy: Retain` or a node that didn't clean up)
+- **Secrets Manager**: no secrets left over
+- **IAM**: no roles/policies left over from the cluster's addons
+- **EC2**: no leftover instances/ENIs (e.g. from Karpenter-provisioned nodes)
+- **EKS**: no cluster/node group left in a stuck state
 
 ## Can't Connect with Tailscale to Internal Endpoints on MacOS
 MacOs doesn't automatically re-push DNS config.
