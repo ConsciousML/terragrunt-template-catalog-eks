@@ -92,33 +92,12 @@ aws route53 list-resource-record-sets --hosted-zone-id "$ZONE_ID" \
 ```
 
 ### 2. Delete the remaining namespaces
-
-If a namespace hangs in `Terminating`, check what's blocking it:
-
+Delete the namespaces containing external k8s resources:
 ```bash
-NS=<namespace>
-kubectl get namespace "$NS" -o json | grep -A 20 '"status"'
+kubectl delete ns argocd monitoring tailscale
 ```
 
-The condition usually names the stuck resource kind and finalizer (e.g. `applications.argoproj.io` with `resources-finalizer.argocd.argoproj.io`, left behind because the controller that would normally clear it is already gone). Clear the finalizer directly:
-
-```bash
-KIND=<kind>
-NAME=<name>
-kubectl patch "$KIND" "$NAME" -n "$NS" -p '{"metadata":{"finalizers":[]}}' --type=merge
-```
-
-### 3. Force-delete any AWS Secrets Manager secrets
-
-Skip the default recovery window for secrets you don't need to keep:
-
-```bash
-SECRET_ID=<secret-name-or-arn>
-aws secretsmanager delete-secret --secret-id "$SECRET_ID" \
-  --region "$REGION" --force-delete-without-recovery
-```
-
-### 4. Destroy the cluster unit directly
+### 3. Destroy the cluster unit
 
 `units/eks/cluster` only uses the `aws` provider (via `terraform-aws-modules/eks/aws`), so it's unaffected by a stuck `kubernetes` provider and can be destroyed on its own once the workarounds above have cleared everything running inside the cluster:
 
@@ -127,7 +106,7 @@ cd pipelines/dev/eks/stack/.terragrunt-stack/eks/cluster
 terragrunt destroy
 ```
 
-### 5. Run the full stack destroy
+### 4. Run the full stack destroy
 
 Addon units are excluded automatically once the cluster is gone (see `provider_k8s_base.hcl`'s `exclude` block), so the rest of the stack (VPC, Route53 zones, ACM certificate, IAM) destroys cleanly:
 
@@ -136,7 +115,7 @@ cd pipelines/dev/eks/stack
 terragrunt run --all destroy --no-stack-generate
 ```
 
-### 6. Wipe the addon units' state
+### 5. Wipe the addon units' state
 
 Excluded units keep their state file, which now points to resources that no longer exist. Remove it wholesale rather than per-resource (see [Manually Removing a Terragrunt State](#manually-removing-a-terragrunt-state) for the single-module version):
 
@@ -145,7 +124,7 @@ STACK_PATH=dev/eks/stack/.terragrunt-stack
 aws s3 rm "s3://${BUCKET}/${STACK_PATH}/eks/addons/" --recursive
 ```
 
-### 7. Verify manually in the AWS console
+### 6. Verify manually in the AWS console
 
 - **VPC**: no orphaned VPC/subnets/security groups
 - **NAT Gateways / Elastic IPs**: billed hourly even if idle — the most expensive thing to miss
