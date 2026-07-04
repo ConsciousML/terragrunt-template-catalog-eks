@@ -7,12 +7,12 @@ include "provider_k8s_base" {
   path = find_in_parent_folders("provider_k8s_base.hcl")
 }
 
-include "provider_kubernetes" {
-  path = find_in_parent_folders("provider_kubernetes.hcl")
+include "provider_kubectl" {
+  path = find_in_parent_folders("provider_kubectl.hcl")
 }
 
 terraform {
-  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/k8s_manifest/?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/kubectl_manifest/?ref=${values.version}"
 }
 
 dependency "prometheus_stack" {

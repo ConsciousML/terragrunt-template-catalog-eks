@@ -9,22 +9,22 @@ Fetches a URL containing one or more YAML manifests and applies each resource to
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.1 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | ~> 3.6 |
-| <a name="requirement_kubectl"></a> [kubectl](#requirement\_kubectl) | ~> 1.19 |
+| <a name="requirement_kubectl"></a> [kubectl](#requirement\_kubectl) | ~> 2.4 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_http"></a> [http](#provider\_http) | ~> 3.6 |
-| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | ~> 1.19 |
+| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | ~> 2.4 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [kubectl_manifest.this](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs/resources/manifest) | resource |
+| [kubectl_manifest.this](https://registry.terraform.io/providers/alekc/kubectl/latest/docs/resources/manifest) | resource |
 | [http_http.this](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
-| [kubectl_file_documents.this](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs/data-sources/file_documents) | data source |
+| [kubectl_file_documents.this](https://registry.terraform.io/providers/alekc/kubectl/latest/docs/data-sources/file_documents) | data source |
 
 ## Inputs
 
