@@ -15,20 +15,13 @@ terraform {
   source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/helm_release/?ref=${values.version}"
 }
 
-dependency "aws_load_balancer_controller" {
-  config_path  = "../../aws_load_balancer_controller/helm"
-  skip_outputs = true
-}
-
-dependency "external_dns" {
-  config_path  = "../../external_dns/private/helm"
-  skip_outputs = true
-}
-
 locals {
   domains_hcl           = find_in_parent_folders("domains.hcl")
   domain_private_argocd = read_terragrunt_config(local.domains_hcl).locals.domain_private_argocd
 }
+
+# aws_load_balancer_controller and external_dns/private are deferred (issue #153): the Ingress
+# below will exist but stay unfulfilled (no ALB, no DNS record) until those units come back.
 
 dependency "acm_certificate" {
   config_path = "../../../route53/acm_certificate"
