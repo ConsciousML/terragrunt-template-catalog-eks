@@ -20,15 +20,6 @@ dependency "argocd" {
   skip_outputs = true
 }
 
-dependency "gateway_public" {
-  config_path = "../../gateway_api/gateway/public"
-  mock_outputs = {
-    name      = "public-alb"
-    namespace = "gateway"
-  }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
-}
-
 locals {
   domains_hcl             = find_in_parent_folders("domains.hcl")
   domain_public_guestbook = read_terragrunt_config(local.domains_hcl).locals.domain_public_guestbook
@@ -63,9 +54,11 @@ inputs = {
     appParams = {
       "guestbook-helm" = {
         host = local.domain_public_guestbook
+        # Hardcoded until the Gateway API units are migrated into app-of-apps (issue #153);
+        # matches units/eks/addons/gateway_api/gateway/public's name/namespace.
         gateway = {
-          name      = dependency.gateway_public.outputs.name
-          namespace = dependency.gateway_public.outputs.namespace
+          name      = "public-alb"
+          namespace = "gateway"
         }
         annotations = {
           "external-dns.alpha.kubernetes.io/scope" = "public"
