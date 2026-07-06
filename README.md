@@ -215,7 +215,7 @@ See the [development guide](docs/development.md) for a detailed workflow with a 
 To modify existing applications or deploy new ones, see the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template#readme).
 
 ## Reproducibility
-Provider lock files (`.terraform.lock.hcl`) must be committed per unit for stacks to be reproducible across tags.
+Provider lock files (`.terraform.lock.hcl`) must be committed per unit for stacks to be reproducible.
 
 Read the [reproducibility guide](docs/reproducibility.md) for what to do and why.
 

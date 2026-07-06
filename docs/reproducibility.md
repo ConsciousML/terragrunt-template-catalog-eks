@@ -21,17 +21,17 @@ terragrunt stack run init
 
 ### 2. Copy them back into `units/`
 
-Each rendered unit's lock file lives at `.terragrunt-stack/<unit-path>/.terraform.lock.hcl`. Copy it into the matching `units/<unit-path>/.terraform.lock.hcl`:
+From the repo root, run:
 
 ```bash
-find .terragrunt-stack -name ".terraform.lock.hcl" | while read -r lock; do
-  unit_path="${lock#.terragrunt-stack/}"
-  unit_path="${unit_path%/.terraform.lock.hcl}"
-  cp "$lock" "../../../../units/${unit_path}/.terraform.lock.hcl"
-done
+make sync-lock-files
 ```
 
-### 3. Commit
+This runs `scripts/sync-lock-files.sh`, which copies each rendered unit's lock file at `.terragrunt-stack/<unit-path>/.terraform.lock.hcl` into the matching `units/<unit-path>/.terraform.lock.hcl`, anywhere in the repo.
+
+### 3. Review and commit
+
+Check `git diff units/` (or `git status` for newly added units) to make sure the changes make sense, then commit:
 
 ```bash
 git add units/**/.terraform.lock.hcl
@@ -50,9 +50,4 @@ terragrunt init
 
 `terragrunt init -upgrade` does the same without the manual `rm`.
 
-Copy the new lock file back into `units/<unit-path>/.terraform.lock.hcl` and commit. Skipping the copy-back means the next `stack generate` falls back to the stale committed lock file and `init` fails with a checksum/version mismatch, the exact error this doc exists to prevent.
-
-## Why Not Alternatives
-
-- **Persisting `.terragrunt-stack` in git** (un-ignoring the lock files there, restoring them via a `before_hook`) keeps lock files scoped per environment, but adds a fragile hook and an easy-to-miss "commit immediately after `-upgrade` or it gets overwritten" step.
-- **Pinning exact provider versions instead of using lock files** avoids the whole problem, but only pins the version number, not the checksum, so it drops the supply-chain guarantee lock files exist for.
+From the repo root, run `make sync-lock-files`, verify `git diff units/<unit-path>/.terraform.lock.hcl` shows only the expected version/checksum change, commit, and push.
