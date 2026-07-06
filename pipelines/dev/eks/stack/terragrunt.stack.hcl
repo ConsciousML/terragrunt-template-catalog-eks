@@ -1,7 +1,9 @@
 locals {
-  version                    = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
-  version_vpc                = "6.6.0"
-  version_cluster            = "21.15.1"
+  version         = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
+  version_vpc     = "6.6.0"
+  version_cluster = "21.15.1"
+  # Keep in sync with the aws-load-balancer-controller chart dependency version pinned in
+  # the app-of-apps repo's aws-load-balancer-controller/Chart.yaml
   version_aws_lbc            = "3.2.1"
   version_argocd             = "9.5.0"
   version_external_dns       = "1.20.0"
@@ -269,6 +271,30 @@ unit "argocd_app_of_apps" {
     finalizers            = ["resources-finalizer.argocd.argoproj.io"]
     sync_options          = ["CreateNamespace=true"]
     prune                 = true
+  }
+}
+
+# --- AWS Load Balancer Controller ---
+# Only the AWS-side IAM/Pod Identity resources are Terraform-managed; the Helm release
+# lives in app-of-apps.
+
+unit "iam_policy_aws_lbc" {
+  source = "${get_repo_root()}/units/eks/addons/aws_load_balancer_controller/iam_policy_url"
+  path   = "eks/addons/aws_load_balancer_controller/iam_policy_url"
+
+  values = {
+    version = local.version
+    url     = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v${local.version_aws_lbc}/docs/install/iam_policy.json"
+  }
+}
+
+unit "iam_role_aws_lbc" {
+  source = "${get_repo_root()}/units/eks/addons/aws_load_balancer_controller/iam_role"
+  path   = "eks/addons/aws_load_balancer_controller/iam_role"
+
+  values = {
+    version = local.version
+    tags    = {}
   }
 }
 
@@ -567,26 +593,6 @@ unit "argocd_app_of_apps" {
 # --- Gateway API (deferred: kubernetes_manifest/kubectl_manifest-based, will move to
 # app-of-apps; guestbook's HTTPRoute won't resolve until then) ---
 
-# unit "gateway_api_crds" {
-#   source = "${get_repo_root()}/units/eks/addons/kubectl_manifest_from_url"
-#   path   = "eks/addons/gateway_api/crds"
-#
-#   values = {
-#     version = local.version
-#     url     = "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/standard-install.yaml"
-#   }
-# }
-#
-# unit "aws_lbc_gateway_api_crds" {
-#   source = "${get_repo_root()}/units/eks/addons/kubectl_manifest_from_url"
-#   path   = "eks/addons/aws_load_balancer_controller/gateway_api_crds"
-#
-#   values = {
-#     version = local.version
-#     url     = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v${local.version_aws_lbc}/config/crd/gateway/gateway-crds.yaml"
-#   }
-# }
-#
 # unit "gateway_api_namespace" {
 #   source = "${get_repo_root()}/units/eks/addons/gateway_api/namespace"
 #   path   = "eks/addons/gateway_api/namespace"
@@ -659,40 +665,9 @@ unit "argocd_app_of_apps" {
 #   }
 # }
 
-# --- AWS Load Balancer Controller + ExternalDNS (deferred: argocd's Ingress will exist but stay
-# unfulfilled without these; will move to app-of-apps once Gateway API supersedes ALB Ingress) ---
+# --- ExternalDNS (deferred: argocd's Ingress will exist but stay unfulfilled without these;
+# will move to app-of-apps once Gateway API supersedes ALB Ingress) ---
 
-# unit "iam_policy_aws_lbc" {
-#   source = "${get_repo_root()}/units/eks/addons/aws_load_balancer_controller/iam_policy_url"
-#   path   = "eks/addons/aws_load_balancer_controller/iam_policy_url"
-#
-#   values = {
-#     version = local.version
-#     url     = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v${local.version_aws_lbc}/docs/install/iam_policy.json"
-#   }
-# }
-#
-# unit "iam_role_aws_lbc" {
-#   source = "${get_repo_root()}/units/eks/addons/aws_load_balancer_controller/iam_role"
-#   path   = "eks/addons/aws_load_balancer_controller/iam_role"
-#
-#   values = {
-#     version = local.version
-#     tags    = {}
-#   }
-# }
-#
-# unit "aws_load_balancer_controller" {
-#   source = "${get_repo_root()}/units/eks/addons/aws_load_balancer_controller/helm"
-#   path   = "eks/addons/aws_load_balancer_controller/helm"
-#
-#   values = {
-#     version                     = local.version
-#     helm_chart_version          = local.version_aws_lbc
-#     enableServiceMutatorWebhook = false
-#   }
-# }
-#
 # unit "iam_role_external_dns_private" {
 #   source = "${get_repo_root()}/units/eks/addons/external_dns/private/iam_role"
 #   path   = "eks/addons/external_dns/private/iam_role"

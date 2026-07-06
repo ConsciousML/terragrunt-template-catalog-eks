@@ -23,10 +23,26 @@ dependency "argocd" {
 locals {
   domains_hcl             = find_in_parent_folders("domains.hcl")
   domain_public_guestbook = read_terragrunt_config(local.domains_hcl).locals.domain_public_guestbook
+
+  region_hcl = find_in_parent_folders("region.hcl")
+  region     = read_terragrunt_config(local.region_hcl).locals.region
 }
 
 dependency "route53_hosted_zone_public" {
   config_path  = "../../../route53/hosted_zone_public"
+  skip_outputs = true
+}
+
+dependency "vpc" {
+  config_path = "../../../../vpc"
+  mock_outputs = {
+    vpc_id = "mock-vpc-id"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
+dependency "iam_role_aws_lbc" {
+  config_path  = "../../aws_load_balancer_controller/iam_role"
   skip_outputs = true
 }
 
@@ -52,7 +68,7 @@ inputs = {
       }
     }
     appParams = {
-      "guestbook-helm" = {
+      "helm-guestbook" = {
         host = local.domain_public_guestbook
         # Hardcoded until the Gateway API units are migrated into app-of-apps (issue #153);
         # matches units/eks/addons/gateway_api/gateway/public's name/namespace.
@@ -62,6 +78,13 @@ inputs = {
         }
         annotations = {
           "external-dns.alpha.kubernetes.io/scope" = "public"
+        }
+      }
+      "helm-aws-lbc" = {
+        "aws-load-balancer-controller" = {
+          clusterName = dependency.eks_cluster.outputs.cluster_name
+          region      = local.region
+          vpcId       = dependency.vpc.outputs.vpc_id
         }
       }
     }
