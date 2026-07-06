@@ -207,6 +207,26 @@ unit "argocd" {
         params = {
           "server.insecure" = true
         }
+        cm = {
+          # Restores the Application CRD health check ArgoCD removed by default in v1.8+.
+          # Without this, sync-wave ordering between nested Applications (app-of-apps) is a
+          # no-op: a child Application with no health assessment reports healthy immediately
+          # on creation, so a later wave proceeds without waiting for it to actually converge.
+          "resource.customizations.health.argoproj.io_Application" = <<-LUA
+            hs = {}
+            hs.status = "Progressing"
+            hs.message = ""
+            if obj.status ~= nil then
+              if obj.status.health ~= nil then
+                hs.status = obj.status.health.status
+                if obj.status.health.message ~= nil then
+                  hs.message = obj.status.health.message
+                end
+              end
+            end
+            return hs
+          LUA
+        }
       }
       server = {
         ingress = {
@@ -236,11 +256,13 @@ unit "argocd_app_of_apps" {
   path   = "eks/addons/argocd/app_of_apps"
 
   values = {
-    version               = local.version
-    name                  = "app-of-apps"
-    namespace             = "argocd"
-    path                  = "apps"
-    target_revision       = "main"
+    version   = local.version
+    name      = "app-of-apps"
+    namespace = "argocd"
+    path      = "apps"
+    # TODO: revert to main
+    #target_revision       = "main"
+    target_revision       = "migrate-tg-k8s-to-app-of-apps"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
