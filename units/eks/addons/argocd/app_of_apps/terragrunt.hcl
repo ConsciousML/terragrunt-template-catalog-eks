@@ -23,6 +23,7 @@ dependency "argocd" {
 locals {
   domains_hcl             = find_in_parent_folders("domains.hcl")
   domain_public_guestbook = read_terragrunt_config(local.domains_hcl).locals.domain_public_guestbook
+  domain_private_argocd   = read_terragrunt_config(local.domains_hcl).locals.domain_private_argocd
 
   region_hcl = find_in_parent_folders("region.hcl")
   region     = read_terragrunt_config(local.region_hcl).locals.region
@@ -31,6 +32,14 @@ locals {
 dependency "route53_hosted_zone_public" {
   config_path  = "../../../route53/hosted_zone_public"
   skip_outputs = true
+}
+
+dependency "acm_certificate" {
+  config_path = "../../../route53/acm_certificate"
+  mock_outputs = {
+    certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 dependency "vpc" {
@@ -86,6 +95,10 @@ inputs = {
           region      = local.region
           vpcId       = dependency.vpc.outputs.vpc_id
         }
+      }
+      "helm-argocd-ingress" = {
+        host           = local.domain_private_argocd
+        certificateArn = dependency.acm_certificate.outputs.certificate_arn
       }
     }
   }

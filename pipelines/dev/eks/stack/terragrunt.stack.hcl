@@ -230,25 +230,6 @@ unit "argocd" {
           LUA
         }
       }
-      server = {
-        ingress = {
-          enabled          = true
-          controller       = "aws"
-          ingressClassName = "alb"
-          annotations = {
-            "alb.ingress.kubernetes.io/scheme"           = "internal"
-            "alb.ingress.kubernetes.io/target-type"      = "ip"
-            "alb.ingress.kubernetes.io/backend-protocol" = "HTTP"
-            "alb.ingress.kubernetes.io/listen-ports"     = "[{\"HTTP\":80}, {\"HTTPS\":443}]"
-            "alb.ingress.kubernetes.io/ssl-redirect"     = "443"
-            "external-dns.alpha.kubernetes.io/scope"     = "private"
-          }
-          aws = {
-            serviceType            = "ClusterIP"
-            backendProtocolVersion = "GRPC"
-          }
-        }
-      }
     }
   }
 }
