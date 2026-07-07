@@ -212,7 +212,7 @@ terragrunt run --all destroy --non-interactive --no-stack-generate
 
 See the [development guide](docs/development.md) for a detailed workflow with a step-by-step example on how to modify this template.
 
-To modify existing applications or deploy new ones, see the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template#readme).
+To modify existing applications or deploy new ones, see the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template#readme). For the catalog-side Terragrunt plumbing that threads AWS-sourced values (IAM roles, Secrets Manager secrets, ...) into those apps, see the [App of Apps integration guide](docs/app_of_apps_integration.md).
 
 ## Reproducibility
 Provider lock files (`.terraform.lock.hcl`) must be committed per unit for stacks to be reproducible.
