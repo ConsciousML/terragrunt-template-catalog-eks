@@ -30,8 +30,19 @@ locals {
 }
 
 dependency "route53_hosted_zone_public" {
-  config_path  = "../../../route53/hosted_zone_public"
-  skip_outputs = true
+  config_path = "../../../route53/hosted_zone_public"
+  mock_outputs = {
+    domain_name = "mock.example.com"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
+dependency "route53_hosted_zone_private" {
+  config_path = "../../../route53/hosted_zone_private"
+  mock_outputs = {
+    domain_name = "mock.example.com"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 dependency "acm_certificate" {
@@ -52,6 +63,16 @@ dependency "vpc" {
 
 dependency "iam_role_aws_lbc" {
   config_path  = "../../aws_load_balancer_controller/iam_role"
+  skip_outputs = true
+}
+
+dependency "iam_role_external_dns_private" {
+  config_path  = "../../external_dns/private/iam_role"
+  skip_outputs = true
+}
+
+dependency "iam_role_external_dns_public" {
+  config_path  = "../../external_dns/public/iam_role"
   skip_outputs = true
 }
 
@@ -99,6 +120,38 @@ inputs = {
       "helm-argocd-ingress" = {
         host           = local.domain_private_argocd
         certificateArn = dependency.acm_certificate.outputs.certificate_arn
+      }
+      "helm-external-dns-private" = {
+        "external-dns" = {
+          serviceAccount = { name = "external-dns-private" }
+          txtOwnerId     = dependency.eks_cluster.outputs.cluster_name
+          # The %%% is for escaping Terragrunt templates
+          txtPrefix        = "%%%{record_type}-external-dns-private-${dependency.eks_cluster.outputs.cluster_name}."
+          domainFilters    = [dependency.route53_hosted_zone_private.outputs.domain_name]
+          sources          = ["service", "ingress", "gateway-httproute"]
+          provider         = { name = "aws" }
+          registry         = "txt"
+          policy           = "sync"
+          logLevel         = "info"
+          annotationFilter = "external-dns.alpha.kubernetes.io/scope=private"
+          extraArgs        = { "aws-zone-type" = "private" }
+        }
+      }
+      "helm-external-dns-public" = {
+        "external-dns" = {
+          serviceAccount = { name = "external-dns-public" }
+          txtOwnerId     = dependency.eks_cluster.outputs.cluster_name
+          # The %%% is for escaping Terragrunt templates
+          txtPrefix        = "%%%{record_type}-external-dns-public-${dependency.eks_cluster.outputs.cluster_name}."
+          domainFilters    = [dependency.route53_hosted_zone_public.outputs.domain_name]
+          sources          = ["service", "ingress", "gateway-httproute"]
+          provider         = { name = "aws" }
+          registry         = "txt"
+          policy           = "sync"
+          logLevel         = "info"
+          annotationFilter = "external-dns.alpha.kubernetes.io/scope=public"
+          extraArgs        = { "aws-zone-type" = "public" }
+        }
       }
     }
   }

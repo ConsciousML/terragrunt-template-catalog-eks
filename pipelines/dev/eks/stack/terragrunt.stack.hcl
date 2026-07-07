@@ -279,6 +279,30 @@ unit "iam_role_aws_lbc" {
   }
 }
 
+# --- ExternalDNS ---
+# Only the AWS-side IAM/Pod Identity resources are Terraform-managed; the Helm releases
+# live in app-of-apps.
+
+unit "iam_role_external_dns_private" {
+  source = "${get_repo_root()}/units/eks/addons/external_dns/private/iam_role"
+  path   = "eks/addons/external_dns/private/iam_role"
+
+  values = {
+    version = local.version
+    tags    = {}
+  }
+}
+
+unit "iam_role_external_dns_public" {
+  source = "${get_repo_root()}/units/eks/addons/external_dns/public/iam_role"
+  path   = "eks/addons/external_dns/public/iam_role"
+
+  values = {
+    version = local.version
+    tags    = {}
+  }
+}
+
 # --- Karpenter (deferred: not required for ArgoCD bootstrap; NodePool/EC2NodeClass are
 # kubernetes_manifest-based and will move to app-of-apps) ---
 
