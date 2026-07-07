@@ -13,7 +13,6 @@ The controller itself is **not deployed by this unit**. It is deployed through a
 
 - **[iam_policy_url](iam_policy_url/)**: Fetches the official IAM policy JSON from the upstream GitHub release URL, ensuring the policy stays in sync with the Helm chart version. Its `body` output flows into `iam_role`
 - **[iam_role](iam_role/)**: Creates an IAM role and binds it to the `aws-load-balancer-controller` service account in `kube-system` via EKS Pod Identity
-- **[helm](helm/)**: Unused (issue #153) - kept here for reference until deleted as a separate cleanup
 
 ## Integration
 

@@ -9,7 +9,6 @@ Provisions shared internet-facing and internal ALBs via the [AWS Load Balancer C
 
 ## What's Inside
 
-- **[kubectl_manifest_from_url](../kubectl_manifest_from_url/)**: Installs the standard Gateway API CRDs and the AWS LBC gateway CRDs
 - **[namespace](namespace/)**: Creates the `gateway` Kubernetes namespace
 - **[gateway_class](gateway_class/)**: Registers `aws-alb` as the GatewayClass bound to `gateway.k8s.aws/alb`
 - **[target_group_configuration/public](target_group_configuration/public/)**: Sets `ip` as the default target type so backends are reached via pod IP, without requiring `NodePort` on backend services

@@ -6,7 +6,6 @@ locals {
   # the app-of-apps repo's aws-load-balancer-controller/Chart.yaml
   version_aws_lbc            = "3.2.1"
   version_argocd             = "9.5.0"
-  version_external_dns       = "1.20.0"
   version_eso                = "2.4.1"
   version_tailscale_operator = "1.96.5"
   version_karpenter_iam      = "21.24.0"
@@ -667,75 +666,6 @@ unit "iam_role_external_dns_public" {
 #
 #   values = {
 #     version = local.version
-#   }
-# }
-
-# --- ExternalDNS (deferred: argocd's Ingress will exist but stay unfulfilled without these;
-# will move to app-of-apps once Gateway API supersedes ALB Ingress) ---
-
-# unit "iam_role_external_dns_private" {
-#   source = "${get_repo_root()}/units/eks/addons/external_dns/private/iam_role"
-#   path   = "eks/addons/external_dns/private/iam_role"
-#
-#   values = {
-#     version = local.version
-#     tags    = {}
-#   }
-# }
-#
-# unit "external_dns_private" {
-#   source = "${get_repo_root()}/units/eks/addons/external_dns/private/helm"
-#   path   = "eks/addons/external_dns/private/helm"
-#
-#   values = {
-#     version            = local.version
-#     helm_chart_version = local.version_external_dns
-#     helm_values = {
-#       sources = ["service", "ingress", "gateway-httproute"]
-#       provider = {
-#         name = "aws"
-#       }
-#       registry         = "txt"
-#       policy           = "sync"
-#       logLevel         = "info"
-#       annotationFilter = "external-dns.alpha.kubernetes.io/scope=private"
-#       extraArgs = {
-#         "aws-zone-type" = "private"
-#       }
-#     }
-#   }
-# }
-#
-# unit "iam_role_external_dns_public" {
-#   source = "${get_repo_root()}/units/eks/addons/external_dns/public/iam_role"
-#   path   = "eks/addons/external_dns/public/iam_role"
-#
-#   values = {
-#     version = local.version
-#     tags    = {}
-#   }
-# }
-#
-# unit "external_dns_public" {
-#   source = "${get_repo_root()}/units/eks/addons/external_dns/public/helm"
-#   path   = "eks/addons/external_dns/public/helm"
-#
-#   values = {
-#     version            = local.version
-#     helm_chart_version = local.version_external_dns
-#     helm_values = {
-#       sources = ["service", "ingress", "gateway-httproute"]
-#       provider = {
-#         name = "aws"
-#       }
-#       registry         = "txt"
-#       policy           = "sync"
-#       logLevel         = "info"
-#       annotationFilter = "external-dns.alpha.kubernetes.io/scope=public"
-#       extraArgs = {
-#         "aws-zone-type" = "public"
-#       }
-#     }
 #   }
 # }
 

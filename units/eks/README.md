@@ -26,7 +26,7 @@ The following pipelines must run once before deploying this stack:
 - **[addons/prometheus_stack](addons/prometheus_stack/README.md)**: kube-prometheus-stack for cluster and workload metrics (Prometheus, Alertmanager, Grafana)
 - **[addons/aws_load_balancer_controller](addons/aws_load_balancer_controller/README.md)**: provisions ALBs from `Ingress` and `Gateway` resources
 - **[addons/gateway_api](addons/gateway_api/README.md)**: shared internet-facing and internal ALBs with TLS, routing owned by each app's `HTTPRoute`
-- **[addons/external_dns](addons/external_dns/README.md)**: two instances syncing DNS records to the private and public hosted zones
+- **[addons/external_dns](addons/external_dns/README.md)**: IAM/Pod Identity for two ExternalDNS instances syncing DNS records to the private and public hosted zones, deployed through app-of-apps
 - **[addons/external_secrets_operator](addons/external_secrets_operator/README.md)**: operator that syncs secrets from AWS Secrets Manager into Kubernetes `Secret` objects, used here to inject the ArgoCD admin password into the cluster
 - **[addons/argocd](addons/argocd/README.md)**: GitOps controller with admin password managed via ESO
 - **[addons/argocd/app_of_apps](addons/argocd/app_of_apps/)**: deploys the root ArgoCD `Application` that bootstraps all child apps from the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template)
