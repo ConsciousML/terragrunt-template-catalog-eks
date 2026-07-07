@@ -135,6 +135,8 @@ inputs = {
           logLevel         = "info"
           annotationFilter = "external-dns.alpha.kubernetes.io/scope=private"
           extraArgs        = { "aws-zone-type" = "private" }
+          # React to deletions immediately instead of on the next poll (issue #25)
+          triggerLoopOnEvent = true
         }
       }
       "helm-external-dns-public" = {
@@ -151,6 +153,8 @@ inputs = {
           logLevel         = "info"
           annotationFilter = "external-dns.alpha.kubernetes.io/scope=public"
           extraArgs        = { "aws-zone-type" = "public" }
+          # React to deletions immediately instead of on the next poll (issue #25)
+          triggerLoopOnEvent = true
         }
       }
     }
