@@ -10,8 +10,9 @@ Deploys the [External Secrets Operator](https://external-secrets.io/latest/) int
 ## What's Inside
 
 - **[iam_role](iam_role/)**: Creates an IAM role bound to the `external-secrets` service account via Pod Identity. Read access is scoped to secrets prefixed with `{environment}-` only
-- **[helm](helm/)**: Deploys the operator via Helm using the namespace from `iam_role`
+
+The operator itself is deployed through app-of-apps ([`helm-external-secrets-operator`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-external-secrets-operator)), not Terraform.
 
 ## Integration
 
-- **[`units/eks/addons/argocd`](../argocd/)**: `aws_password_secret`, `aws_secret_store`, and `aws_external_secret` all depend on ESO being deployed before creating their resources
+- **[`units/eks/addons/argocd`](../argocd/)**: `aws_password_secret` stores the admin password ESO later syncs in via its own app-of-apps-managed `SecretStore`/`ExternalSecret`
