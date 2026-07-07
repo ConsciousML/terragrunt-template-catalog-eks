@@ -6,7 +6,6 @@ locals {
   # the app-of-apps repo's aws-load-balancer-controller/Chart.yaml
   version_aws_lbc            = "3.2.1"
   version_argocd             = "9.5.0"
-  version_eso                = "2.4.1"
   version_tailscale_operator = "1.96.5"
   version_karpenter_iam      = "21.24.0"
   version_karpenter_helm     = "1.13.0"
@@ -194,6 +193,20 @@ unit "acm_certificate" {
   }
 }
 
+# --- External Secrets Operator ---
+# Only the IAM/Pod Identity resources are Terraform-managed; the Helm release lives in
+# app-of-apps.
+
+unit "iam_role_eso" {
+  source = "${get_repo_root()}/units/eks/addons/external_secrets_operator/iam_role"
+  path   = "eks/addons/external_secrets_operator/iam_role"
+
+  values = {
+    version = local.version
+    tags    = {}
+  }
+}
+
 # --- ArgoCD ---
 
 unit "argocd" {
@@ -230,6 +243,18 @@ unit "argocd" {
         }
       }
     }
+  }
+}
+
+unit "argocd_password" {
+  source = "${get_repo_root()}/units/eks/addons/argocd/aws_password_secret"
+  path   = "eks/addons/argocd/aws_password_secret"
+
+  values = {
+    version                 = local.version
+    length                  = 16
+    recovery_window_in_days = 0
+    tags                    = {}
   }
 }
 
@@ -533,64 +558,6 @@ unit "iam_role_external_dns_public" {
 #
 #   values = {
 #     version = local.version
-#   }
-# }
-
-# --- ArgoCD admin password via ESO (deferred: using ArgoCD's default auto-generated admin
-# password for now; SecretStore/ExternalSecret are kubernetes_manifest-based and will move
-# to app-of-apps) ---
-
-# unit "argocd_password" {
-#   source = "${get_repo_root()}/units/eks/addons/argocd/aws_password_secret"
-#   path   = "eks/addons/argocd/aws_password_secret"
-#
-#   values = {
-#     version                 = local.version
-#     length                  = 16
-#     recovery_window_in_days = 0
-#     tags                    = {}
-#   }
-# }
-#
-# unit "argocd_aws_secret_store" {
-#   source = "${get_repo_root()}/units/eks/addons/argocd/aws_secret_store"
-#   path   = "eks/addons/argocd/aws_secret_store"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-#
-# unit "argocd_aws_external_secret" {
-#   source = "${get_repo_root()}/units/eks/addons/argocd/aws_external_secret"
-#   path   = "eks/addons/argocd/aws_external_secret"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-
-# --- External Secrets Operator (deferred: nothing consumes it while the ArgoCD password
-# and prometheus_stack ESO units above are deferred) ---
-
-# unit "iam_role_eso" {
-#   source = "${get_repo_root()}/units/eks/addons/external_secrets_operator/iam_role"
-#   path   = "eks/addons/external_secrets_operator/iam_role"
-#
-#   values = {
-#     version = local.version
-#     tags    = {}
-#   }
-# }
-#
-# unit "external_secrets_operator" {
-#   source = "${get_repo_root()}/units/eks/addons/external_secrets_operator/helm"
-#   path   = "eks/addons/external_secrets_operator/helm"
-#
-#   values = {
-#     version            = local.version
-#     helm_chart_version = local.version_eso
-#     helm_values        = {}
 #   }
 # }
 

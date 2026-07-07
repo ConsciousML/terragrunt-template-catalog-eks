@@ -76,6 +76,19 @@ dependency "iam_role_external_dns_public" {
   skip_outputs = true
 }
 
+dependency "iam_role_eso" {
+  config_path  = "../../external_secrets_operator/iam_role"
+  skip_outputs = true
+}
+
+dependency "argocd_password" {
+  config_path = "../aws_password_secret"
+  mock_outputs = {
+    secret_name = "mock-argocd-password"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
 inputs = {
   cluster_name          = dependency.eks_cluster.outputs.cluster_name
   repo_url              = "https://github.com/${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_app_of_apps}"
@@ -156,6 +169,25 @@ inputs = {
           # React to deletions immediately instead of on the next poll (issue #25)
           triggerLoopOnEvent = true
         }
+      }
+      "argocd-secrets" = {
+        secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
+        awsRegion       = include.root.locals.aws_region
+        externalSecrets = [
+          {
+            name                 = "argocd-admin-password"
+            targetSecretName     = "argocd-secret"
+            targetCreationPolicy = "Merge"
+            refreshPolicy        = "CreatedOnce"
+            data = [
+              {
+                secretKey      = "admin.password"
+                remoteKey      = dependency.argocd_password.outputs.secret_name
+                remoteProperty = "bcrypt_hash"
+              }
+            ]
+          }
+        ]
       }
     }
   }
