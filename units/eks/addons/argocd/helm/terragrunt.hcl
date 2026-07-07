@@ -37,12 +37,15 @@ dependency "route53_hosted_zone_private" {
 }
 
 inputs = {
-  cluster_name       = dependency.eks_cluster.outputs.cluster_name
-  name               = "argocd"
-  repository         = "https://argoproj.github.io/argo-helm"
-  chart              = "argo-cd"
-  namespace          = "argocd"
-  create_namespace   = true
+  cluster_name     = dependency.eks_cluster.outputs.cluster_name
+  name             = "argocd"
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  namespace        = "argocd"
+  create_namespace = true
+  # Uninstall can take longer than the provider's 300s default while ArgoCD cascades
+  # deletes through its own Applications and their managed resources.
+  timeout            = 600
   helm_chart_version = values.helm_chart_version
   helm_values        = values.helm_values
   helm_set = [
