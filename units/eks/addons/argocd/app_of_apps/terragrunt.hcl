@@ -56,7 +56,8 @@ dependency "acm_certificate" {
 dependency "vpc" {
   config_path = "../../../../vpc"
   mock_outputs = {
-    vpc_id = "mock-vpc-id"
+    vpc_id         = "mock-vpc-id"
+    vpc_cidr_block = "10.0.0.0/16"
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
@@ -85,6 +86,14 @@ dependency "argocd_password" {
   config_path = "../aws_password_secret"
   mock_outputs = {
     secret_name = "mock-argocd-password"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
+dependency "tailscale_oauth_client_secret" {
+  config_path = "../../tailscale/oauth_client_secret"
+  mock_outputs = {
+    secret_name = "mock-tailscale-oauth"
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
@@ -188,6 +197,36 @@ inputs = {
             ]
           }
         ]
+      }
+      "tailscale-secrets" = {
+        secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
+        awsRegion       = include.root.locals.aws_region
+        externalSecrets = [
+          {
+            name                 = "tailscale-operator-oauth"
+            targetSecretName     = "operator-oauth"
+            targetCreationPolicy = "Merge"
+            refreshPolicy        = "CreatedOnce"
+            data = [
+              {
+                secretKey      = "client_id"
+                remoteKey      = dependency.tailscale_oauth_client_secret.outputs.secret_name
+                remoteProperty = "client_id"
+              },
+              {
+                secretKey      = "client_secret"
+                remoteKey      = dependency.tailscale_oauth_client_secret.outputs.secret_name
+                remoteProperty = "client_secret"
+              }
+            ]
+          }
+        ]
+      }
+      "helm-tailscale-connector" = {
+        name            = "${dependency.eks_cluster.outputs.cluster_name}-connector"
+        hostnamePrefix  = dependency.eks_cluster.outputs.cluster_name
+        replicas        = 1
+        advertiseRoutes = [dependency.vpc.outputs.vpc_cidr_block]
       }
     }
   }

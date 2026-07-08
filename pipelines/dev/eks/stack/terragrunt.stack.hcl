@@ -4,12 +4,11 @@ locals {
   version_cluster = "21.15.1"
   # Keep in sync with the aws-load-balancer-controller chart dependency version pinned in
   # the app-of-apps repo's aws-load-balancer-controller/Chart.yaml
-  version_aws_lbc            = "3.2.1"
-  version_argocd             = "9.5.0"
-  version_tailscale_operator = "1.96.5"
-  version_karpenter_iam      = "21.24.0"
-  version_karpenter_helm     = "1.13.0"
-  version_prometheus_stack   = "87.5.0"
+  version_aws_lbc          = "3.2.1"
+  version_argocd           = "9.5.0"
+  version_karpenter_iam    = "21.24.0"
+  version_karpenter_helm   = "1.13.0"
+  version_prometheus_stack = "87.5.0"
 
   environment       = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
   cluster_name_full = read_terragrunt_config(find_in_parent_folders("cluster_name_env.hcl")).locals.cluster_name_full
@@ -327,6 +326,40 @@ unit "iam_role_external_dns_public" {
   }
 }
 
+# --- Tailscale ---
+# Only the Tailscale-API Terraform resources (OAuth client, split DNS) are managed here;
+# the operator Helm release and Connector CRD live in app-of-apps. The ACL policy lives in
+# the pipelines/bootstrap/tailscale stack, not the EKS stack.
+
+unit "tailscale_oauth_client_tailscale_operator" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/oauth_client_tailscale_operator"
+  path   = "eks/addons/tailscale/oauth_client_tailscale_operator"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "tailscale_oauth_client_secret" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/oauth_client_secret"
+  path   = "eks/addons/tailscale/oauth_client_secret"
+
+  values = {
+    version                 = local.version
+    recovery_window_in_days = 0
+    tags                    = {}
+  }
+}
+
+unit "tailscale_split_dns" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/split_dns"
+  path   = "eks/addons/tailscale/split_dns"
+
+  values = {
+    version = local.version
+  }
+}
+
 # --- Karpenter (deferred: not required for ArgoCD bootstrap; NodePool/EC2NodeClass are
 # kubernetes_manifest-based and will move to app-of-apps) ---
 
@@ -630,45 +663,6 @@ unit "iam_role_external_dns_public" {
 # unit "gateway_api_gateway_private" {
 #   source = "${get_repo_root()}/units/eks/addons/gateway_api/gateway/private"
 #   path   = "eks/addons/gateway_api/gateway/private"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-
-# --- Tailscale (deferred: not required for ArgoCD bootstrap) ---
-
-# unit "tailscale_oauth_client_tailscale_operator" {
-#   source = "${get_repo_root()}/units/eks/addons/tailscale/oauth_client_tailscale_operator"
-#   path   = "eks/addons/tailscale/oauth_client_tailscale_operator"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-#
-# unit "tailscale_operator" {
-#   source = "${get_repo_root()}/units/eks/addons/tailscale/operator"
-#   path   = "eks/addons/tailscale/operator"
-#
-#   values = {
-#     version            = local.version
-#     helm_chart_version = local.version_tailscale_operator
-#   }
-# }
-#
-# unit "tailscale_connector" {
-#   source = "${get_repo_root()}/units/eks/addons/tailscale/connector"
-#   path   = "eks/addons/tailscale/connector"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-#
-# unit "tailscale_split_dns" {
-#   source = "${get_repo_root()}/units/eks/addons/tailscale/split_dns"
-#   path   = "eks/addons/tailscale/split_dns"
 #
 #   values = {
 #     version = local.version

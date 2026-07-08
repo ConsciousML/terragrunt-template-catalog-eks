@@ -65,19 +65,11 @@ In the [app of apps unit](../units/eks/addons/argocd/app_of_apps/terragrunt.hcl)
 
 If the app wraps an upstream Helm chart with a subchart alias (e.g. `helm-aws-lbc` depending on the `aws-load-balancer-controller` chart), nest the values one level under that subchart's name, same as the existing `helm-aws-lbc` and `helm-external-dns-*` entries.
 
-### 5. Reuse a generic chart instead of authoring a new one, when possible
+### 5. Reuse a generic chart or author a new one
 
-Some apps in the app-of-apps repo are generic and meant to back multiple `Application` entries (e.g. `helm-eso-secret-sync`). If the app you're adding is "another instance of a pattern that already exists" rather than something new, check whether an existing chart already covers it before writing a new one.
+Follow the [documentation to add an app](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/README.md#adding-an-app) in the App of Apps repository.
 
-To reuse a generic chart, give the `apps/values.yaml` entry a distinct `name` (this is both the `Application` name and the `appParams` key) and a `path` pointing at the shared chart directory:
-
-```yaml
-  - name: argocd-secrets
-    path: helm-eso-secret-sync
-    destination:
-      namespace: argocd
-    syncWave: 1
-```
+Ensure that the new app `name` you'll use in [`apps/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/apps/values.yaml) match the one from the previous step.
 
 ### 6. Deploy your new app
 1. Commit and push changes in both repositories
