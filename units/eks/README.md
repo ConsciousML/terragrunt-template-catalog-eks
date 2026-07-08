@@ -25,7 +25,6 @@ The following pipelines must run once before deploying this stack:
 - **[addons/ebs_csi_driver](addons/ebs_csi_driver/README.md)**: EKS managed addon providing `PersistentVolumeClaim` provisioning backed by EBS volumes
 - **[addons/prometheus_stack](addons/prometheus_stack/README.md)**: kube-prometheus-stack for cluster and workload metrics (Prometheus, Alertmanager, Grafana)
 - **[addons/aws_load_balancer_controller](addons/aws_load_balancer_controller/README.md)**: provisions ALBs from `Ingress` and `Gateway` resources
-- **[addons/gateway_api](addons/gateway_api/README.md)**: shared internet-facing and internal ALBs with TLS, routing owned by each app's `HTTPRoute`
 - **[addons/external_dns](addons/external_dns/README.md)**: IAM/Pod Identity for two ExternalDNS instances syncing DNS records to the private and public hosted zones, deployed through app-of-apps
 - **[addons/external_secrets_operator](addons/external_secrets_operator/README.md)**: IAM/Pod Identity for the operator that syncs secrets from AWS Secrets Manager into Kubernetes `Secret` objects, deployed through app-of-apps
 - **[addons/argocd](addons/argocd/README.md)**: GitOps controller with admin password managed via ESO

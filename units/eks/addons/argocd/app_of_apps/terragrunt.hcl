@@ -122,15 +122,12 @@ inputs = {
     appParams = {
       "helm-guestbook" = {
         host = local.domain_public_guestbook
-        # Hardcoded until the Gateway API units are migrated into app-of-apps (issue #153);
-        # matches units/eks/addons/gateway_api/gateway/public's name/namespace.
-        gateway = {
-          name      = "public-alb"
-          namespace = "gateway"
-        }
         annotations = {
           "external-dns.alpha.kubernetes.io/scope" = "public"
         }
+      }
+      "helm-gateway-api" = {
+        certificateArn = dependency.acm_certificate.outputs.certificate_arn
       }
       "helm-aws-lbc" = {
         "aws-load-balancer-controller" = {
