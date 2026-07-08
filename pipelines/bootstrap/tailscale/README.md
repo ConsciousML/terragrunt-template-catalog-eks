@@ -18,7 +18,7 @@ This bootstrap creates:
 | Tailscale WIF | Workload Identity Federation credential for GitHub Actions to authenticate to Tailscale without long-lived secrets |
 | GitHub Secrets | Stores the WIF client ID and audience as GitHub secrets for CI workflows |
 
-The Kubernetes operator, subnet router, and split DNS are deployed per-cluster as part of the [EKS stack](../../examples/stacks/eks/).
+Split DNS is deployed per-cluster as part of the [EKS stack](../../dev/eks/stack/). The Kubernetes operator and subnet router (`Connector`) are deployed through [app-of-apps](../../../docs/app-of-apps-integration.md) instead, once the EKS stack's `oauth_client_secret` unit has synced the OAuth credentials into Secrets Manager.
 
 ## Quick Start
 
