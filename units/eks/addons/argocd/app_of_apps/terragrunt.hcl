@@ -203,10 +203,12 @@ inputs = {
         awsRegion       = include.root.locals.aws_region
         externalSecrets = [
           {
-            name                 = "tailscale-operator-oauth"
-            targetSecretName     = "operator-oauth"
-            targetCreationPolicy = "Merge"
-            refreshPolicy        = "CreatedOnce"
+            name             = "tailscale-operator-oauth"
+            targetSecretName = "operator-oauth"
+            # ESO is the sole owner of this secret (unlike argocd-secret), and the source
+            # OAuth client can be rotated, so create it and keep polling.
+            targetCreationPolicy = "Owner"
+            refreshPolicy        = "Periodic"
             data = [
               {
                 secretKey      = "client_id"
