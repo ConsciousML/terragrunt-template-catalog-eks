@@ -6,6 +6,7 @@ locals {
   # the app-of-apps repo's aws-load-balancer-controller/Chart.yaml
   version_aws_lbc          = "3.2.1"
   version_argocd           = "9.5.0"
+  version_argocd_apps      = "2.0.5"
   version_karpenter_iam    = "21.24.0"
   version_prometheus_stack = "87.5.0"
 
@@ -272,6 +273,7 @@ unit "argocd_app_of_apps" {
     finalizers            = ["resources-finalizer.argocd.argoproj.io"]
     sync_options          = ["CreateNamespace=true"]
     prune                 = true
+    helm_chart_version    = local.version_argocd_apps
   }
 }
 

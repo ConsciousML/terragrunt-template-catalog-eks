@@ -7,8 +7,8 @@ include "provider_k8s_base" {
   path = find_in_parent_folders("provider_k8s_base.hcl")
 }
 
-include "provider_kubectl" {
-  path = find_in_parent_folders("provider_kubectl.hcl")
+include "provider_helm" {
+  path = find_in_parent_folders("provider_helm.hcl")
 }
 
 terraform {
@@ -120,6 +120,7 @@ inputs = {
   finalizers            = values.finalizers
   sync_options          = values.sync_options
   prune                 = values.prune
+  helm_chart_version    = values.helm_chart_version
   helm_values = {
     config = {
       spec = {
