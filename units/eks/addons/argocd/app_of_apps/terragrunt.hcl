@@ -98,6 +98,15 @@ dependency "tailscale_oauth_client_secret" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
+dependency "karpenter_iam" {
+  config_path = "../../karpenter/iam"
+  mock_outputs = {
+    queue_name         = "mock-queue"
+    node_iam_role_name = "mock-node-role"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
 inputs = {
   cluster_name          = dependency.eks_cluster.outputs.cluster_name
   repo_url              = "https://github.com/${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_app_of_apps}"
@@ -226,6 +235,18 @@ inputs = {
         hostnamePrefix  = dependency.eks_cluster.outputs.cluster_name
         replicas        = 1
         advertiseRoutes = [dependency.vpc.outputs.vpc_cidr_block]
+      }
+      "helm-karpenter" = {
+        karpenter = {
+          settings = {
+            clusterName       = dependency.eks_cluster.outputs.cluster_name
+            interruptionQueue = dependency.karpenter_iam.outputs.queue_name
+          }
+        }
+      }
+      "helm-karpenter-config" = {
+        nodeRole    = dependency.karpenter_iam.outputs.node_iam_role_name
+        clusterName = dependency.eks_cluster.outputs.cluster_name
       }
     }
   }

@@ -7,7 +7,6 @@ locals {
   version_aws_lbc          = "3.2.1"
   version_argocd           = "9.5.0"
   version_karpenter_iam    = "21.24.0"
-  version_karpenter_helm   = "1.13.0"
   version_prometheus_stack = "87.5.0"
 
   environment       = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
@@ -358,90 +357,21 @@ unit "tailscale_split_dns" {
   }
 }
 
-# --- Karpenter (deferred: not required for ArgoCD bootstrap; NodePool/EC2NodeClass are
-# kubernetes_manifest-based and will move to app-of-apps) ---
+# --- Karpenter ---
+# Only the AWS-side IAM/Pod Identity resources are Terraform-managed; the controller and its
+# node configuration (EC2NodeClass, NodePool) live in app-of-apps.
 
-# unit "karpenter_iam" {
-#   source = "${get_repo_root()}/units/eks/addons/karpenter/iam"
-#   path   = "eks/addons/karpenter/iam"
-#
-#   values = {
-#     version = local.version_karpenter_iam
-#     # Set to true when using `SPOT` instances
-#     enable_spot_termination = true
-#     tags                    = {}
-#   }
-# }
-#
-# unit "karpenter" {
-#   source = "${get_repo_root()}/units/eks/addons/karpenter/helm"
-#   path   = "eks/addons/karpenter/helm"
-#
-#   values = {
-#     version            = local.version
-#     helm_chart_version = local.version_karpenter_helm
-#     helm_values = {
-#       settings = {
-#         enableZonalShift = false
-#       }
-#       controller = {
-#         resources = {
-#           requests = {
-#             cpu    = "1"
-#             memory = "1Gi"
-#           }
-#           limits = {
-#             cpu    = "1"
-#             memory = "1Gi"
-#           }
-#         }
-#       }
-#     }
-#   }
-# }
-#
-# unit "karpenter_ec2_node_class" {
-#   source = "${get_repo_root()}/units/eks/addons/karpenter/ec2_node_class"
-#   path   = "eks/addons/karpenter/ec2_node_class"
-#
-#   values = {
-#     version            = local.version
-#     name               = "default"
-#     ami_selector_terms = [{ alias = "al2023@v20260618" }]
-#   }
-# }
-#
-# unit "karpenter_node_pool" {
-#   source = "${get_repo_root()}/units/eks/addons/karpenter/node_pool"
-#   path   = "eks/addons/karpenter/node_pool"
-#
-#   values = {
-#     version = local.version
-#     spec = {
-#       template = {
-#         spec = {
-#           requirements = [
-#             { key = "kubernetes.io/arch", operator = "In", values = ["amd64"] },
-#             { key = "kubernetes.io/os", operator = "In", values = ["linux"] },
-#             { key = "karpenter.sh/capacity-type", operator = "In", values = ["spot"] },
-#             { key = "karpenter.k8s.aws/instance-category", operator = "In", values = ["c", "m", "r"] },
-#             { key = "karpenter.k8s.aws/instance-generation", operator = "Gt", values = ["2"] },
-#           ]
-#           expireAfter = "720h"
-#         }
-#       }
-#       # Safety net to prevent runaway scaling costs. Increase this value if your
-#       # workloads require more compute capacity.
-#       limits = {
-#         cpu = 10
-#       }
-#       disruption = {
-#         consolidationPolicy = "WhenEmptyOrUnderutilized"
-#         consolidateAfter    = "1m"
-#       }
-#     }
-#   }
-# }
+unit "karpenter_iam" {
+  source = "${get_repo_root()}/units/eks/addons/karpenter/iam"
+  path   = "eks/addons/karpenter/iam"
+
+  values = {
+    version = local.version_karpenter_iam
+    # Set to true when using `SPOT` instances
+    enable_spot_termination = true
+    tags                    = {}
+  }
+}
 
 # --- EBS CSI storage class (deferred: kubernetes_manifest-based, will move to app-of-apps) ---
 
