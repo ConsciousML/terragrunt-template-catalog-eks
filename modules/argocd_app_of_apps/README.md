@@ -8,19 +8,19 @@ Creates an ArgoCD [`Application`](https://argo-cd.readthedocs.io/en/stable/opera
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.1 |
-| <a name="requirement_kubectl"></a> [kubectl](#requirement\_kubectl) | ~> 2.4 |
+| <a name="requirement_helm"></a> [helm](#requirement\_helm) | 3.1.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | ~> 2.4 |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | 3.1.1 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [kubectl_manifest.this](https://registry.terraform.io/providers/alekc/kubectl/latest/docs/resources/manifest) | resource |
+| [helm_release.this](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) | resource |
 
 ## Inputs
 
@@ -30,6 +30,7 @@ Creates an ArgoCD [`Application`](https://argo-cd.readthedocs.io/en/stable/opera
 | <a name="input_destination_namespace"></a> [destination\_namespace](#input\_destination\_namespace) | Kubernetes namespace ArgoCD will deploy child applications into | `string` | `"argocd"` | no |
 | <a name="input_destination_server"></a> [destination\_server](#input\_destination\_server) | Kubernetes API server URL of the destination cluster | `string` | `"https://kubernetes.default.svc"` | no |
 | <a name="input_finalizers"></a> [finalizers](#input\_finalizers) | List of finalizers applied to the Application resource | `list(string)` | <pre>[<br/>  "resources-finalizer.argocd.argoproj.io"<br/>]</pre> | no |
+| <a name="input_helm_chart_version"></a> [helm\_chart\_version](#input\_helm\_chart\_version) | Version of the argo-helm/argocd-apps chart to install | `string` | n/a | yes |
 | <a name="input_helm_values"></a> [helm\_values](#input\_helm\_values) | Helm values injected into spec.source.helm.values on the app-of-apps Application | `any` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the ArgoCD Application resource | `string` | `"app-of-apps"` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where the ArgoCD Application resource is created | `string` | `"argocd"` | no |
