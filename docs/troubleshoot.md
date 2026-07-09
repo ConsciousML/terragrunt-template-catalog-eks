@@ -215,3 +215,30 @@ Or flush the DNS cache:
 ```bash
 sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder
 ```
+
+## Accessing ArgoCD When It Doesn't Resolve on the Private Hosted Zone
+
+If `argocd-server`'s hostname isn't resolving yet (ExternalDNS hasn't written the record, Tailscale isn't set up, or you just need quick access), port-forward straight to the service instead:
+
+```bash
+kubectl port-forward svc/argocd-server -n argocd 8080:80
+```
+
+Then open `http://localhost:8080`. `server.insecure` is set to `true` on the ArgoCD Helm release (see `units/eks/addons/argocd/helm`), so plain HTTP works and there's no TLS certificate mismatch.
+
+## Getting the ArgoCD Admin Password When the ESO Sync Isn't Working
+
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d; echo
+```
+
+## Force-Deleting a Stuck ArgoCD Application
+
+If an `Application` hangs on delete (`deletionTimestamp` set but never removed), its `resources-finalizer.argocd.argoproj.io` finalizer is stuck. Clear it directly:
+
+```bash
+kubectl patch application <name> -n argocd --type=merge -p '{"metadata":{"finalizers":null}}'
+```
+
+This skips ArgoCD's own cascade-prune, so check for orphaned resources it was still managing afterward.
+```

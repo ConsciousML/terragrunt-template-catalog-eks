@@ -27,7 +27,8 @@
         - **Private Route53 hosted zone** (`units/eks/route53/hosted_zone_private`): created and associated with the VPC; internal resolution only
         - **ACM certificate** (`units/eks/route53/acm_certificate`): wildcard certificate for `*.{environment}.{base_domain}`, validated via DNS against the public hosted zone; shared by all apps in the environment
         - **EBS CSI driver** (`units/eks/addons/ebs_csi_driver/addon`): EKS managed addon enabling `PersistentVolumeClaim` provisioning backed by EBS volumes; depends on the cluster and its supporting unit, IAM role (`iam_role`, Pod Identity association for `ebs-csi-controller-sa`)
-        - **AWS Load Balancer Controller** (`units/eks/addons/aws_load_balancer_controller/helm`): runs in-cluster and provisions ALBs; supporting units: IAM policy (`iam_policy_url`), IAM role (`iam_role`)
+        - **AWS Load Balancer Controller**: provisions ALBs; deployed through app-of-apps (`helm-aws-lbc`). `units/eks/addons/aws_load_balancer_controller/` only provisions IAM (`iam_policy_url`, `iam_role`)
+        - **Gateway API CRDs**: delivered via ArgoCD Applications (`crds-gateway-api`, `crds-aws-lbc-gateway-api`), not Terraform
         - **ExternalDNS private** (`units/eks/addons/external_dns/private/helm`): watches `service`, `ingress`, and `gateway-httproute` resources annotated `scope=private`; writes records to the private hosted zone; supporting unit: IAM role (`private/iam_role`)
         - **ExternalDNS public** (`units/eks/addons/external_dns/public/helm`): watches `service`, `ingress`, and `gateway-httproute` resources annotated `scope=public`; writes records to the public hosted zone; supporting unit: IAM role (`public/iam_role`)
         - **External Secrets Operator** (`units/eks/addons/external_secrets_operator/helm`): syncs AWS Secrets Manager secrets into Kubernetes; supporting unit: IAM role (`units/eks/addons/external_secrets_operator/iam_role`)

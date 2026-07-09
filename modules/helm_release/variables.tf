@@ -62,3 +62,9 @@ variable "helm_set_sensitive" {
   }))
   default = []
 }
+
+variable "timeout" {
+  description = "Time in seconds to wait for any individual Kubernetes operation during install/upgrade/uninstall"
+  type        = number
+  default     = 300
+}

@@ -37,6 +37,7 @@ Generic module for installing a Helm chart on an EKS cluster.
 | <a name="input_name"></a> [name](#input\_name) | Name of the Helm release | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Kubernetes namespace to install the chart into | `string` | n/a | yes |
 | <a name="input_repository"></a> [repository](#input\_repository) | URL of the Helm chart repository | `string` | n/a | yes |
+| <a name="input_timeout"></a> [timeout](#input\_timeout) | Time in seconds to wait for any individual Kubernetes operation during install/upgrade/uninstall | `number` | `300` | no |
 
 ## Outputs
 
