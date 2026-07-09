@@ -275,6 +275,14 @@ unit "argocd_app_of_apps" {
     sync_options          = ["CreateNamespace=true"]
     prune                 = true
     helm_chart_version    = local.version_argocd_apps
+    retry = {
+      limit = 7
+      backoff = {
+        duration     = "5s"
+        factor       = 2
+        max_duration = "2m"
+      }
+    }
   }
 }
 

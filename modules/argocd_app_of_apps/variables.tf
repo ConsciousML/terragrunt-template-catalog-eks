@@ -79,3 +79,23 @@ variable "helm_chart_version" {
   description = "Version of the argo-helm/argocd-apps chart to install"
   type        = string
 }
+
+variable "retry" {
+  description = "Retry policy for the app-of-apps Application's sync operation. Defaults raised above ArgoCD's own defaults (limit 5, maxDuration 3m) so slow-starting sync waves (e.g. a component's first rollout) have enough runway to go Healthy before the sync gives up."
+  type = object({
+    limit = number
+    backoff = object({
+      duration     = string
+      factor       = number
+      max_duration = string
+    })
+  })
+  default = {
+    limit = 7
+    backoff = {
+      duration     = "5s"
+      factor       = 2
+      max_duration = "2m"
+    }
+  }
+}

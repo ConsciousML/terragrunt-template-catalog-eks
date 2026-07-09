@@ -121,6 +121,7 @@ inputs = {
   sync_options          = values.sync_options
   prune                 = values.prune
   helm_chart_version    = values.helm_chart_version
+  retry                 = values.retry
   helm_values = {
     config = {
       spec = {
