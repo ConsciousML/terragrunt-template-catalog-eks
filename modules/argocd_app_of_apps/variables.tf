@@ -74,3 +74,8 @@ variable "helm_values" {
   type        = any
   default     = {}
 }
+
+variable "helm_chart_version" {
+  description = "Version of the argo-helm/argocd-apps chart to install"
+  type        = string
+}

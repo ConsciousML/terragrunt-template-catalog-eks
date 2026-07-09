@@ -1,8 +1,8 @@
 terraform {
   required_providers {
-    kubectl = {
-      source  = "alekc/kubectl"
-      version = "~> 2.4"
+    helm = {
+      source  = "hashicorp/helm"
+      version = "3.1.1"
     }
   }
 
