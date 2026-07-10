@@ -29,7 +29,7 @@ In `units/eks/addons/argocd/app_of_apps/terragrunt.hcl`, add a `dependency` bloc
 
 ```hcl
 dependency "argocd_password" {
-  config_path = "../aws_password_secret"
+  config_path = "../aws_secret_password"
   mock_outputs = {
     secret_name = "mock-argocd-password"
   }
@@ -45,23 +45,11 @@ In the [app of apps unit](../units/eks/addons/argocd/app_of_apps/terragrunt.hcl)
 "argocd-secrets" = {
   secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
   awsRegion       = include.root.locals.aws_region
-  externalSecrets = [
-    {
-      name                 = "argocd-admin-password"
-      targetSecretName     = "argocd-secret"
-      targetCreationPolicy = "Merge"
-      refreshPolicy        = "CreatedOnce"
-      data = [
-        {
-          secretKey      = "admin.password"
-          remoteKey      = dependency.argocd_password.outputs.secret_name
-          remoteProperty = "bcrypt_hash"
-        }
-      ]
-    }
-  ]
+  remoteKey       = dependency.argocd_password.outputs.secret_name
 }
 ```
+
+Only inject values that trace back to a `dependency` block or a genuine Terraform-owned fact (region, cluster name, ARNs, hostnames, secret names). Anything static or chart-known (`targetSecretName`, `targetCreationPolicy`, `data`, annotations, ports, and so on) belongs as a default in the app-of-apps repo instead, typically via a dedicated `extraValueFiles` entry (see `helm-eso-secret-sync/argocd-secrets-values.yaml` in that repo for this exact app). The one exception is when composing a value requires string interpolation shared across multiple appParams entries (Helm/YAML values files can't do that, only HCL locals can) — see `local.kube_prometheus_stack_release` in the same `terragrunt.hcl` for an example.
 
 If the app wraps an upstream Helm chart with a subchart alias (e.g. `helm-aws-lbc` depending on the `aws-load-balancer-controller` chart), nest the values one level under that subchart's name, same as the existing `helm-aws-lbc` and `helm-external-dns-*` entries.
 

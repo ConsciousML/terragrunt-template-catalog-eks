@@ -19,9 +19,9 @@ The Helm release, its HTTPRoutes, and its SecretStore/ExternalSecret are **not d
 
 ## What's Inside
 
-- **[grafana/aws_password_secret](grafana/aws_password_secret/)**: Generates a random Grafana admin password and stores it in AWS Secrets Manager. Its `secret_name` output flows into app-of-apps as a Helm value on `grafana-secrets`, which syncs the plaintext password into a `grafana-admin-credentials` Kubernetes secret that `helm-kube-prometheus-stack` points Grafana's `admin.existingSecret`/`passwordKey` at — the chart never generates its own admin secret
+- **[grafana/aws_secret_password](grafana/aws_secret_password/)**: Generates a random Grafana admin password and stores it in AWS Secrets Manager. Its `secret_name` output flows into app-of-apps as a Helm value on `grafana-secrets`, which syncs the plaintext password into a `grafana-admin-credentials` Kubernetes secret that `helm-kube-prometheus-stack` points Grafana's `admin.existingSecret`/`passwordKey` at — the chart never generates its own admin secret
 
 ## Integration
 
 - **[`units/eks/addons/ebs_csi_driver`](../ebs_csi_driver/)**: `helm-kube-prometheus-stack` needs the EBS CSI driver addon deployed first for its Prometheus/Alertmanager persistent storage; `units/eks/addons/argocd/app_of_apps` takes an ordering dependency on `ebs_csi_driver/addon` for this
-- **[`units/eks/addons/argocd/app_of_apps`](../argocd/app_of_apps/)**: deploys the Helm release, HTTPRoutes, and SecretStore/ExternalSecret through app-of-apps. Takes an ordering dependency on `grafana/aws_password_secret` and passes its `secret_name` output through as a Helm value on `grafana-secrets`
+- **[`units/eks/addons/argocd/app_of_apps`](../argocd/app_of_apps/)**: deploys the Helm release, HTTPRoutes, and SecretStore/ExternalSecret through app-of-apps. Takes an ordering dependency on `grafana/aws_secret_password` and passes its `secret_name` output through as a Helm value on `grafana-secrets`

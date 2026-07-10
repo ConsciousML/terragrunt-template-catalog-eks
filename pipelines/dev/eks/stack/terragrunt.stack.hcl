@@ -119,9 +119,9 @@ unit "cluster" {
 
         # Use at least `min_size = 2` or upgrade the `instance_types`
         # Otherwise some important system components will be stuck in `PENDING` (too many nodes)
-        min_size     = 2
+        min_size     = 3
         max_size     = 10
-        desired_size = 2
+        desired_size = 3
       }
     }
 
@@ -245,8 +245,8 @@ unit "argocd" {
 }
 
 unit "argocd_password" {
-  source = "${get_repo_root()}/units/eks/addons/argocd/aws_password_secret"
-  path   = "eks/addons/argocd/aws_password_secret"
+  source = "${get_repo_root()}/units/eks/addons/argocd/aws_secret_password"
+  path   = "eks/addons/argocd/aws_secret_password"
 
   values = {
     version                 = local.version
@@ -398,8 +398,8 @@ unit "karpenter_iam" {
 # HTTPRoutes, and SecretStore/ExternalSecret live in app-of-apps.
 
 unit "grafana_password" {
-  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/grafana/aws_password_secret"
-  path   = "eks/addons/prometheus_stack/grafana/aws_password_secret"
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/grafana/aws_secret_password"
+  path   = "eks/addons/prometheus_stack/grafana/aws_secret_password"
 
   values = {
     version                 = local.version

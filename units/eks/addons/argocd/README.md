@@ -12,7 +12,7 @@ Deploys ArgoCD into the cluster and wires up its admin password via AWS Secrets 
 
 ## What's Inside
 
-- **[aws_password_secret](aws_password_secret/)**: Generates a random admin password and stores it in AWS Secrets Manager. Its `secret_name` output flows into `app_of_apps`
+- **[aws_secret_password](aws_secret_password/)**: Generates a random admin password and stores it in AWS Secrets Manager. Its `secret_name` output flows into `app_of_apps`
 - **[helm](helm/)**: Deploys ArgoCD via Helm. Sets `global.domain` from `domains.hcl` and attaches the ACM certificate ARN to the ALB ingress annotation for TLS termination on HTTPS
 - **[app_of_apps](app_of_apps/)**: Deploys the root ArgoCD `Application` CR pointing to the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template). Passes the ACM certificate ARN, guestbook hostname, and the admin password secret name as Helm values
 

@@ -36,7 +36,7 @@ aws secretsmanager get-secret-value \
   --query SecretString \
   --output text | jq -r .plaintext
 ```
-See [`prometheus_stack/grafana`](../units/eks/addons/prometheus_stack/README.md#whats-inside) for how the password is generated (`aws_password_secret`) and synced into the cluster (`aws_external_secret`).
+See [`prometheus_stack/grafana`](../units/eks/addons/prometheus_stack/README.md#whats-inside) for how the password is generated (`aws_secret_password`) and synced into the cluster (`aws_external_secret`).
 
 ## Which Tool to Reach For
 

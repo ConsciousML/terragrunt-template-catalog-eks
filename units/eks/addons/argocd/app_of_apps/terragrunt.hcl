@@ -31,10 +31,11 @@ locals {
   region_hcl = find_in_parent_folders("region.hcl")
   region     = read_terragrunt_config(local.region_hcl).locals.region
 
-  # Single source of truth for the Grafana admin secret's target K8s secret name/key,
-  # shared by the grafana-secrets and helm-kube-prometheus-stack appParams entries below.
-  grafana_admin_secret_name = "grafana-admin-credentials"
-  grafana_admin_secret_key  = "admin-password"
+  # Shared by helm-kube-prometheus-stack's fullnameOverride and the 3 helm-httproute
+  # backendRef names below. Only HCL can compose "<release>-grafana", so it lives here.
+  # Must also match tool.helm.releaseName for helm-kube-prometheus-stack in apps/values.yaml
+  # (argocd-app-of-apps-template repo), which appParams has no path to set.
+  kube_prometheus_stack_release = "kube-prometheus-stack"
 }
 
 dependency "route53_hosted_zone_public" {
@@ -91,7 +92,7 @@ dependency "iam_role_eso" {
 }
 
 dependency "argocd_password" {
-  config_path = "../aws_password_secret"
+  config_path = "../aws_secret_password"
   mock_outputs = {
     secret_name = "mock-argocd-password"
   }
@@ -116,7 +117,7 @@ dependency "karpenter_iam" {
 }
 
 dependency "grafana_password" {
-  config_path = "../../prometheus_stack/grafana/aws_password_secret"
+  config_path = "../../prometheus_stack/grafana/aws_secret_password"
   mock_outputs = {
     secret_name = "mock-grafana-password"
   }
@@ -152,11 +153,8 @@ inputs = {
       }
     }
     appParams = {
-      "helm-guestbook" = {
+      "guestbook-httproute" = {
         host = local.domain_public_guestbook
-        annotations = {
-          "external-dns.alpha.kubernetes.io/scope" = "public"
-        }
       }
       "gateway-public" = {
         certificateArn = dependency.acm_certificate.outputs.certificate_arn
@@ -177,89 +175,33 @@ inputs = {
       }
       "helm-external-dns-private" = {
         "external-dns" = {
-          serviceAccount = { name = "external-dns-private" }
-          txtOwnerId     = dependency.eks_cluster.outputs.cluster_name
+          txtOwnerId = dependency.eks_cluster.outputs.cluster_name
           # The %%% is for escaping Terragrunt templates
-          txtPrefix        = "%%%{record_type}-external-dns-private-${dependency.eks_cluster.outputs.cluster_name}."
-          domainFilters    = [dependency.route53_hosted_zone_private.outputs.domain_name]
-          sources          = ["service", "ingress", "gateway-httproute"]
-          provider         = { name = "aws" }
-          registry         = "txt"
-          policy           = "sync"
-          logLevel         = "info"
-          annotationFilter = "external-dns.alpha.kubernetes.io/scope=private"
-          extraArgs        = { "aws-zone-type" = "private" }
-          # React to deletions immediately instead of on the next poll (issue #25)
-          triggerLoopOnEvent = true
+          txtPrefix     = "%%%{record_type}-external-dns-private-${dependency.eks_cluster.outputs.cluster_name}."
+          domainFilters = [dependency.route53_hosted_zone_private.outputs.domain_name]
         }
       }
       "helm-external-dns-public" = {
         "external-dns" = {
-          serviceAccount = { name = "external-dns-public" }
-          txtOwnerId     = dependency.eks_cluster.outputs.cluster_name
+          txtOwnerId = dependency.eks_cluster.outputs.cluster_name
           # The %%% is for escaping Terragrunt templates
-          txtPrefix        = "%%%{record_type}-external-dns-public-${dependency.eks_cluster.outputs.cluster_name}."
-          domainFilters    = [dependency.route53_hosted_zone_public.outputs.domain_name]
-          sources          = ["service", "ingress", "gateway-httproute"]
-          provider         = { name = "aws" }
-          registry         = "txt"
-          policy           = "sync"
-          logLevel         = "info"
-          annotationFilter = "external-dns.alpha.kubernetes.io/scope=public"
-          extraArgs        = { "aws-zone-type" = "public" }
-          # React to deletions immediately instead of on the next poll (issue #25)
-          triggerLoopOnEvent = true
+          txtPrefix     = "%%%{record_type}-external-dns-public-${dependency.eks_cluster.outputs.cluster_name}."
+          domainFilters = [dependency.route53_hosted_zone_public.outputs.domain_name]
         }
       }
       "argocd-secrets" = {
         secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
         awsRegion       = include.root.locals.aws_region
-        externalSecrets = [
-          {
-            name                 = "argocd-admin-password"
-            targetSecretName     = "argocd-secret"
-            targetCreationPolicy = "Merge"
-            refreshPolicy        = "CreatedOnce"
-            data = [
-              {
-                secretKey      = "admin.password"
-                remoteKey      = dependency.argocd_password.outputs.secret_name
-                remoteProperty = "bcrypt_hash"
-              }
-            ]
-          }
-        ]
+        remoteKey       = dependency.argocd_password.outputs.secret_name
       }
       "tailscale-secrets" = {
         secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
         awsRegion       = include.root.locals.aws_region
-        externalSecrets = [
-          {
-            name             = "tailscale-operator-oauth"
-            targetSecretName = "operator-oauth"
-            # ESO is the sole owner of this secret (unlike argocd-secret), and the source
-            # OAuth client can be rotated, so create it and keep polling.
-            targetCreationPolicy = "Owner"
-            refreshPolicy        = "Periodic"
-            data = [
-              {
-                secretKey      = "client_id"
-                remoteKey      = dependency.tailscale_oauth_client_secret.outputs.secret_name
-                remoteProperty = "client_id"
-              },
-              {
-                secretKey      = "client_secret"
-                remoteKey      = dependency.tailscale_oauth_client_secret.outputs.secret_name
-                remoteProperty = "client_secret"
-              }
-            ]
-          }
-        ]
+        remoteKey       = dependency.tailscale_oauth_client_secret.outputs.secret_name
       }
       "helm-tailscale-connector" = {
         name            = "${dependency.eks_cluster.outputs.cluster_name}-connector"
         hostnamePrefix  = dependency.eks_cluster.outputs.cluster_name
-        replicas        = 1
         advertiseRoutes = [dependency.vpc.outputs.vpc_cidr_block]
       }
       "helm-karpenter" = {
@@ -277,63 +219,32 @@ inputs = {
       "grafana-secrets" = {
         secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
         awsRegion       = include.root.locals.aws_region
-        externalSecrets = [
-          {
-            name                 = "grafana-admin-password"
-            targetSecretName     = local.grafana_admin_secret_name
-            targetCreationPolicy = "Owner"
-            refreshPolicy        = "CreatedOnce"
-            data = [
-              {
-                secretKey      = local.grafana_admin_secret_key
-                remoteKey      = dependency.grafana_password.outputs.secret_name
-                remoteProperty = "plaintext"
-              }
-            ]
-          }
-        ]
+        remoteKey       = dependency.grafana_password.outputs.secret_name
       }
+      # See local.kube_prometheus_stack_release above: fullnameOverride and the 3
+      # helm-httproute backendRef names below must all agree on this same literal, and only
+      # HCL locals can compose "<release>-grafana" — Helm/YAML values files can't.
       "helm-kube-prometheus-stack" = {
         "kube-prometheus-stack" = {
-          grafana = {
-            admin = {
-              existingSecret = local.grafana_admin_secret_name
-              passwordKey    = local.grafana_admin_secret_key
-            }
-          }
+          fullnameOverride = local.kube_prometheus_stack_release
         }
       }
       "grafana-httproute" = {
-        name = "grafana"
         host = local.domain_private_grafana
         backendRef = {
-          name = "kube-prometheus-stack-grafana"
-          port = 80
-        }
-        annotations = {
-          "external-dns.alpha.kubernetes.io/scope" = "private"
+          name = "${local.kube_prometheus_stack_release}-grafana"
         }
       }
       "prometheus-httproute" = {
-        name = "prometheus"
         host = local.domain_private_prometheus
         backendRef = {
-          name = "kube-prometheus-stack-prometheus"
-          port = 9090
-        }
-        annotations = {
-          "external-dns.alpha.kubernetes.io/scope" = "private"
+          name = "${local.kube_prometheus_stack_release}-prometheus"
         }
       }
       "alertmanager-httproute" = {
-        name = "alertmanager"
         host = local.domain_private_alertmanager
         backendRef = {
-          name = "kube-prometheus-stack-alertmanager"
-          port = 9093
-        }
-        annotations = {
-          "external-dns.alpha.kubernetes.io/scope" = "private"
+          name = "${local.kube_prometheus_stack_release}-alertmanager"
         }
       }
     }
