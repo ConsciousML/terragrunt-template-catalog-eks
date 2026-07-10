@@ -21,12 +21,20 @@ dependency "argocd" {
 }
 
 locals {
-  domains_hcl             = find_in_parent_folders("domains.hcl")
-  domain_public_guestbook = read_terragrunt_config(local.domains_hcl).locals.domain_public_guestbook
-  domain_private_argocd   = read_terragrunt_config(local.domains_hcl).locals.domain_private_argocd
+  domains_hcl                 = find_in_parent_folders("domains.hcl")
+  domain_public_guestbook     = read_terragrunt_config(local.domains_hcl).locals.domain_public_guestbook
+  domain_private_argocd       = read_terragrunt_config(local.domains_hcl).locals.domain_private_argocd
+  domain_private_grafana      = read_terragrunt_config(local.domains_hcl).locals.domain_private_grafana
+  domain_private_prometheus   = read_terragrunt_config(local.domains_hcl).locals.domain_private_prometheus
+  domain_private_alertmanager = read_terragrunt_config(local.domains_hcl).locals.domain_private_alertmanager
 
   region_hcl = find_in_parent_folders("region.hcl")
   region     = read_terragrunt_config(local.region_hcl).locals.region
+
+  # Single source of truth for the Grafana admin secret's target K8s secret name/key,
+  # shared by the grafana-secrets and helm-kube-prometheus-stack appParams entries below.
+  grafana_admin_secret_name = "grafana-admin-credentials"
+  grafana_admin_secret_key  = "admin-password"
 }
 
 dependency "route53_hosted_zone_public" {
@@ -107,6 +115,19 @@ dependency "karpenter_iam" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
+dependency "grafana_password" {
+  config_path = "../../prometheus_stack/grafana/aws_password_secret"
+  mock_outputs = {
+    secret_name = "mock-grafana-password"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
+dependency "ebs_csi_driver_addon" {
+  config_path  = "../../ebs_csi_driver/addon"
+  skip_outputs = true
+}
+
 inputs = {
   cluster_name          = dependency.eks_cluster.outputs.cluster_name
   repo_url              = "https://github.com/${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_app_of_apps}"
@@ -121,6 +142,7 @@ inputs = {
   sync_options          = values.sync_options
   prune                 = values.prune
   helm_chart_version    = values.helm_chart_version
+  retry                 = values.retry
   helm_values = {
     config = {
       spec = {
@@ -136,7 +158,10 @@ inputs = {
           "external-dns.alpha.kubernetes.io/scope" = "public"
         }
       }
-      "helm-gateway-api" = {
+      "gateway-public" = {
+        certificateArn = dependency.acm_certificate.outputs.certificate_arn
+      }
+      "gateway-private" = {
         certificateArn = dependency.acm_certificate.outputs.certificate_arn
       }
       "helm-aws-lbc" = {
@@ -248,6 +273,68 @@ inputs = {
       "helm-karpenter-config" = {
         nodeRole    = dependency.karpenter_iam.outputs.node_iam_role_name
         clusterName = dependency.eks_cluster.outputs.cluster_name
+      }
+      "grafana-secrets" = {
+        secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
+        awsRegion       = include.root.locals.aws_region
+        externalSecrets = [
+          {
+            name                 = "grafana-admin-password"
+            targetSecretName     = local.grafana_admin_secret_name
+            targetCreationPolicy = "Owner"
+            refreshPolicy        = "CreatedOnce"
+            data = [
+              {
+                secretKey      = local.grafana_admin_secret_key
+                remoteKey      = dependency.grafana_password.outputs.secret_name
+                remoteProperty = "plaintext"
+              }
+            ]
+          }
+        ]
+      }
+      "helm-kube-prometheus-stack" = {
+        "kube-prometheus-stack" = {
+          grafana = {
+            admin = {
+              existingSecret = local.grafana_admin_secret_name
+              passwordKey    = local.grafana_admin_secret_key
+            }
+          }
+        }
+      }
+      "grafana-httproute" = {
+        name = "grafana"
+        host = local.domain_private_grafana
+        backendRef = {
+          name = "kube-prometheus-stack-grafana"
+          port = 80
+        }
+        annotations = {
+          "external-dns.alpha.kubernetes.io/scope" = "private"
+        }
+      }
+      "prometheus-httproute" = {
+        name = "prometheus"
+        host = local.domain_private_prometheus
+        backendRef = {
+          name = "kube-prometheus-stack-prometheus"
+          port = 9090
+        }
+        annotations = {
+          "external-dns.alpha.kubernetes.io/scope" = "private"
+        }
+      }
+      "alertmanager-httproute" = {
+        name = "alertmanager"
+        host = local.domain_private_alertmanager
+        backendRef = {
+          name = "kube-prometheus-stack-alertmanager"
+          port = 9093
+        }
+        annotations = {
+          "external-dns.alpha.kubernetes.io/scope" = "private"
+        }
       }
     }
   }

@@ -38,6 +38,7 @@ Creates an ArgoCD [`Application`](https://argo-cd.readthedocs.io/en/stable/opera
 | <a name="input_project"></a> [project](#input\_project) | ArgoCD project the Application belongs to | `string` | `"default"` | no |
 | <a name="input_prune"></a> [prune](#input\_prune) | Whether ArgoCD should delete resources that are no longer tracked | `bool` | `true` | no |
 | <a name="input_repo_url"></a> [repo\_url](#input\_repo\_url) | Git repository URL that ArgoCD will sync from | `string` | n/a | yes |
+| <a name="input_retry"></a> [retry](#input\_retry) | Retry policy for the app-of-apps Application's sync operation. Defaults raised above ArgoCD's own defaults (limit 5, maxDuration 3m) so slow-starting sync waves (e.g. a component's first rollout) have enough runway to go Healthy before the sync gives up. | <pre>object({<br/>    limit = number<br/>    backoff = object({<br/>      duration     = string<br/>      factor       = number<br/>      max_duration = string<br/>    })<br/>  })</pre> | <pre>{<br/>  "backoff": {<br/>    "duration": "5s",<br/>    "factor": 2,<br/>    "max_duration": "2m"<br/>  },<br/>  "limit": 7<br/>}</pre> | no |
 | <a name="input_sync_options"></a> [sync\_options](#input\_sync\_options) | List of ArgoCD sync options | `list(string)` | <pre>[<br/>  "CreateNamespace=true"<br/>]</pre> | no |
 | <a name="input_target_revision"></a> [target\_revision](#input\_target\_revision) | Git branch, tag, or commit SHA to sync | `string` | `"main"` | no |
 

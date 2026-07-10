@@ -187,6 +187,20 @@ argocd login argocd.private.dev.<base_domain> \
     --output text | jq -r .plaintext)
 ```
 
+### Access the Monitoring UIs
+
+Grafana, Prometheus, and Alertmanager are only reachable via Tailscale, same as ArgoCD.
+
+- Grafana: `https://grafana.private.dev.<base_domain>`, log in with username `admin` and:
+  ```bash
+  aws secretsmanager get-secret-value \
+    --secret-id dev-grafana-password \
+    --query SecretString \
+    --output text | jq -r .plaintext
+  ```
+- Prometheus: `https://prometheus.private.dev.<base_domain>` (no login required)
+- Alertmanager: `https://alertmanager.private.dev.<base_domain>` (no login required)
+
 ### Access the Guestbook App
 
 Open `https://guestbook.public.dev.<base_domain>` in your browser. No login required.

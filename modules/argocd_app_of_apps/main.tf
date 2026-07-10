@@ -31,6 +31,14 @@ resource "helm_release" "this" {
         syncPolicy = {
           syncOptions = var.sync_options
           automated   = { prune = var.prune }
+          retry = {
+            limit = var.retry.limit
+            backoff = {
+              duration    = var.retry.backoff.duration
+              factor      = var.retry.backoff.factor
+              maxDuration = var.retry.backoff.max_duration
+            }
+          }
         }
       }
     }
