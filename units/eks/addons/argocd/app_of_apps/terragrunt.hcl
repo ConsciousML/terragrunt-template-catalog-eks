@@ -153,7 +153,7 @@ inputs = {
       }
     }
     appParams = {
-      "helm-guestbook" = {
+      "guestbook-httproute" = {
         host = local.domain_public_guestbook
       }
       "gateway-public" = {
