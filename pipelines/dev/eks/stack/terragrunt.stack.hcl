@@ -119,9 +119,9 @@ unit "cluster" {
 
         # Use at least `min_size = 2` or upgrade the `instance_types`
         # Otherwise some important system components will be stuck in `PENDING` (too many nodes)
-        min_size     = 2
+        min_size     = 3
         max_size     = 10
-        desired_size = 2
+        desired_size = 3
       }
     }
 
