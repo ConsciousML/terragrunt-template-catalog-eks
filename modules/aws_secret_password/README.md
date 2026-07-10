@@ -1,5 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# argocd\_password
+# aws\_secret\_password
+
+Generates a random password and stores it (plaintext and bcrypt hash) in a single AWS Secrets Manager secret.
 
 ## Requirements
 
