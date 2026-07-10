@@ -53,7 +53,7 @@ inputs = {
   helm_values        = values.helm_values
   helm_set = [
     # Admin password is generated in Secrets Manager and synced in via ESO
-    # (../grafana/aws_password_secret, ../aws_secret_store, ../grafana/aws_external_secret)
+    # (../grafana/aws_secret_password, ../aws_secret_store, ../grafana/aws_external_secret)
     # into a secret the ESO units own, not one the chart creates
     {
       name  = "grafana.admin.existingSecret"

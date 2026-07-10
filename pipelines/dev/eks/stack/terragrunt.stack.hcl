@@ -245,8 +245,8 @@ unit "argocd" {
 }
 
 unit "argocd_password" {
-  source = "${get_repo_root()}/units/eks/addons/argocd/aws_password_secret"
-  path   = "eks/addons/argocd/aws_password_secret"
+  source = "${get_repo_root()}/units/eks/addons/argocd/aws_secret_password"
+  path   = "eks/addons/argocd/aws_secret_password"
 
   values = {
     version                 = local.version
@@ -261,11 +261,12 @@ unit "argocd_app_of_apps" {
   path   = "eks/addons/argocd/app_of_apps"
 
   values = {
-    version               = local.version
-    name                  = "app-of-apps"
-    namespace             = "argocd"
-    path                  = "apps"
-    target_revision       = "main"
+    version   = local.version
+    name      = "app-of-apps"
+    namespace = "argocd"
+    path      = "apps"
+    #target_revision       = "main"
+    target_revision       = "improve-tg-aoa-ownership"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
@@ -398,8 +399,8 @@ unit "karpenter_iam" {
 # HTTPRoutes, and SecretStore/ExternalSecret live in app-of-apps.
 
 unit "grafana_password" {
-  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/grafana/aws_password_secret"
-  path   = "eks/addons/prometheus_stack/grafana/aws_password_secret"
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/grafana/aws_secret_password"
+  path   = "eks/addons/prometheus_stack/grafana/aws_secret_password"
 
   values = {
     version                 = local.version

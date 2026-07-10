@@ -91,7 +91,7 @@ dependency "iam_role_eso" {
 }
 
 dependency "argocd_password" {
-  config_path = "../aws_password_secret"
+  config_path = "../aws_secret_password"
   mock_outputs = {
     secret_name = "mock-argocd-password"
   }
@@ -116,7 +116,7 @@ dependency "karpenter_iam" {
 }
 
 dependency "grafana_password" {
-  config_path = "../../prometheus_stack/grafana/aws_password_secret"
+  config_path = "../../prometheus_stack/grafana/aws_secret_password"
   mock_outputs = {
     secret_name = "mock-grafana-password"
   }

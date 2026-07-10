@@ -15,4 +15,4 @@ The operator itself is deployed through app-of-apps ([`helm-external-secrets-ope
 
 ## Integration
 
-- **[`units/eks/addons/argocd`](../argocd/)**: `aws_password_secret` stores the admin password ESO later syncs in via its own app-of-apps-managed `SecretStore`/`ExternalSecret`
+- **[`units/eks/addons/argocd`](../argocd/)**: `aws_secret_password` stores the admin password ESO later syncs in via its own app-of-apps-managed `SecretStore`/`ExternalSecret`

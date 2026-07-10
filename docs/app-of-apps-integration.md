@@ -29,7 +29,7 @@ In `units/eks/addons/argocd/app_of_apps/terragrunt.hcl`, add a `dependency` bloc
 
 ```hcl
 dependency "argocd_password" {
-  config_path = "../aws_password_secret"
+  config_path = "../aws_secret_password"
   mock_outputs = {
     secret_name = "mock-argocd-password"
   }
