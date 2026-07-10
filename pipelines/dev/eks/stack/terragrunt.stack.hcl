@@ -4,11 +4,10 @@ locals {
   version_cluster = "21.15.1"
   # Keep in sync with the aws-load-balancer-controller chart dependency version pinned in
   # the app-of-apps repo's aws-load-balancer-controller/Chart.yaml
-  version_aws_lbc          = "3.2.1"
-  version_argocd           = "9.5.0"
-  version_argocd_apps      = "2.0.5"
-  version_karpenter_iam    = "21.24.0"
-  version_prometheus_stack = "87.5.0"
+  version_aws_lbc       = "3.2.1"
+  version_argocd        = "9.5.0"
+  version_argocd_apps   = "2.0.5"
+  version_karpenter_iam = "21.24.0"
 
   environment       = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
   cluster_name_full = read_terragrunt_config(find_in_parent_folders("cluster_name_env.hcl")).locals.cluster_name_full
@@ -395,143 +394,21 @@ unit "karpenter_iam" {
 #   }
 # }
 
-# --- Prometheus stack (deferred: not required for ArgoCD bootstrap; namespace/SecretStore/
-# ExternalSecret/httproute units are kubernetes_manifest-based and will move to app-of-apps) ---
+# --- Prometheus stack ---
+# Only the Grafana admin password (Secrets Manager) is Terraform-managed; the Helm release,
+# HTTPRoutes, and SecretStore/ExternalSecret live in app-of-apps.
 
-# unit "prometheus_stack_namespace" {
-#   source = "${get_repo_root()}/units/eks/addons/prometheus_stack/namespace"
-#   path   = "eks/addons/prometheus_stack/namespace"
-#
-#   values = {
-#     version = local.version
-#     name    = "monitoring"
-#   }
-# }
-#
-# unit "grafana_password" {
-#   source = "${get_repo_root()}/units/eks/addons/prometheus_stack/grafana/aws_password_secret"
-#   path   = "eks/addons/prometheus_stack/grafana/aws_password_secret"
-#
-#   values = {
-#     version                 = local.version
-#     length                  = 16
-#     recovery_window_in_days = 0
-#     tags                    = {}
-#   }
-# }
-#
-# unit "prometheus_stack_aws_secret_store" {
-#   source = "${get_repo_root()}/units/eks/addons/prometheus_stack/aws_secret_store"
-#   path   = "eks/addons/prometheus_stack/aws_secret_store"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-#
-# unit "grafana_aws_external_secret" {
-#   source = "${get_repo_root()}/units/eks/addons/prometheus_stack/grafana/aws_external_secret"
-#   path   = "eks/addons/prometheus_stack/grafana/aws_external_secret"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-#
-# unit "prometheus_stack" {
-#   source = "${get_repo_root()}/units/eks/addons/prometheus_stack/helm"
-#   path   = "eks/addons/prometheus_stack/helm"
-#
-#   values = {
-#     version            = local.version
-#     helm_chart_version = local.version_prometheus_stack
-#     helm_values = {
-#       # Pins the generated Service names (e.g. kube-prometheus-stack-prometheus) so the
-#       # per-tool httproute/ units (grafana/, prometheus/, alertmanager/) can target them deterministically
-#       fullnameOverride = "kube-prometheus-stack"
-#
-#       # These control plane components are AWS-managed on EKS and not exposed for scraping
-#       kubeEtcd              = { enabled = false }
-#       kubeScheduler         = { enabled = false }
-#       kubeControllerManager = { enabled = false }
-#
-#       defaultRules = {
-#         disabled = {
-#           # This node group intentionally runs 2 nodes; the rule can't tell EKS has no
-#           # control-plane node label and treats <3 nodes as always failing N+1 tolerance.
-#           # Dev-only: do not carry this disable over to staging/prod stacks, where
-#           # N+1 node failure tolerance is a real concern the alert should keep catching.
-#           KubeCPUOvercommit = true
-#         }
-#       }
-#
-#       prometheus = {
-#         prometheusSpec = {
-#           # Scrape any ServiceMonitor/PodMonitor in the cluster regardless of labels, so
-#           # other addons can opt into scraping just by enabling their chart's serviceMonitor
-#           serviceMonitorSelectorNilUsesHelmValues = false
-#           podMonitorSelectorNilUsesHelmValues     = false
-#
-#           storageSpec = {
-#             volumeClaimTemplate = {
-#               spec = {
-#                 storageClassName = "gp3"
-#                 accessModes      = ["ReadWriteOnce"]
-#                 resources        = { requests = { storage = "50Gi" } }
-#               }
-#             }
-#           }
-#         }
-#       }
-#
-#       alertmanager = {
-#         alertmanagerSpec = {
-#           storage = {
-#             volumeClaimTemplate = {
-#               spec = {
-#                 storageClassName = "gp3"
-#                 accessModes      = ["ReadWriteOnce"]
-#                 resources        = { requests = { storage = "10Gi" } }
-#               }
-#             }
-#           }
-#         }
-#       }
-#
-#       # Dashboards/datasources are sidecar-provisioned from ConfigMaps, nothing to persist
-#       grafana = {
-#         persistence = { enabled = false }
-#       }
-#     }
-#   }
-# }
-#
-# unit "prometheus_stack_httproute_prometheus" {
-#   source = "${get_repo_root()}/units/eks/addons/prometheus_stack/prometheus/httproute"
-#   path   = "eks/addons/prometheus_stack/prometheus/httproute"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-#
-# unit "prometheus_stack_httproute_alertmanager" {
-#   source = "${get_repo_root()}/units/eks/addons/prometheus_stack/alertmanager/httproute"
-#   path   = "eks/addons/prometheus_stack/alertmanager/httproute"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-#
-# unit "prometheus_stack_httproute_grafana" {
-#   source = "${get_repo_root()}/units/eks/addons/prometheus_stack/grafana/httproute"
-#   path   = "eks/addons/prometheus_stack/grafana/httproute"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
+unit "grafana_password" {
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/grafana/aws_password_secret"
+  path   = "eks/addons/prometheus_stack/grafana/aws_password_secret"
+
+  values = {
+    version                 = local.version
+    length                  = 16
+    recovery_window_in_days = 0
+    tags                    = {}
+  }
+}
 
 # --- Domain names (deferred: not required for ArgoCD bootstrap) ---
 
