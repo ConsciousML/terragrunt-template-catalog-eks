@@ -12,7 +12,7 @@ Complete the [Getting Started](../README.md#getting-started) guide in full. You 
 
 ## Steps
 
-### 1. Add the CIDR to the catalog
+### Add the CIDR to the Catalog
 
 Add the new environment to `pipelines/network.hcl`:
 
@@ -30,7 +30,7 @@ locals {
 
 Pick the next available `/16` block. Check `pipelines/network.hcl` for CIDRs already in use.
 
-### 2. Re-run the Tailscale bootstrap
+### Re-run the Tailscale Bootstrap
 
 The Tailscale ACL reads all VPC CIDRs from `network.hcl` automatically. Re-applying the bootstrap picks up the new entry and adds it to `autoApprovers`. See the [Tailscale bootstrap README](../pipelines/bootstrap/tailscale/README.md) for prerequisites and commands.
 
@@ -41,7 +41,7 @@ terragrunt stack run init
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
-### 3. Run the DNS bootstrap
+### Run the DNS Bootstrap
 
 Copy the dev DNS bootstrap directory:
 
@@ -59,7 +59,7 @@ locals {
 
 Then apply it and delegate the NS records at your registrar. See the [DNS bootstrap README](../pipelines/bootstrap/setup_dns/README.md) for the full deploy and delegation steps.
 
-### 4. Create the environment directory
+### Create the Environment Directory
 
 ```bash
 cp -r pipelines/dev pipelines/dev-2
@@ -73,11 +73,11 @@ locals {
 }
 ```
 
-### 5. Deploy the EKS stack
+### Deploy the EKS Stack
 
 ```bash
 source .env
-cd pipelines/dev-2/eks
+cd pipelines/dev-2/eks/stack
 terragrunt stack run init
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
