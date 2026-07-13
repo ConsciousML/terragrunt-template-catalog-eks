@@ -15,5 +15,5 @@ The following inputs are required by EKS and must not be removed:
 ## Downstream
 
 - **[`units/eks/cluster`](../eks/cluster/)**: consumes the VPC ID and subnet IDs to place the control plane and node groups
-- **[`units/eks/addons/tailscale/connector`](../eks/addons/tailscale/connector/)**: reads the VPC CIDR to advertise as a Tailnet subnet route
+- **[`helm-tailscale-connector`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-tailscale-connector)** (app-of-apps): reads the VPC CIDR to advertise as a Tailnet subnet route
 - **[`units/eks/addons/tailscale/split_dns`](../eks/addons/tailscale/split_dns/)**: derives the VPC DNS resolver address from the VPC CIDR

@@ -1,6 +1,8 @@
 # External Secrets Operator
 
-Deploys the [External Secrets Operator](https://external-secrets.io/latest/) into the cluster, syncing secrets from AWS Secrets Manager into Kubernetes `Secret` objects.
+Provisions the AWS-side IAM/Pod Identity resources for the [External Secrets Operator](https://external-secrets.io/latest/), which syncs secrets from AWS Secrets Manager into Kubernetes `Secret` objects.
+
+The operator itself is **not deployed by this unit**. It is deployed through app-of-apps as [`helm-external-secrets-operator`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-external-secrets-operator).
 
 ## Concepts
 
@@ -9,10 +11,9 @@ Deploys the [External Secrets Operator](https://external-secrets.io/latest/) int
 
 ## What's Inside
 
-- **[iam_role](iam_role/)**: Creates an IAM role bound to the `external-secrets` service account via Pod Identity. Read access is scoped to secrets prefixed with `{environment}-` only
-
-The operator itself is deployed through app-of-apps ([`helm-external-secrets-operator`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-external-secrets-operator)), not Terraform.
+- **[iam_role](iam_role/)**: Creates an IAM role bound to the `external-secrets` service account via Pod Identity. Read access is scoped to secrets prefixed with `{environment}-`
 
 ## Integration
 
-- **[`units/eks/addons/argocd`](../argocd/)**: `aws_secret_password` stores the admin password ESO later syncs in via its own app-of-apps-managed `SecretStore`/`ExternalSecret`
+- **[`units/eks/addons/argocd`](../argocd/)**: `aws_secret_password` stores the admin password ESO later syncs in via its own app-of-apps-managed `SecretStore` and `ExternalSecret`.
+- **[`helm-external-secrets-operator`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-external-secrets-operator)** (app-of-apps): it's this chart that deploys the operator

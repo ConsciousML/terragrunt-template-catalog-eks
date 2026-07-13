@@ -35,7 +35,7 @@ unit "vpc" {
 ## Getting Started
 
 ### Prerequisites
-Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate with AWS` (included).
+Perform the [quickstart](../../README.md#getting-started) up to `Authenticate with AWS` (included).
 
 ### Deploy a Stack
 ```bash

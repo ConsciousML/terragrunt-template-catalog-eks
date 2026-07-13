@@ -14,6 +14,11 @@ Doc types in this repo, with examples to read before writing one of the same kin
 - **Dev pipeline** (local environment specifics, config file inventory): `pipelines/dev/README.md`, `pipelines/dev/eks/README.md`
 - **Operational guide** (procedural, task-oriented): `docs/development.md`, `docs/troubleshoot.md`, `docs/reproducibility.md`
 
+## Content
+
+- Only document facts that are not obvious from the code 
+- Don't restate a value that can drift out of sync with the code (a pinned version, a count, an exclusivity claim like "the only" or "single"). Point at the file that holds the value instead of repeating it in prose.
+
 ## Style
 
 - Never join list items with slashes (e.g. `dev`/`staging`/`prod` or `aws_eks_cluster`/`aws_eks_cluster_auth`). Use commas and "and" instead (e.g. `dev`, `staging`, and `prod`).

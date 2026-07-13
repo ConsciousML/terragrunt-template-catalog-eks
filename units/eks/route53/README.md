@@ -9,14 +9,14 @@ Provisions the DNS infrastructure and TLS certificate for the EKS cluster: a pub
 
 ## What's Inside
 
-- **[hosted_zone_public](hosted_zone_public/)**: Manages the public hosted zone named `{environment}.{base_domain}` (e.g. `dev.axelmendoza.com`). Pre-created by the [`pipelines/bootstrap/setup_dns`](../../../pipelines/bootstrap/setup_dns/) pipeline, so `create = false` in the EKS stack. Its `zone_id` and `domain_name` outputs flow into `acm_certificate`
+- **[hosted_zone_public](hosted_zone_public/)**: Manages the public hosted zone. Pre-created by the [`pipelines/bootstrap/setup_dns`](../../../pipelines/bootstrap/setup_dns/) pipeline, so `create = false` in the EKS stack
 - **[hosted_zone_private](hosted_zone_private/)**: Creates a private hosted zone associated with the VPC for internal DNS resolution only
 - **[acm_certificate](acm_certificate/)**: Issues a wildcard certificate for `*.{domain_env}`, `*.{domain_env_private}`, and `*.{domain_env_public}`, validated via DNS against the public hosted zone
 
 ## Integration
 
 - **[`pipelines/bootstrap/setup_dns`](../../../pipelines/bootstrap/setup_dns/)**: creates the public hosted zone once and outputs NS records to delegate at the registrar. Must run before the EKS stack
-- **[`units/eks/addons/argocd/app_of_apps`](../addons/argocd/app_of_apps/)**: threads the ACM certificate ARN into app-of-apps's `helm-gateway-api` app, which uses it for the Gateway's `LoadBalancerConfiguration` HTTPS listener
+- **[`units/eks/addons/argocd/app_of_apps`](../addons/argocd/app_of_apps/)**: threads the ACM certificate ARN into app-of-apps's [`helm-gateway-api-gateway`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-gateway-api-gateway) app, both the `gateway-public` and `gateway-private` instances
 - **[`units/eks/addons/external_dns`](../addons/external_dns/)**: watches `HTTPRoute` and ingress resources and writes A records to the private hosted zone
-- **[`units/eks/addons/tailscale/split_dns`](../addons/tailscale/split_dns/)**: takes an ordering dependency on the private hosted zone; the intercepted domain is read from `domains.hcl` rather than this zone's output
+- **[`units/eks/addons/tailscale/split_dns`](../addons/tailscale/split_dns/)**: takes an ordering dependency on the private hosted zone. The intercepted domain is read from `domains.hcl` rather than this zone's output
 - **[`units/vpc`](../../vpc/)**: `hosted_zone_private` depends on the VPC ID to associate the private zone with the VPC

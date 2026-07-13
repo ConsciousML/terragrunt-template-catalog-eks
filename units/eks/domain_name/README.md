@@ -1,6 +1,6 @@
 # Domain Name
 
-Exposes the domain name of each user-facing tool as a Terraform state output, one unit per tool. Each unit is a [`modules/identity`](../../../modules/identity/) passthrough around the corresponding `domain_private_*`/`domain_public_*` local in [`domains.hcl`](../../../pipelines/dev/eks/domains.hcl).
+Exposes the domain name of each user-facing tool as a Terraform state output, one unit per tool. Each unit is a [`modules/identity`](../../../modules/identity/) passthrough around the corresponding `domain_private_*` and `domain_public_*` locals in [`domains.hcl`](../../../pipelines/dev/eks/domains.hcl).
 
 ## What's Inside
 
