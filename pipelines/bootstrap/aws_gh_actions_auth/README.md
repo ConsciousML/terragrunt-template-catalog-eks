@@ -99,35 +99,4 @@ Read the [continuous integration guide](../../../docs/continuous-integration.md#
 
 ## Module Details
 
-This stack instantiates the following Terraform modules to run Terragrunt with GitHub Actions.
-
-### 1. [GitHub OIDC Provider](../../../modules/oidc_provider/README.md)
-Creates an [AWS IAM OpenID Connect provider](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html) to declare the external identity provider (GitHub Actions in this case).
-
-**Why**: GitHub Actions will be a known audience to AWS and will validate its token when authentication occurs.
-
-### 2. [IAM Role GitHub Actions](../../../modules/iam_role_github_actions/README.md)
-Creates an IAM Role that can only be used by GitHub Actions running under this specific repository.
-
-### 3. [GitHub Actions IAM Policies](../../../modules/iam_policies/README.md)
-Assigns policy ARNs to the IAM role from 2.
-This enables the necessary permissions for Terragrunt to run in GitHub Actions.
-
-### 4. [GitHub Secrets](../../../modules/github_secrets/README.md)
-Stores `AWS_REGION` and `AWS_ROLE_ARN` as GitHub secrets to be retrieved in GitHub Actions workflows.
-
-### 5. [Deploy Key](../../../modules/deploy_key/README.md)
-Generates an SSH deploy key for repository access.
-
-Enables Terragrunt to pull code from private repositories during multi-repo deployments.
-
-### 6. [Terraform Docs Deploy Key](../../../modules/deploy_key/README.md)
-Generates a separate write-access deploy key used by the `terraform-docs` CI step to commit auto-generated module documentation back to the repository.
-
-## Authentication Flow
-
-1. OIDC Provider establishes GitHub Actions as a trusted identity provider in AWS
-2. IAM Role defines who can authenticate (specific GitHub repo/branch) via trust policy
-3. IAM Policies define what the role can do once authenticated (creating, modifying and deleting AWS resources through Terragrunt)
-4. GitHub Secrets stores the role ARN and region for workflows to reference
-5. Deploy Key enables Terragrunt to access private repositories during execution
+See the [`units/github`](../../../units/github/README.md) group README for what each unit provisions and how they compose.

@@ -12,7 +12,7 @@ Joins the EKS cluster to a Tailnet via the Tailscale Kubernetes operator, exposi
 
 ## What's Inside
 
-- **[acl](acl/)**: Applies the Tailscale ACL policy to the Tailnet. Defines the tags and auto-approves the VPC CIDR range for subnet routing. Part of the [`pipelines/bootstrap/tailscale`](../../../../pipelines/bootstrap/tailscale/) stack, not the EKS stack
+- **[acl](acl/)**: Applies the Tailscale ACL policy to the Tailnet. Defines three tags: `tag:ci` (assigned to GitHub Actions runners that join via WIF), `tag:k8s-operator` (owned by `tag:ci`, assigned to the Tailscale Kubernetes operator), and `tag:k8s` (owned by `tag:k8s-operator`, assigned to nodes managed by the operator). Auto-approves subnet routes for the VPC CIDR so tagged nodes can advertise routes without manual approval in the Tailscale admin panel. Part of the [`pipelines/bootstrap/tailscale`](../../../../pipelines/bootstrap/tailscale/) stack, not the EKS stack
 - **[oauth_client_tailscale_operator](oauth_client_tailscale_operator/)**: Creates a Tailscale OAuth client for the operator
 - **[oauth_client_secret](oauth_client_secret/)**: Stores `oauth_client_tailscale_operator`'s `client_id`/`client_secret` in AWS Secrets Manager. Its `secret_name` output flows into `app_of_apps`
 - **[split_dns](split_dns/)**: Configures Tailscale split DNS to route queries for `domain_env_private` (e.g. `private.dev.axelmendoza.com`) through the VPC DNS resolver, so private hostnames resolve over the Tailnet without intercepting public endpoints. Reads `domain_env_private` from `domains.hcl`. Depends on `vpc` and `route53/hosted_zone_private`
