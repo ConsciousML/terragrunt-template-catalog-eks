@@ -10,7 +10,7 @@ This requires deleting the state file in S3 **and** the corresponding digest ent
 
 ### Steps
 
-**1. Delete the state file in S3:**
+**Delete the state file in S3:**
 
 Go to the S3 bucket and delete the `.tfstate` file for the module, or use the CLI:
 
@@ -18,7 +18,7 @@ Go to the S3 bucket and delete the `.tfstate` file for the module, or use the CL
 aws s3 rm s3://<bucket>/<path/to/module>/tofu.tfstate
 ```
 
-**2. Find the stale DynamoDB entry:**
+**Find the stale DynamoDB entry:**
 
 ```bash
 aws dynamodb scan \
@@ -29,7 +29,7 @@ aws dynamodb scan \
   --output text
 ```
 
-**3. Delete the digest entry** (the one ending in `-md5`):
+**Delete the digest entry** (the one ending in `-md5`):
 
 ```bash
 aws dynamodb delete-item \
@@ -37,7 +37,7 @@ aws dynamodb delete-item \
   --key '{"LockID": {"S": "<bucket>/<path/to/module>/tofu.tfstate-md5"}}'
 ```
 
-**4. Verify the state is gone:**
+**Verify the state is gone:**
 
 ```bash
 terragrunt init
@@ -56,20 +56,20 @@ Error refreshing state: state data in S3 does not have the expected content.
 
 ### Steps
 
-Set these once, scoped to the exact bucket (environment) and path you're clearing, other environments share the same DynamoDB table and a too-broad prefix will match them too:
+Set these once, scoped to the exact bucket (environment) and path you're clearing. Other environments share the same DynamoDB table, and a too-broad prefix will match them too:
 
 ```bash
 export BUCKET="<bucket>"
 export PREFIX="<path/to/directory>"  # no leading/trailing slash
 ```
 
-**1. Delete the state files in S3:**
+**Delete the state files in S3:**
 
 ```bash
 aws s3 rm "s3://${BUCKET}/${PREFIX}/" --recursive --exclude "*" --include "*/tofu.tfstate"
 ```
 
-**2. Find the stale DynamoDB entries under that prefix:**
+**Find the stale DynamoDB entries under that prefix:**
 
 ```bash
 aws dynamodb scan \
@@ -80,7 +80,7 @@ aws dynamodb scan \
   --output text
 ```
 
-**3. Delete each digest entry** (the ones ending in `-md5`):
+**Delete each digest entry** (the ones ending in `-md5`):
 
 ```bash
 aws dynamodb scan \
@@ -97,7 +97,7 @@ aws dynamodb scan \
   done
 ```
 
-**4. Verify the state is gone:**
+**Verify the state is gone:**
 
 ```bash
 aws s3 ls "s3://${BUCKET}/${PREFIX}/" --recursive | grep tofu.tfstate | grep -v '\-md5\|\.tflock'
@@ -119,11 +119,11 @@ plugin6.(*GRPCProvider).PlanResourceChange: rpc error: code = Unknown desc
 get OpenAPI spec: context deadline exceeded
 ```
 
-This happens when the EKS API server is slow/unresponsive, or when a stack was regenerated against a different branch/ref than what's actually deployed. Any unit using `kubectl_manifest` or `helm_release` (SecretStore, StorageClass, ArgoCD, ExternalDNS, etc.) will hang, and `terragrunt run --all destroy` can't proceed past those units.
+This happens when the EKS API server is slow/unresponsive, or when a stack was regenerated against a different branch/ref than what's actually deployed, causing `terragrunt run --all destroy` to get stuck.
 
-If `kubectl` still responds even though the provider doesn't, work around Terragrunt entirely instead of fighting it.
+If we need to destroy by hand, work around Terragrunt entirely instead of fighting it:
 
-### 0. Set up the variables used below
+### Set Up the Variables Used Below
 
 ```bash
 REGION=eu-west-3
@@ -133,7 +133,7 @@ BUCKET="tofu-state-${ACCOUNT_ID}-${ENVIRONMENT}"
 CLUSTER_NAME="${ENVIRONMENT}-<cluster_name>"
 ```
 
-### 1. Delete Ingress/Gateway/HTTPRoute objects via kubectl
+### Delete Ingress/Gateway/HTTPRoute Objects via kubectl
 
 This lets AWS Load Balancer Controller and ExternalDNS clean up their ALBs, target groups, security groups, and Route53 records gracefully, avoiding orphaned resources outside the cluster:
 
@@ -154,13 +154,13 @@ aws route53 list-resource-record-sets --hosted-zone-id "$ZONE_ID" \
   --query "ResourceRecordSets[?Type!='NS' && Type!='SOA']"
 ```
 
-### 2. Delete the remaining namespaces
+### Delete the Remaining Namespaces
 Delete the namespaces containing external k8s resources:
 ```bash
 kubectl delete ns argocd monitoring tailscale
 ```
 
-### 3. Destroy the cluster unit
+### Destroy the Cluster Unit
 
 `units/eks/cluster` only uses the `aws` provider (via `terraform-aws-modules/eks/aws`), so it's unaffected by a stuck `kubernetes` provider and can be destroyed on its own once the workarounds above have cleared everything running inside the cluster:
 
@@ -169,7 +169,7 @@ cd pipelines/dev/eks/stack/.terragrunt-stack/eks/cluster
 terragrunt destroy
 ```
 
-### 4. Run the full stack destroy
+### Run the Full Stack Destroy
 
 Addon units are excluded automatically once the cluster is gone (see `provider_k8s_base.hcl`'s `exclude` block), so the rest of the stack (VPC, Route53 zones, ACM certificate, IAM) destroys cleanly:
 
@@ -178,7 +178,7 @@ cd pipelines/dev/eks/stack
 terragrunt run --all destroy --no-stack-generate
 ```
 
-### 5. Wipe the addon units' state
+### Wipe the Addon Units' State
 
 Excluded units keep their state file, which now points to resources that no longer exist. Remove it wholesale rather than per-resource by following [Manually Removing a Directory of Terragrunt States](#manually-removing-a-directory-of-terragrunt-states) with:
 
@@ -187,10 +187,10 @@ export BUCKET="tofu-state-${ACCOUNT_ID}-${ENVIRONMENT}"
 export PREFIX="dev/eks/stack/.terragrunt-stack/eks/addons"
 ```
 
-### 6. Verify manually in the AWS console
+### Verify Manually in the AWS Console
 
 - **VPC**: no orphaned VPC/subnets/security groups
-- **NAT Gateways / Elastic IPs**: billed hourly even if idle — the most expensive thing to miss
+- **NAT Gateways / Elastic IPs**: billed hourly even if idle. The most expensive thing to miss
 - **Load Balancers**: no ALB/NLB left over (would respawn if an Ingress/Service survived)
 - **EBS volumes**: no orphaned volumes from PVCs (`reclaimPolicy: Retain` or a node that didn't clean up)
 - **Secrets Manager**: no secrets left over
@@ -198,8 +198,8 @@ export PREFIX="dev/eks/stack/.terragrunt-stack/eks/addons"
 - **EC2**: no leftover instances/ENIs (e.g. from Karpenter-provisioned nodes)
 - **EKS**: no cluster/node group left in a stuck state
 
-## Can't Connect with Tailscale to Internal Endpoints on MacOS
-MacOs doesn't automatically re-push DNS config.
+## Can't Connect with Tailscale to Internal Endpoints on macOS
+macOS doesn't automatically re-push DNS config.
 
 First confirm ExternalDNS has written the record:
 ```bash
@@ -224,7 +224,7 @@ If `argocd-server`'s hostname isn't resolving yet (ExternalDNS hasn't written th
 kubectl port-forward svc/argocd-server -n argocd 8080:80
 ```
 
-Then open `http://localhost:8080`. `server.insecure` is set to `true` on the ArgoCD Helm release (see `units/eks/addons/argocd/helm`), so plain HTTP works and there's no TLS certificate mismatch.
+Then open `http://localhost:8080`. `server.insecure` is set to `true` on the `argocd` unit's `helm_values` in the [dev stack file](../pipelines/dev/eks/stack/terragrunt.stack.hcl), so plain HTTP works and there's no TLS certificate mismatch.
 
 ## Getting the ArgoCD Admin Password When the ESO Sync Isn't Working
 
