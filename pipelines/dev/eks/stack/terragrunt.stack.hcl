@@ -382,17 +382,6 @@ unit "karpenter_iam" {
   }
 }
 
-# --- EBS CSI storage class (deferred: kubernetes_manifest-based, will move to app-of-apps) ---
-
-# unit "ebs_csi_driver_storage_class_gp3" {
-#   source = "${get_repo_root()}/units/eks/addons/ebs_csi_driver/storage_class/gp3"
-#   path   = "eks/addons/ebs_csi_driver/storage_class/gp3"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-
 # --- Prometheus stack ---
 # Only the Grafana admin password (Secrets Manager) is Terraform-managed; the Helm release,
 # HTTPRoutes, and SecretStore/ExternalSecret live in app-of-apps.
