@@ -9,9 +9,12 @@ A reusable Terragrunt catalog of modules, units, and stacks for building EKS clu
 
 Comes with a production-grade [EKS Cluster](units/eks/README.md), deployable across `dev`, `staging`, and `prod` environments, that supports:
 
-- GitOps via ArgoCD and the App of Apps pattern
-- Public traffic routing via ALB and Gateway API
+- Persistent storage via EBS-backed `PersistentVolumeClaim`s
+- Cluster and workload metrics via Prometheus, Alertmanager, and Grafana
+- Public and private traffic routing via ALB and Gateway API
 - Automated DNS and TLS termination
+- Secrets synced from AWS Secrets Manager
+- GitOps via ArgoCD and the App of Apps pattern
 - VPN access via Tailscale
 - Node autoscaling via Karpenter
 
