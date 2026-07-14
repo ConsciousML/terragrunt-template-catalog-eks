@@ -9,9 +9,12 @@ A reusable Terragrunt catalog of modules, units, and stacks for building EKS clu
 
 Comes with a production-grade [EKS Cluster](units/eks/README.md), deployable across `dev`, `staging`, and `prod` environments, that supports:
 
-- GitOps via ArgoCD and the App of Apps pattern
-- Public traffic routing via ALB and Gateway API
+- Persistent storage via EBS-backed `PersistentVolumeClaim`s
+- Cluster and workload metrics via Prometheus, Alertmanager, and Grafana
+- Public and private traffic routing via ALB and Gateway API
 - Automated DNS and TLS termination
+- Secrets synced from AWS Secrets Manager
+- GitOps via ArgoCD and the App of Apps pattern
 - VPN access via Tailscale
 - Node autoscaling via Karpenter
 
@@ -226,7 +229,7 @@ terragrunt run --all destroy --non-interactive --no-stack-generate
 
 See the [development guide](docs/development.md) for a detailed workflow with a step-by-step example on how to modify this template.
 
-To modify existing applications or deploy new ones, see the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template#readme). For the catalog-side Terragrunt plumbing that threads AWS-sourced values (IAM roles, Secrets Manager secrets, ...) into those apps, see the [App of Apps integration guide](docs/app_of_apps_integration.md).
+To modify existing applications or deploy new ones, see the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template#readme). For the catalog-side Terragrunt plumbing that threads AWS-sourced values (IAM roles, Secrets Manager secrets, ...) into those apps, see the [App of Apps integration guide](docs/app-of-apps-integration.md).
 
 ## Reproducibility
 Provider lock files (`.terraform.lock.hcl`) must be committed per unit for stacks to be reproducible.

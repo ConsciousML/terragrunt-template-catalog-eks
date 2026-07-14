@@ -6,19 +6,21 @@ This guide walks you through the complete development workflow for adding new in
 
 The development process follows a structured approach with these layers:
 
-1. **Terraform Module** (`modules/`): The core infrastructure code
-2. **Terragrunt Unit** (`units/`): Wrapper that makes the module reusable
-3. **Stack** (`pipelines/dev/`): Iterate on your changes locally before pushing
+- **Terraform Module** (`modules/`): the core infrastructure code
+- **Terragrunt Unit** (`units/`): wrapper that makes the module reusable
+- **Stack** (`pipelines/dev/`): iterate on your changes locally before pushing
 
 ## Step-by-Step Development Process
 
-### 1. Create a Feature Branch
+### Create a Feature Branch
 ```bash
 git checkout -b add-new-module-feature
 ```
 
-### 2. Write a Terraform Module
-Create your infrastructure module in `modules/your_module/` with the standard Terraform files:
+### Write a Terraform Module
+This step is optional if your unit wraps an external registry module directly instead of an authored one, as `cluster` and `vpc` do (e.g. `tfr:///terraform-aws-modules/eks/aws`). In that case, skip straight to writing the Terragrunt unit wrapper.
+
+Create your infrastructure [module](https://developer.hashicorp.com/terraform/language/modules) in `modules/your_module/` with the standard Terraform files:
 - `main.tf`: Resource definitions
 - `variables.tf`: Input variables with detailed descriptions
 - `outputs.tf`: Output values (if needed)
@@ -28,26 +30,18 @@ Create your infrastructure module in `modules/your_module/` with the standard Te
 
 Read the [instructions](../modules/README.md#documentation) to learn more on documentation generation with `terraform-docs`.
 
-### 3. Create a Terragrunt Unit Wrapper
-Write a terragrunt wrapper in `units/your_module/terragrunt.hcl` that:
+### Create a Terragrunt Unit Wrapper
+Write a [unit](https://docs.terragrunt.com/features/units/) in `units/your_module/terragrunt.hcl` that:
 - References the module using `values.version` for the git ref
 - Defines dependencies on other units (if needed)
 - Maps unit inputs to module variables
 
-### 4. Wire Up a Dev Stack
-Either integrate your unit into the [existing EKS stack](../pipelines/dev/eks/stack/terragrunt.stack.hcl) or create a new stack at `pipelines/dev/your_stack/terragrunt.stack.hcl` that:
-- References units using `${get_repo_root()}/units/unit_name` for local development
-- Combines multiple units into an infrastructure deployment
-- Provides configuration values
-- Uses automatic version detection
+See the [units](../units/) directory for examples.
 
-For example:
+### Wire Up a Dev Stack
+Integrate your unit into the [existing EKS stack](../pipelines/dev/eks/stack/terragrunt.stack.hcl) by adding a `unit` block that references it using `${get_repo_root()}/units/unit_name` for local development:
+
 ```hcl
-# pipelines/dev/your_stack/terragrunt.stack.hcl
-locals {
-  version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
-}
-
 unit "your_module" {
   source = "${get_repo_root()}/units/your_module"
   path   = "your_module"
@@ -59,10 +53,10 @@ unit "your_module" {
 }
 ```
 
-### 5. Test Your Changes
+### Test Your Changes
 ```bash
 source .env
-cd pipelines/dev/your_stack/
+cd pipelines/dev/eks/stack/
 terragrunt stack generate
 terragrunt run --all init --backend-bootstrap
 terragrunt run --all validate
@@ -70,8 +64,8 @@ terragrunt run --all plan
 terragrunt run --all apply
 ```
 
-### 6. Create Pull Request
-Once your stack works correctly, create a PR and merge it to `main`.
+### Create Pull Request
+Once your stack works correctly, create a PR and iterate until the [CI](../.github/workflows/ci.yaml) checks pass, then merge it to `main`.
 
 ## Integrate In Production
 Next, tag the latest commit on main:

@@ -6,7 +6,7 @@ Creates one public Route 53 hosted zone per environment (`<environment>.yourdoma
 
 Run this **once per environment** before deploying the EKS stack. The public hosted zone must exist and be authoritative before ACM can validate TLS certificates for any app in the environment.
 
-This bootstrap creates only the **public** zone. The [EKS stack](../../dev/eks/terragrunt.stack.hcl) creates a matching private zone and handles everything else: [ACM](../../../units/eks/route53/acm_certificate/terragrunt.hcl) issues TLS certificates (validated via CNAMEs in this public zone), [ExternalDNS private](../../../units/eks/addons/external_dns/private/helm/terragrunt.hcl) writes A records to the private zone for internal apps and [ExternalDNS public](../../../units/eks/addons/external_dns/public/helm/terragrunt.hcl) writes A records to this public zone for public apps.
+This bootstrap creates only the **public** zone. The [EKS stack](../../dev/eks/stack/) creates a matching private zone and wires ACM, ExternalDNS, and TLS on top. See the [route53](../../../units/eks/route53/README.md) and [external_dns](../../../units/eks/addons/external_dns/README.md) unit docs for details.
 
 The full DNS flow:
 1. This bootstrap creates the [public hosted zone](../../../units/eks/route53/hosted_zone_public/terragrunt.hcl) and outputs 4 nameservers.
@@ -25,9 +25,12 @@ Update `pipelines/dns.hcl` with your domain:
 
 ```hcl
 locals {
-  base_domain         = "yourdomain.com"
-  subdomain_argocd    = "argocd"
-  subdomain_guestbook = "guestbook"
+  base_domain            = "yourdomain.com"
+  subdomain_argocd       = "argocd"
+  subdomain_guestbook    = "guestbook"
+  subdomain_prometheus   = "prometheus"
+  subdomain_alertmanager = "alertmanager"
+  subdomain_grafana      = "grafana"
 }
 ```
 
