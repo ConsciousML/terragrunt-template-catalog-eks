@@ -38,6 +38,10 @@ inputs = {
   # EKS Provisioned Control Plane configuration
   control_plane_scaling_config = values.control_plane_scaling_config
 
+  enabled_log_types                      = values.enabled_log_types
+  cloudwatch_log_group_class             = values.cloudwatch_log_group_class
+  cloudwatch_log_group_retention_in_days = values.cloudwatch_log_group_retention_in_days
+
   # Run the following command to see all the available addons:
   # aws eks describe-addon-versions --query 'addons[*].addonName' --output text | tr '\t' '\n'
   # Here's the argument reference for the addons:
