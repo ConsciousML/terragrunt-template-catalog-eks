@@ -1,6 +1,8 @@
-# Agent Feedback
+# How to Write Docs
 
 Guidance for AI agents working in this repository. Read before making documentation or content edits.
+
+If you're documenting the `argocd-app-of-apps-template` repo, also read its [`docs/how-to-write-docs.md`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/docs/how-to-write-docs.md) for rules specific to that repo.
 
 ## Source of Truth
 
@@ -27,6 +29,8 @@ Doc types in this repo, with examples to read before writing one of the same kin
 - `## What's Inside` must list every piece of the group, including ones deployed through app-of-apps instead of Terraform. Those are part of the group, not a dependency.
 
 ## Style
+
+These rules apply to inline code comments too, not just Markdown.
 
 - Never join list items with slashes (e.g. `dev`/`staging`/`prod` or `aws_eks_cluster`/`aws_eks_cluster_auth`). Use commas and "and" instead (e.g. `dev`, `staging`, and `prod`).
 - Never use `;`, `-`, or an em dash (`—`) in the middle of a sentence. Use commas, parentheses, or split into two sentences instead.

@@ -62,13 +62,13 @@
         - `environment-variables.md`: reference for every environment variable used across bootstrap pipelines and the EKS stack
         - `continuous-integration.md`: what CI validates on every pull request
         - `app-of-apps-integration.md`: catalog-side plumbing for threading Terraform values into app-of-apps
-        - `agents/how-to-write-docs.md`: see &lt;documentation&gt;
+        - `how-to-write-docs.md`: see &lt;documentation&gt;
 
         Every other README (per-unit, per-module, per-addon-group, in this repo and in `argocd-app-of-apps-template`) is reached by following links from the docs above. This map indexes entry points, not every file.
     </documentation_map>
 
     <documentation>
-        Read `docs/agents/how-to-write-docs.md` before writing or editing any doc, in this repo or in `argocd-app-of-apps-template`. It defines the doc types, which existing docs to read before writing a new one, and the house style rules. Treat it as the single source of truth for documentation practice, don't restate its rules elsewhere.
+        Read `docs/how-to-write-docs.md` before writing or editing any doc, in this repo or in `argocd-app-of-apps-template`. It defines the doc types, which existing docs to read before writing a new one, and the house style rules. Treat it as the single source of truth for documentation practice, don't restate its rules elsewhere. It links out to `argocd-app-of-apps-template/docs/how-to-write-docs.md` for rules specific to that repo.
     </documentation>
 
     <instructions>
