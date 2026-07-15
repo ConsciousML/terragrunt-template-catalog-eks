@@ -11,9 +11,3 @@ The following inputs are required by EKS and must not be removed:
 - A NAT gateway on private subnets is required so nodes can reach ECR and other AWS services to pull images. Without it, node bootstrap stalls
 - Subnets must span at least two Availability Zones and each have at least 16 available IP addresses
 - The VPC CIDR must not overlap with other VPCs connected via Transit Gateway or VPC peering. CIDR conflicts cause unpredictable routing failures
-
-## Downstream
-
-- **[`units/eks/cluster`](../eks/cluster/)**: consumes the VPC ID and subnet IDs to place the control plane and node groups
-- **[`helm-tailscale-connector`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-tailscale-connector)** (app-of-apps): reads the VPC CIDR to advertise as a Tailnet subnet route
-- **[`units/eks/addons/tailscale/split_dns`](../eks/addons/tailscale/split_dns/)**: derives the VPC DNS resolver address from the VPC CIDR

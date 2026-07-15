@@ -46,6 +46,17 @@ unit "vpc" {
     enable_dns_hostnames = true
     enable_dns_support   = true
 
+    enable_flow_log                      = false
+    create_flow_log_cloudwatch_log_group = false
+    create_flow_log_cloudwatch_iam_role  = false
+
+    flow_log_traffic_type             = "REJECT" # only denied traffic reduces log volume
+    flow_log_max_aggregation_interval = 600      # 10-min batching vs 60s, fewer records
+
+    # Cost optimization: cheaper CloudWatch log class + short retention
+    flow_log_cloudwatch_log_group_class             = "INFREQUENT_ACCESS"
+    flow_log_cloudwatch_log_group_retention_in_days = 7
+
     public_subnet_tags = {
       # Tag for AWS LBC to know where to deploy external ALB
       "kubernetes.io/role/elb" = 1
@@ -79,6 +90,14 @@ unit "cluster" {
     control_plane_scaling_config = {
       tier = "standard"
     }
+
+    # Control plane logging disabled to cut CloudWatch costs.
+    # Dev-only: do not port this to staging/prod, re-enable there.
+    enabled_log_types = []
+    # Infrequent Access cuts cost ~50% but doesn't support all Standard class features:
+    # https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatch_Logs_Log_Classes.html
+    cloudwatch_log_group_class             = "INFREQUENT_ACCESS"
+    cloudwatch_log_group_retention_in_days = 7
 
     # Run the following command to see all the available addons:
     # aws eks describe-addon-versions --query 'addons[*].addonName' --output text | tr '\t' '\n'

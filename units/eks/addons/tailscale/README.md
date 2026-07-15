@@ -16,15 +16,14 @@ Joins the EKS cluster to a Tailnet via the Tailscale Kubernetes operator, exposi
 - **[oauth_client_tailscale_operator](oauth_client_tailscale_operator/)**: Creates a Tailscale OAuth client for the operator
 - **[oauth_client_secret](oauth_client_secret/)**: Stores `oauth_client_tailscale_operator`'s credentials in AWS Secrets Manager
 - **[split_dns](split_dns/)**: Configures Tailscale split DNS to route queries for `domain_env_private` (e.g. `private.dev.axelmendoza.com`) through the VPC DNS resolver, so private hostnames resolve over the Tailnet without intercepting public endpoints. Reads `domain_env_private` from `domains.hcl`. Depends on `vpc` and `route53/hosted_zone_private`
+- **[`helm-tailscale-operator`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-tailscale-operator)** (app-of-apps): deploys the operator Helm release itself. Not deployed by this unit
+- **[`helm-tailscale-connector`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-tailscale-connector)** (app-of-apps): deploys the `Connector` CR. Not deployed by this unit
 
-The operator Helm release and the `Connector` CR are deployed through app-of-apps, not Terraform. The ESO `SecretStore` and `ExternalSecret` that sync the OAuth credentials into the operator's expected `operator-oauth` secret are also deployed through app-of-apps (`tailscale-secrets`, an instance of the generic [`helm-eso-secret-sync`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-eso-secret-sync) chart), mirroring how ArgoCD's admin password is synced. See the [App of Apps integration guide](../../../../docs/app-of-apps-integration.md).
+The ESO `SecretStore` and `ExternalSecret` that sync the OAuth credentials into the operator's expected `operator-oauth` secret are also deployed through app-of-apps (`tailscale-secrets`, an instance of the generic [`helm-eso-secret-sync`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-eso-secret-sync) chart), mirroring how ArgoCD's admin password is synced. See the [App of Apps integration guide](../../../../docs/app-of-apps-integration.md).
 
-## Integration
+## Upstream Dependencies
 
 - **[`units/tailscale`](../../../tailscale/)**: provisions the WIF credential and GitHub secrets that allow CI to authenticate to Tailscale when deploying the operator
 - **[`units/eks/addons/external_secrets_operator`](../external_secrets_operator/)**: its IAM role must be in place before the ESO controller (deployed through app-of-apps) can read the OAuth secret
-- **[`units/eks/addons/argocd/app_of_apps`](../argocd/app_of_apps/)**: takes an ordering dependency on `oauth_client_secret` so it exists before app-of-apps deploys `tailscale-secrets`
 - **[`units/eks/route53/hosted_zone_private`](../../route53/hosted_zone_private/)**: `split_dns` takes an ordering dependency to ensure the private zone exists before configuring Tailscale DNS. The intercepted domain is read from `domains.hcl` (`domain_env_private`), not from this unit's output
 - **[`units/vpc`](../../../vpc/)**: `split_dns` derives the VPC DNS resolver address from it
-- **[`helm-tailscale-operator`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-tailscale-operator)** (app-of-apps): it's this chart that deploys the operator
-- **[`helm-tailscale-connector`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-tailscale-connector)** (app-of-apps): it's this chart that deploys the `Connector` CR

@@ -40,6 +40,14 @@ inputs = {
 
   private_subnet_tags = values.private_subnet_tags
 
+  enable_flow_log                                 = values.enable_flow_log
+  create_flow_log_cloudwatch_log_group            = values.create_flow_log_cloudwatch_log_group
+  create_flow_log_cloudwatch_iam_role             = values.create_flow_log_cloudwatch_iam_role
+  flow_log_traffic_type                           = values.flow_log_traffic_type
+  flow_log_max_aggregation_interval               = values.flow_log_max_aggregation_interval
+  flow_log_cloudwatch_log_group_class             = values.flow_log_cloudwatch_log_group_class
+  flow_log_cloudwatch_log_group_retention_in_days = values.flow_log_cloudwatch_log_group_retention_in_days
+
   tags = {
     environment = "${local.environment}"
   }
