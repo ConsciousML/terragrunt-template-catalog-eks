@@ -2,6 +2,8 @@
 
 Provisions the AWS and GitHub resources needed for GitHub Actions to authenticate with AWS via OIDC and access private repositories.
 
+Run via [`pipelines/bootstrap/aws_gh_actions_auth`](../../pipelines/bootstrap/aws_gh_actions_auth/) once per repository before enabling CI.
+
 ## Concepts
 
 - [OpenID Connect (OIDC) in GitHub Actions](https://docs.github.com/en/actions/concepts/security/openid-connect)
@@ -16,8 +18,3 @@ Provisions the AWS and GitHub resources needed for GitHub Actions to authenticat
 - **[secrets/action](secrets/action/)**: Stores the region and `iam_role`'s ARN as GitHub Actions secrets so workflows can assume the role without hardcoded credentials
 - **[secrets/eks_local_admin](secrets/eks_local_admin/)**: Stores `EKS_LOCAL_ADMIN_ARN` as a GitHub Actions secret. The [CD workflow](https://github.com/ConsciousML/terragrunt-template-live-eks/blob/main/.github/workflows/cd.yaml) reads it via `get_env` and injects it into the cluster `access_entries` (see [prod EKS stack](https://github.com/ConsciousML/terragrunt-template-live-eks/blob/main/live/prod/eks/terragrunt.stack.hcl)), so the local admin retains kubectl access after CI deploys the cluster
 - **[deploy_key](deploy_key/)**: Generates SSH deploy keys and registers them on target repositories, enabling Terragrunt to pull code from private repositories during CI. Instantiated twice in the bootstrap stack: once read-only (remote sources), once with write access (terraform-docs commits)
-
-## Integration
-
-- **[`pipelines/bootstrap/aws_gh_actions_auth`](../../pipelines/bootstrap/aws_gh_actions_auth/)**: orchestrates all units in this group as a one-time bootstrap stack. Run it once per repository before enabling CI
-- **GitHub Actions workflows**: consume the secrets and deploy keys provisioned by this group to authenticate with AWS and access private repositories

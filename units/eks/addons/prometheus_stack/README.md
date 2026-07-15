@@ -2,12 +2,6 @@
 
 Deploys [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) for cluster and workload metrics: Prometheus, Alertmanager, Grafana, kube-state-metrics, and node-exporter.
 
-The following components of the stack are deployed in the app-of-apps repository, not by units in this repo:
-
-- [`helm-kube-prometheus-stack`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-kube-prometheus-stack): the chart itself
-- `grafana-httproute`, `prometheus-httproute`, and `alertmanager-httproute`: instances of the generic [`helm-httproute`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-httproute) chart
-- `grafana-secrets`: an instance of the generic [`helm-eso-secret-sync`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-eso-secret-sync) chart
-
 ## Concepts
 
 - [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
@@ -23,9 +17,11 @@ The following components of the stack are deployed in the app-of-apps repository
 
 ## What's Inside
 
-- **[grafana/aws_secret_password](grafana/aws_secret_password/)**: Generates a random Grafana admin password and stores it in AWS Secrets Manager. The chart never generates its own admin secret, Grafana's admin credentials always come from this secret via ESO
+- **[grafana/aws_secret_password](grafana/aws_secret_password/)**: Generates a random Grafana admin password and stores it in AWS Secrets Manager. The chart never generates its own admin secret, Grafana's admin credentials always come from this secret via ESO. `app_of_apps` takes an ordering dependency on it so the password exists before ESO tries to sync it
+- **[`helm-kube-prometheus-stack`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-kube-prometheus-stack)** (app-of-apps): the chart itself. Not deployed by this unit
+- **`grafana-httproute`, `prometheus-httproute`, `alertmanager-httproute`** (app-of-apps): instances of the generic [`helm-httproute`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-httproute) chart, exposing the stack's UIs
+- **`grafana-secrets`** (app-of-apps): an instance of the generic [`helm-eso-secret-sync`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-eso-secret-sync) chart, syncs `grafana/aws_secret_password` into the cluster
 
-## Integration
+## Upstream Dependencies
 
 - **[`units/eks/addons/ebs_csi_driver`](../ebs_csi_driver/)**: `units/eks/addons/argocd/app_of_apps` takes an ordering dependency on `ebs_csi_driver/addon` so the driver exists before ArgoCD deploys anything backed by persistent storage
-- **[`units/eks/addons/argocd/app_of_apps`](../argocd/app_of_apps/)**: deploys the Helm release, HTTPRoutes, and SecretStore and ExternalSecret through app-of-apps. Takes an ordering dependency on `grafana/aws_secret_password` so the password exists before ESO tries to sync it

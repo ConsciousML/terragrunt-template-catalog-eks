@@ -12,7 +12,8 @@ Installs the [Amazon EBS CSI Driver](https://github.com/kubernetes-sigs/aws-ebs-
 - **[iam_role](iam_role/)**: Creates an IAM role bound to the `ebs-csi-controller-sa` service account in `kube-system` via Pod Identity, with the AWS-managed EBS CSI driver policy attached
 - **[addon](addon/)**: Installs the `aws-ebs-csi-driver` EKS managed addon, depending on both `units/eks/cluster` and `iam_role` so the Pod Identity association exists before the addon is installed
 
-## Integration
+This unit only installs the driver. It creates no `StorageClass`. The default `gp3` class comes from [`storage-class-gp3`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/storage-class-gp3) (app-of-apps). Without it synced too, every `PersistentVolumeClaim` stays `Pending`.
+
+## Upstream Dependencies
 
 - **[`units/eks/cluster`](../../cluster/)**: Provides the `cluster_name` output consumed by both `iam_role` and `addon`. Without the `addon` unit waiting on `iam_role`, the controller pod starts without credentials and the addon stays in `CREATING` indefinitely
-- **[`storage-class-gp3`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/storage-class-gp3)** (app-of-apps): defines the default `gp3` `StorageClass` this driver provisions volumes for. This unit only installs the driver. It creates no `StorageClass`. Without `storage-class-gp3` synced too, every `PersistentVolumeClaim` stays `Pending`
