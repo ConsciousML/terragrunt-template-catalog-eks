@@ -46,9 +46,9 @@ unit "vpc" {
     enable_dns_hostnames = true
     enable_dns_support   = true
 
-    enable_flow_log                      = true
-    create_flow_log_cloudwatch_log_group = true
-    create_flow_log_cloudwatch_iam_role  = true
+    enable_flow_log                      = false
+    create_flow_log_cloudwatch_log_group = false
+    create_flow_log_cloudwatch_iam_role  = false
 
     flow_log_traffic_type             = "REJECT" # only denied traffic reduces log volume
     flow_log_max_aggregation_interval = 600      # 10-min batching vs 60s, fewer records
@@ -91,8 +91,9 @@ unit "cluster" {
       tier = "standard"
     }
 
-    # Control plane logging cost optimization
-    enabled_log_types = ["api"]
+    # Control plane logging disabled to cut CloudWatch costs.
+    # Dev-only: do not port this to staging/prod, re-enable there.
+    enabled_log_types = []
     # Infrequent Access cuts cost ~50% but doesn't support all Standard class features:
     # https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatch_Logs_Log_Classes.html
     cloudwatch_log_group_class             = "INFREQUENT_ACCESS"
