@@ -259,6 +259,31 @@ unit "argocd" {
           LUA
         }
       }
+      # Scraped for the argo-cd-mixin dashboards (https://github.com/adinhodovic/argo-cd-mixin).
+      controller = {
+        metrics = {
+          enabled = true
+          serviceMonitor = {
+            enabled = true
+          }
+        }
+      }
+      repoServer = {
+        metrics = {
+          enabled = true
+          serviceMonitor = {
+            enabled = true
+          }
+        }
+      }
+      notifications = {
+        metrics = {
+          enabled = true
+          serviceMonitor = {
+            enabled = true
+          }
+        }
+      }
     }
   }
 }
