@@ -26,7 +26,7 @@ remote_state {
 
     # The bucket name is suffixed using the env name (i.e `dev`, `staging`, ect.)
     # This allows to completely isolate states between environments
-    bucket = "tofu-state-${get_aws_account_id()}-${local.environment}"
+    bucket = "tofu-state-${get_aws_account_id()}-${local.aws_region}-${local.environment}"
 
     # The state file path within the bucket, based on module's relative path to ensure each module has its own isolated state
     key            = "${path_relative_to_include()}/tofu.tfstate"
