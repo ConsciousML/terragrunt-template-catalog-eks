@@ -82,7 +82,7 @@ unit "cluster" {
   values = {
     version = local.version_cluster
 
-    kubernetes_version = "1.35"
+    kubernetes_version = "1.36"
 
     # Two-phase bootstrap: keep public access on for the initial apply, since ArgoCD,
     # app-of-apps, and the Tailscale Connector (which gives CI its route into the VPC)
@@ -138,8 +138,8 @@ unit "cluster" {
 
         # Pin to a specific AMI release to prevent unintended rolling node replacements on every apply.
         # Find available versions with:
-        # aws ssm get-parameters-by-path --path /aws/service/eks/optimized-ami/1.35/amazon-linux-2023/x86_64/standard --query 'Parameters[].Name'
-        ami_release_version = "1.35.6-20260618"
+        # aws ssm get-parameters-by-path --path /aws/service/eks/optimized-ami/1.36/amazon-linux-2023/x86_64/standard --query 'Parameters[].Name'
+        ami_release_version = "1.36.2-20260709"
 
         # Use cheapest config for testing purposes
         instance_types = ["t3.medium"]
@@ -149,6 +149,13 @@ unit "cluster" {
         min_size     = 3
         max_size     = 10
         desired_size = 3
+
+        # Blocks pods from reaching instance metadata: pods sit at hop 2, only the node itself (hop 1) can get a token
+        metadata_options = {
+          http_tokens                 = "required"
+          http_put_response_hop_limit = 1
+          http_endpoint               = "enabled"
+        }
       }
     }
 

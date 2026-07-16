@@ -193,6 +193,19 @@ argocd login argocd.private.dev.<base_domain> \
     --output text | jq -r .plaintext)
 ```
 
+### Disable the Public EKS Endpoint
+
+Logging into ArgoCD over Tailscale confirms the Tailscale Connector is routing into the VPC. For improved security, set `endpoint_public_access` to `false` in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](pipelines/dev/eks/stack/terragrunt.stack.hcl), then re-apply just the `cluster` unit:
+
+```bash
+cd pipelines/dev/eks/stack/.terragrunt-stack/eks/cluster
+terragrunt apply --non-interactive
+```
+
+From this point on, `kubectl` and the AWS CLI can only reach the API server while connected to Tailscale.
+
+**Caution**: Before destroying the stack, set `endpoint_public_access` back to `true` and apply the `cluster` unit first. `terragrunt run --all destroy` tears down the Tailscale Connector alongside the Helm releases, and once it's gone there is no path left to the private API server to finish uninstalling them.
+
 ### Access the Monitoring UIs
 
 Grafana, Prometheus, and Alertmanager are only reachable via Tailscale, same as ArgoCD.
