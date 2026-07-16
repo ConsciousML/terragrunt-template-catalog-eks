@@ -25,6 +25,11 @@ dependency "route53_hosted_zone_private" {
   skip_outputs = true
 }
 
+dependency "prometheus_operator_crds" {
+  config_path  = "../../prometheus_stack/crds"
+  skip_outputs = true
+}
+
 inputs = {
   cluster_name     = dependency.eks_cluster.outputs.cluster_name
   name             = "argocd"
