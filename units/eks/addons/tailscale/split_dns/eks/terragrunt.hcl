@@ -8,24 +8,19 @@ terraform {
 }
 
 dependency "vpc" {
-  config_path = "../../../../vpc"
+  config_path = "../../../../../vpc"
   mock_outputs = {
     vpc_cidr_block = "10.0.0.0/16"
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
-dependency "route53_hosted_zone_private" {
-  config_path  = "../../../route53/hosted_zone_private"
-  skip_outputs = true
-}
-
 locals {
-  domains_hcl        = find_in_parent_folders("domains.hcl")
-  domain_env_private = read_terragrunt_config(local.domains_hcl).locals.domain_env_private
+  region_hcl = find_in_parent_folders("region.hcl")
+  region     = read_terragrunt_config(local.region_hcl).locals.region
 }
 
 inputs = {
-  domain      = local.domain_env_private
+  domain      = "${local.region}.eks.amazonaws.com"
   nameservers = [cidrhost(dependency.vpc.outputs.vpc_cidr_block, 2)]
 }

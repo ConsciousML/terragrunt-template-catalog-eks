@@ -15,7 +15,8 @@ Joins the EKS cluster to a Tailnet via the Tailscale Kubernetes operator, exposi
 - **[acl](acl/)**: Applies the Tailscale ACL policy to the Tailnet, auto-approving subnet routes for the VPC CIDR so tagged nodes can advertise routes without manual approval in the Tailscale admin panel. Part of the [`pipelines/bootstrap/tailscale`](../../../../pipelines/bootstrap/tailscale/) stack, not the EKS stack
 - **[oauth_client_tailscale_operator](oauth_client_tailscale_operator/)**: Creates a Tailscale OAuth client for the operator
 - **[oauth_client_secret](oauth_client_secret/)**: Stores `oauth_client_tailscale_operator`'s credentials in AWS Secrets Manager
-- **[split_dns](split_dns/)**: Configures Tailscale split DNS to route queries for `domain_env_private` (e.g. `private.dev.axelmendoza.com`) through the VPC DNS resolver, so private hostnames resolve over the Tailnet without intercepting public endpoints. Reads `domain_env_private` from `domains.hcl`. Depends on `vpc` and `route53/hosted_zone_private`
+- **[split_dns/default](split_dns/default/)**: Configures Tailscale split DNS to route queries for `domain_env_private` (e.g. `private.dev.axelmendoza.com`) through the VPC DNS resolver, so private hostnames resolve over the Tailnet without intercepting public endpoints. Reads `domain_env_private` from `domains.hcl`
+- **[split_dns/eks](split_dns/eks/)**: Configures Tailscale split DNS to route queries for the region's EKS private endpoint domain (`<region>.eks.amazonaws.com`) through the VPC DNS resolver, so the private EKS API endpoint resolves over the Tailnet
 - **[`helm-tailscale-operator`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-tailscale-operator)** (app-of-apps): deploys the operator Helm release itself. Not deployed by this unit
 - **[`helm-tailscale-connector`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-tailscale-connector)** (app-of-apps): deploys the `Connector` CR. Not deployed by this unit
 
@@ -25,5 +26,5 @@ The ESO `SecretStore` and `ExternalSecret` that sync the OAuth credentials into 
 
 - **[`units/tailscale`](../../../tailscale/)**: provisions the WIF credential and GitHub secrets that allow CI to authenticate to Tailscale when deploying the operator
 - **[`units/eks/addons/external_secrets_operator`](../external_secrets_operator/)**: its IAM role must be in place before the ESO controller (deployed through app-of-apps) can read the OAuth secret
-- **[`units/eks/route53/hosted_zone_private`](../../route53/hosted_zone_private/)**: `split_dns` takes an ordering dependency to ensure the private zone exists before configuring Tailscale DNS. The intercepted domain is read from `domains.hcl` (`domain_env_private`), not from this unit's output
-- **[`units/vpc`](../../../vpc/)**: `split_dns` derives the VPC DNS resolver address from it
+- **[`units/eks/route53/hosted_zone_private`](../../route53/hosted_zone_private/)**: `split_dns/default` takes an ordering dependency to ensure the private zone exists before configuring Tailscale DNS. The intercepted domain is read from `domains.hcl` (`domain_env_private`), not from this unit's output
+- **[`units/vpc`](../../../vpc/)**: `split_dns/default` and `split_dns/eks` both derive the VPC DNS resolver address from it
