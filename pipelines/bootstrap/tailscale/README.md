@@ -30,7 +30,7 @@ From the root directory of this repository, run:
 ```bash
 source .env
 cd pipelines/bootstrap/tailscale
-terragrunt stack run init
+terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 

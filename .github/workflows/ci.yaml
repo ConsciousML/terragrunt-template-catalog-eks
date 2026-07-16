@@ -121,5 +121,5 @@ jobs:
       - name: Run Terragrunt stack generate and plan
         run: |
           cd ${{ env.TG_STACK_PATH }}
-          terragrunt stack run init
+          terragrunt stack generate
           terragrunt run --all plan --backend-bootstrap --non-interactive --no-stack-generate
