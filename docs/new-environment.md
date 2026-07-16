@@ -81,3 +81,9 @@ cd pipelines/dev-2/eks/stack
 terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
+
+### Disable the Public EKS Endpoint
+
+The cluster unit's `values` block keeps `endpoint_public_access` set to `true` for this first apply, since ArgoCD, app-of-apps, and the Tailscale Connector (which routes CI into the VPC) don't exist yet on a brand-new cluster.
+
+Once the stack is up, follow the [Disable the Public EKS Endpoint](../README.md#disable-the-public-eks-endpoint) step in the main README, using `pipelines/dev-2` in place of `pipelines/dev`.

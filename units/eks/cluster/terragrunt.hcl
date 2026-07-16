@@ -27,7 +27,8 @@ inputs = {
 
   kubernetes_version = values.kubernetes_version
 
-  endpoint_public_access = values.endpoint_public_access
+  endpoint_public_access  = values.endpoint_public_access
+  endpoint_private_access = values.endpoint_private_access
 
   # Adds the current caller identity as an administrator via cluster access entry
   enable_cluster_creator_admin_permissions = values.enable_cluster_creator_admin_permissions

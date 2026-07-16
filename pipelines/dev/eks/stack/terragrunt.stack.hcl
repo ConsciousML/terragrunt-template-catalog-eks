@@ -84,9 +84,13 @@ unit "cluster" {
 
     kubernetes_version = "1.35"
 
-    # For improved security, should be set to `false`
-    # Use Tailscale to access the private endpoint
-    endpoint_public_access = true
+    # Two-phase bootstrap: keep public access on for the initial apply, since ArgoCD,
+    # app-of-apps, and the Tailscale Connector (which gives CI its route into the VPC)
+    # aren't up yet on a brand-new cluster. Once ArgoCD is reachable over Tailscale,
+    # confirming the Connector is routing, set `endpoint_public_access` to false here
+    # and re-apply the `cluster` unit. See docs/new-environment.md for the exact step.
+    endpoint_public_access  = true
+    endpoint_private_access = true
 
     # Adds the current caller identity as an administrator via cluster access entry
     enable_cluster_creator_admin_permissions = true
@@ -419,9 +423,18 @@ unit "tailscale_oauth_client_secret" {
   }
 }
 
-unit "tailscale_split_dns" {
-  source = "${get_repo_root()}/units/eks/addons/tailscale/split_dns"
-  path   = "eks/addons/tailscale/split_dns"
+unit "tailscale_split_dns_default" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/split_dns/default"
+  path   = "eks/addons/tailscale/split_dns/default"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "tailscale_split_dns_eks_endpoint" {
+  source = "${get_repo_root()}/units/eks/addons/tailscale/split_dns/eks"
+  path   = "eks/addons/tailscale/split_dns/eks"
 
   values = {
     version = local.version
