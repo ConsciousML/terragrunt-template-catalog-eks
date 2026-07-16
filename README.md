@@ -136,7 +136,7 @@ Deploy the [EKS Cluster Stack](units/eks/README.md):
 ```bash
 source .env
 cd pipelines/dev/eks/stack
-terragrunt stack run init
+terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 

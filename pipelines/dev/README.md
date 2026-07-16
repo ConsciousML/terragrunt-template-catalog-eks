@@ -41,7 +41,7 @@ Perform the [quickstart](../../README.md#getting-started) up to `Authenticate wi
 ```bash
 cd pipelines/dev/eks/stack
 
-terragrunt stack run init
+terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
