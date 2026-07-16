@@ -107,8 +107,11 @@ For more information on how to use mise, read their [getting started guide](http
 - [prek](https://github.com/j178/prek#installation)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [GitHub CLI](https://github.com/cli/cli#installation)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
+- [jq](https://jqlang.org/download/)
+- [ArgoCD CLI](https://argo-cd.readthedocs.io/en/stable/cli_installation/)
 
-See [mise.toml](./mise.toml) for specific versions.
+See [mise.toml](./mise.toml) and [mise.local.toml](./mise.local.toml) for specific versions.
 
 ### Authenticate with AWS
 Authenticate to the AWS CLI:
@@ -190,17 +193,6 @@ argocd login argocd.private.dev.<base_domain> \
     --output text | jq -r .plaintext)
 ```
 
-### Disable the Public EKS Endpoint
-
-Logging into ArgoCD over Tailscale confirms the Tailscale Connector is routing into the VPC. For improved security, set `endpoint_public_access` to `false` in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](pipelines/dev/eks/stack/terragrunt.stack.hcl), then re-apply just the `cluster` unit:
-
-```bash
-cd pipelines/dev/eks/stack/.terragrunt-stack/eks/cluster
-terragrunt apply --non-interactive
-```
-
-From this point on, `kubectl` and the AWS CLI can only reach the API server while connected to Tailscale.
-
 ### Access the Monitoring UIs
 
 Grafana, Prometheus, and Alertmanager are only reachable via Tailscale, same as ArgoCD.
@@ -220,6 +212,17 @@ Grafana, Prometheus, and Alertmanager are only reachable via Tailscale, same as 
 Open `https://guestbook.public.dev.<base_domain>` in your browser. No login required.
 
 Apps are deployed using the [App of Apps](https://github.com/ConsciousML/argocd-app-of-apps-template) pattern: a single ArgoCD Application bootstraps all child apps from that repository.
+
+### Disable the Public EKS Endpoint
+
+Logging into ArgoCD over Tailscale confirms the Tailscale Connector is routing into the VPC. For improved security, set `endpoint_public_access` to `false` in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](pipelines/dev/eks/stack/terragrunt.stack.hcl), then re-apply just the `cluster` unit:
+
+```bash
+cd pipelines/dev/eks/stack/.terragrunt-stack/eks/cluster
+terragrunt apply --non-interactive
+```
+
+From this point on, `kubectl` and the AWS CLI can only reach the API server while connected to Tailscale.
 
 ### Destroy the Infrastructure
 Finally, cleanup by destroying the infrastructure (cwd in `pipelines/dev/eks/stack`):
