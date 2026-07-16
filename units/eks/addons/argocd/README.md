@@ -20,6 +20,7 @@ The ESO `SecretStore` and `ExternalSecret` that sync the admin password's bcrypt
 
 ## Upstream Dependencies
 
+- **[`units/eks/addons/prometheus_stack/crds`](../prometheus_stack/crds/)**: `helm` takes an ordering dependency on it so the Prometheus Operator CRDs exist before ArgoCD's own Helm release renders any `ServiceMonitor`
 - **[`units/eks/addons/external_secrets_operator`](../external_secrets_operator/)**: `app_of_apps` takes an ordering dependency on its IAM role so the ESO controller can read the admin password secret once deployed through app-of-apps
 - **[`units/eks/addons/aws_load_balancer_controller`](../aws_load_balancer_controller/)**: `app_of_apps` takes an ordering dependency on its IAM role so the Pod Identity association exists before ArgoCD deploys the controller
 - **[`units/eks/addons/external_dns`](../external_dns/)**: `app_of_apps` takes an ordering dependency on both IAM roles so the Pod Identity associations exist before ArgoCD deploys either instance

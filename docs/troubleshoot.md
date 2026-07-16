@@ -126,7 +126,7 @@ If we need to destroy by hand, work around Terragrunt entirely instead of fighti
 ### Set Up the Variables Used Below
 
 ```bash
-REGION=eu-west-3
+REGION=us-east-1
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ENVIRONMENT=dev
 BUCKET="tofu-state-${ACCOUNT_ID}-${ENVIRONMENT}"

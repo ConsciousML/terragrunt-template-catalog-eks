@@ -149,7 +149,7 @@ aws eks update-kubeconfig --region <region-code> --name <cluster-name>
 
 By default, you connect to your cluster with:
 ```bash
-aws eks update-kubeconfig --region eu-west-3 --name dev-cluster
+aws eks update-kubeconfig --region us-east-1 --name dev-cluster
 ```
 
 Next, verify `kubectl` is connected:
