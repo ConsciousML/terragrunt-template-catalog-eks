@@ -18,6 +18,7 @@ dependency "tailscale_wif" {
 
 inputs = {
   github_token     = values.github_token
+  github_owner     = include.root.locals.github_username_catalog
   github_repo_name = values.github_repo_name
   secrets = {
     TS_OAUTH_CLIENT_ID = dependency.tailscale_wif.outputs.client_id

@@ -4,6 +4,11 @@ variable "github_token" {
   sensitive   = true
 }
 
+variable "github_owner" {
+  description = "GitHub organization or user account that owns the target repository"
+  type        = string
+}
+
 variable "github_repo_name" {
   description = "GitHub repository name where secrets will be stored"
   type        = string
