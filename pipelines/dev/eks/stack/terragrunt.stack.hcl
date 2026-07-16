@@ -115,13 +115,19 @@ unit "cluster" {
     # https://docs.aws.amazon.com/eks/latest/userguide/workloads-add-ons-available-eks.html
     addons = {
       # aws-ebs-csi-driver is installed from units/eks/addons/ebs_csi_driver/addon
-      coredns = {}
+      coredns = {
+        addon_version = "v1.14.2-eksbuild.4"
+      }
       eks-pod-identity-agent = {
         before_compute = true
+        addon_version  = "v1.3.10-eksbuild.3"
       }
-      kube-proxy = {}
+      kube-proxy = {
+        addon_version = "v1.36.0-eksbuild.7"
+      }
       vpc-cni = {
         before_compute = true
+        addon_version  = "v1.21.2-eksbuild.2"
         # Prefix delegation: nodes need more IPs than one-per-ENI allows
         configuration_values = jsonencode({
           env = {
@@ -188,8 +194,9 @@ unit "ebs_csi_driver_addon" {
   path   = "eks/addons/ebs_csi_driver/addon"
 
   values = {
-    version = local.version
-    tags    = {}
+    version       = local.version
+    addon_version = "v1.62.0-eksbuild.1"
+    tags          = {}
   }
 }
 
