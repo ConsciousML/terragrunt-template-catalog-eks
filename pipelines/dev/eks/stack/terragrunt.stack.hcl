@@ -8,6 +8,10 @@ locals {
   version_argocd        = "9.5.0"
   version_argocd_apps   = "2.0.5"
   version_karpenter_iam = "21.24.0"
+  # Keep in sync with the appVersion the kube-prometheus-stack chart dependency pins in the
+  # app-of-apps repo's helm-kube-prometheus-stack/Chart.yaml, both track the same
+  # prometheus-operator CRD version.
+  version_prometheus_operator_crds = "30.0.1"
 
   environment       = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
   cluster_name_full = read_terragrunt_config(find_in_parent_folders("cluster_name_env.hcl")).locals.cluster_name_full
@@ -224,6 +228,20 @@ unit "iam_role_eso" {
   }
 }
 
+# --- Prometheus Operator CRDs ---
+# Installed ahead of ArgoCD so the ServiceMonitor CRD already exists by the time anything
+# renders one.
+
+unit "prometheus_operator_crds" {
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/crds"
+  path   = "eks/addons/prometheus_stack/crds"
+
+  values = {
+    version            = local.version
+    helm_chart_version = local.version_prometheus_operator_crds
+  }
+}
+
 # --- ArgoCD ---
 
 unit "argocd" {
@@ -257,6 +275,31 @@ unit "argocd" {
             end
             return hs
           LUA
+        }
+      }
+      # Scraped for the argo-cd-mixin dashboards (https://github.com/adinhodovic/argo-cd-mixin).
+      controller = {
+        metrics = {
+          enabled = true
+          serviceMonitor = {
+            enabled = true
+          }
+        }
+      }
+      repoServer = {
+        metrics = {
+          enabled = true
+          serviceMonitor = {
+            enabled = true
+          }
+        }
+      }
+      notifications = {
+        metrics = {
+          enabled = true
+          serviceMonitor = {
+            enabled = true
+          }
         }
       }
     }
