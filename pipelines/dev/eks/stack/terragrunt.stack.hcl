@@ -82,7 +82,7 @@ unit "cluster" {
   values = {
     version = local.version_cluster
 
-    kubernetes_version = "1.35"
+    kubernetes_version = "1.36"
 
     # Two-phase bootstrap: keep public access on for the initial apply, since ArgoCD,
     # app-of-apps, and the Tailscale Connector (which gives CI its route into the VPC)
@@ -115,13 +115,19 @@ unit "cluster" {
     # https://docs.aws.amazon.com/eks/latest/userguide/workloads-add-ons-available-eks.html
     addons = {
       # aws-ebs-csi-driver is installed from units/eks/addons/ebs_csi_driver/addon
-      coredns = {}
+      coredns = {
+        addon_version = "v1.14.2-eksbuild.4"
+      }
       eks-pod-identity-agent = {
         before_compute = true
+        addon_version  = "v1.3.10-eksbuild.3"
       }
-      kube-proxy = {}
+      kube-proxy = {
+        addon_version = "v1.36.0-eksbuild.7"
+      }
       vpc-cni = {
         before_compute = true
+        addon_version  = "v1.21.2-eksbuild.2"
         # Prefix delegation: nodes need more IPs than one-per-ENI allows
         configuration_values = jsonencode({
           env = {
@@ -138,8 +144,8 @@ unit "cluster" {
 
         # Pin to a specific AMI release to prevent unintended rolling node replacements on every apply.
         # Find available versions with:
-        # aws ssm get-parameters-by-path --path /aws/service/eks/optimized-ami/1.35/amazon-linux-2023/x86_64/standard --query 'Parameters[].Name'
-        ami_release_version = "1.35.6-20260618"
+        # aws ssm get-parameters-by-path --path /aws/service/eks/optimized-ami/1.36/amazon-linux-2023/x86_64/standard --query 'Parameters[].Name'
+        ami_release_version = "1.36.2-20260709"
 
         # Use cheapest config for testing purposes
         instance_types = ["t3.medium"]
@@ -149,6 +155,13 @@ unit "cluster" {
         min_size     = 3
         max_size     = 10
         desired_size = 3
+
+        # Blocks pods from reaching instance metadata: pods sit at hop 2, only the node itself (hop 1) can get a token
+        metadata_options = {
+          http_tokens                 = "required"
+          http_put_response_hop_limit = 1
+          http_endpoint               = "enabled"
+        }
       }
     }
 
@@ -181,8 +194,9 @@ unit "ebs_csi_driver_addon" {
   path   = "eks/addons/ebs_csi_driver/addon"
 
   values = {
-    version = local.version
-    tags    = {}
+    version       = local.version
+    addon_version = "v1.62.0-eksbuild.1"
+    tags          = {}
   }
 }
 
