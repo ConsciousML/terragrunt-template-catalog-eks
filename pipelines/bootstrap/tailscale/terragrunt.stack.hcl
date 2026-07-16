@@ -12,7 +12,7 @@ locals {
 
 unit "acl" {
   source = "git::git@github.com:${local.github_username_catalog}/${local.github_repo_name_catalog}.git//units/eks/addons/tailscale/acl?ref=${local.version}"
-  path   = "tailscale/acl"
+  path   = "eks/addons/tailscale/acl"
 
   values = {
     version = local.version
