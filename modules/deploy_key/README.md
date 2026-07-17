@@ -33,6 +33,7 @@ Deploy keys are SSH keys that grant access to a specific repository (usually rea
 |------|-------------|------|---------|:--------:|
 | <a name="input_current_repository"></a> [current\_repository](#input\_current\_repository) | GitHub repository name (format: 'repo-name') where the GitHub Actions secrets will be stored | `string` | n/a | yes |
 | <a name="input_deploy_key_title"></a> [deploy\_key\_title](#input\_deploy\_key\_title) | Human-readable title for the deploy key as it appears in GitHub repository settings | `string` | `"Terragrunt Deploy Key"` | no |
+| <a name="input_github_owner"></a> [github\_owner](#input\_github\_owner) | GitHub organization or user account that owns the target repositories | `string` | n/a | yes |
 | <a name="input_github_token"></a> [github\_token](#input\_github\_token) | GitHub personal access token with 'repo' and 'admin:repo\_hook' permissions. Required to create deploy keys and manage repository settings | `string` | n/a | yes |
 | <a name="input_read_only"></a> [read\_only](#input\_read\_only) | Whether the deploy key should be read-only (true) or have write access (false). For security, defaults to read-only. | `bool` | `true` | no |
 | <a name="input_repositories"></a> [repositories](#input\_repositories) | List of GitHub repository names (format: 'repo-name') where deploy keys will be added for secure access | `list(string)` | n/a | yes |

@@ -91,7 +91,7 @@ stack "aws_gh_actions_auth" {
 
 unit "deploy_key_terraform_docs" {
   source = "git::git@github.com:${local.github_username_catalog}/${local.github_repo_name_catalog}.git//units/github/deploy_key/?ref=${local.version}"
-  path   = "terraform_docs_deploy_key"
+  path   = "github/deploy_key"
 
   values = {
     version            = local.version

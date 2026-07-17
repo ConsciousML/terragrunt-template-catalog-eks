@@ -487,49 +487,49 @@ unit "grafana_password" {
   }
 }
 
-# --- Domain names (deferred: not required for ArgoCD bootstrap) ---
+# --- Domain names ---
 
-# unit "domain_name_argocd" {
-#   source = "${get_repo_root()}/units/eks/domain_name/argocd"
-#   path   = "eks/domain_name/argocd"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-#
-# unit "domain_name_guestbook" {
-#   source = "${get_repo_root()}/units/eks/domain_name/guestbook"
-#   path   = "eks/domain_name/guestbook"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-#
-# unit "domain_name_prometheus" {
-#   source = "${get_repo_root()}/units/eks/domain_name/prometheus"
-#   path   = "eks/domain_name/prometheus"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-#
-# unit "domain_name_alertmanager" {
-#   source = "${get_repo_root()}/units/eks/domain_name/alertmanager"
-#   path   = "eks/domain_name/alertmanager"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
-#
-# unit "domain_name_grafana" {
-#   source = "${get_repo_root()}/units/eks/domain_name/grafana"
-#   path   = "eks/domain_name/grafana"
-#
-#   values = {
-#     version = local.version
-#   }
-# }
+unit "domain_name_argocd" {
+  source = "${get_repo_root()}/units/eks/domain_name/argocd"
+  path   = "eks/domain_name/argocd"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "domain_name_guestbook" {
+  source = "${get_repo_root()}/units/eks/domain_name/guestbook"
+  path   = "eks/domain_name/guestbook"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "domain_name_prometheus" {
+  source = "${get_repo_root()}/units/eks/domain_name/prometheus"
+  path   = "eks/domain_name/prometheus"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "domain_name_alertmanager" {
+  source = "${get_repo_root()}/units/eks/domain_name/alertmanager"
+  path   = "eks/domain_name/alertmanager"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "domain_name_grafana" {
+  source = "${get_repo_root()}/units/eks/domain_name/grafana"
+  path   = "eks/domain_name/grafana"
+
+  values = {
+    version = local.version
+  }
+}

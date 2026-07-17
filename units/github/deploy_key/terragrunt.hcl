@@ -9,6 +9,7 @@ terraform {
 
 inputs = {
   github_token       = values.github_token
+  github_owner       = include.root.locals.github_username_catalog
   repositories       = values.repositories
   secret_names       = values.secret_names
   current_repository = values.current_repository

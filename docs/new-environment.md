@@ -34,13 +34,6 @@ Pick the next available `/16` block. Check `pipelines/network.hcl` for CIDRs alr
 
 The Tailscale ACL reads all VPC CIDRs from `network.hcl` automatically. Re-applying the bootstrap picks up the new entry and adds it to `autoApprovers`. See the [Tailscale bootstrap README](../pipelines/bootstrap/tailscale/README.md) for prerequisites and commands.
 
-```bash
-source .env
-cd pipelines/bootstrap/tailscale
-terragrunt stack generate
-terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
-```
-
 ### Run the DNS Bootstrap
 
 Copy the dev DNS bootstrap directory:

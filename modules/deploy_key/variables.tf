@@ -4,6 +4,11 @@ variable "github_token" {
   sensitive   = true
 }
 
+variable "github_owner" {
+  description = "GitHub organization or user account that owns the target repositories"
+  type        = string
+}
+
 variable "repositories" {
   description = "List of GitHub repository names (format: 'repo-name') where deploy keys will be added for secure access"
   type        = list(string)

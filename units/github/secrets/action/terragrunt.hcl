@@ -17,6 +17,7 @@ terraform {
 
 inputs = {
   github_token     = values.github_token
+  github_owner     = include.root.locals.github_username_catalog
   github_repo_name = values.github_repo_name
   secrets = {
     AWS_REGION   = include.root.locals.aws_region
