@@ -24,3 +24,13 @@ variable "budget_name" {
   type        = string
   default     = "estimated-charges"
 }
+
+variable "notification_type" {
+  description = "Whether each threshold notification fires on ACTUAL or FORECASTED spend"
+  type        = string
+
+  validation {
+    condition     = contains(["ACTUAL", "FORECASTED"], var.notification_type)
+    error_message = "notification_type must be either \"ACTUAL\" or \"FORECASTED\"."
+  }
+}

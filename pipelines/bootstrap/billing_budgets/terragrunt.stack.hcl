@@ -4,6 +4,11 @@ locals {
   github_locals            = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
   github_username_catalog  = local.github_locals.github_username_catalog
   github_repo_name_catalog = local.github_locals.github_repo_name_catalog
+
+  # Edit these before deploying
+  thresholds_usd            = [33.3, 66.6, 99.9]
+  forecasted_thresholds_usd = [66.6, 133.2, 199.8]
+  emails                    = ["axelmendoza@hotmail.fr"]
 }
 
 stack "billing_budgets" {
@@ -12,11 +17,12 @@ stack "billing_budgets" {
   values = {
     version = local.version
 
-    # Edit these before deploying
-    thresholds_usd = [33.3, 66.6, 99.9]
-    emails         = ["axelmendoza@hotmail.fr"]
+    thresholds_usd            = local.thresholds_usd
+    forecasted_thresholds_usd = local.forecasted_thresholds_usd
+    emails                    = local.emails
 
-    budget_name = "estimated-charges"
-    tags        = {}
+    budget_name            = "estimated-charges"
+    forecasted_budget_name = "estimated-charges-forecast"
+    tags                   = {}
   }
 }

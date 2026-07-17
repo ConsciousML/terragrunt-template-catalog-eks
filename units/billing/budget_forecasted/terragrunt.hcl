@@ -8,8 +8,9 @@ terraform {
 }
 
 inputs = {
-  thresholds_usd = values.thresholds_usd
-  emails         = values.emails
-  budget_name    = values.budget_name
-  tags           = values.tags
+  thresholds_usd    = values.thresholds_usd
+  emails            = values.emails
+  budget_name       = values.budget_name
+  notification_type = "FORECASTED"
+  tags              = values.tags
 }

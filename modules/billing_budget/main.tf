@@ -11,7 +11,7 @@ resource "aws_budgets_budget" "this" {
       comparison_operator        = "GREATER_THAN"
       threshold                  = notification.value
       threshold_type             = "ABSOLUTE_VALUE"
-      notification_type          = "ACTUAL"
+      notification_type          = var.notification_type
       subscriber_email_addresses = var.emails
     }
   }
