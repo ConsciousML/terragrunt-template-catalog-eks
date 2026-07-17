@@ -26,3 +26,21 @@ stack "billing_budgets" {
     tags                   = {}
   }
 }
+
+stack "billing_anomaly_detection" {
+  source = "github.com/${local.github_username_catalog}/${local.github_repo_name_catalog}//stacks/billing_anomaly_detection?ref=${local.version}"
+  path   = "billing_anomaly_detection"
+  values = {
+    version = local.version
+
+    # Edit these before deploying
+    monitor_name      = "anomaly-monitor"
+    monitor_dimension = "SERVICE"
+    subscription_name = "anomaly-subscription"
+    threshold_usd     = 3
+    frequency         = "DAILY"
+    emails            = local.emails
+
+    tags = {}
+  }
+}
