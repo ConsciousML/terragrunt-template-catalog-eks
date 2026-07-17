@@ -26,10 +26,17 @@ All environment VPC CIDRs are read automatically from `network.hcl` and used to 
 
 ### Deploy
 
-From the root directory of this repository, run:
+The ACL must exist before the WIF credential, since the WIF's OAuth client is scoped to a tag (`tag:ci`) that only the ACL defines. Deploy the two in order, from the root directory of this repository:
+
 ```bash
 source .env
-cd pipelines/bootstrap/tailscale
+cd pipelines/bootstrap/tailscale/acl
+terragrunt stack generate
+terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
+```
+
+```bash
+cd ../wif
 terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
