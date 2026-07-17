@@ -9,6 +9,10 @@ locals {
   thresholds_usd            = [33.3, 66.6, 99.9]
   forecasted_thresholds_usd = [66.6, 133.2, 199.8]
   emails                    = ["axelmendoza@hotmail.fr"]
+
+  # See docs/environment-variables.md#billing_anomaly_monitor_arn
+  monitor_arn_env = get_env("BILLING_ANOMALY_MONITOR_ARN", "")
+  monitor_arn     = local.monitor_arn_env != "" ? local.monitor_arn_env : null
 }
 
 stack "billing_budgets" {
@@ -36,6 +40,7 @@ stack "billing_anomaly_detection" {
     # Edit these before deploying
     monitor_name      = "anomaly-monitor"
     monitor_dimension = "SERVICE"
+    monitor_arn       = local.monitor_arn
     subscription_name = "anomaly-subscription"
     threshold_usd     = 3
     frequency         = "DAILY"

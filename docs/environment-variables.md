@@ -72,3 +72,20 @@ If you need to override it locally (e.g. to test with a different identity), add
 ```bash
 export EKS_LOCAL_ADMIN_ARN=<your_arn>
 ```
+
+## `BILLING_ANOMALY_MONITOR_ARN`
+
+**Required by**: `pipelines/bootstrap/aws_billing_alerts/`
+
+The ARN of your account's existing `SERVICE`-dimension Cost Anomaly Detection monitor, which AWS auto-creates for every account. Find it with:
+```bash
+aws ce get-anomaly-monitors --output json \
+  --query "AnomalyMonitors[?MonitorDimension=='SERVICE'].MonitorArn | [0]"
+```
+
+Add it to your `.env`:
+```bash
+export BILLING_ANOMALY_MONITOR_ARN=<your_arn>
+```
+
+Leave unset only if you want the pipeline to create a new monitor instead (fails if one already exists for the same dimension).

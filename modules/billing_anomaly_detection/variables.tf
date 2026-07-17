@@ -5,7 +5,7 @@ variable "monitor_name" {
 }
 
 variable "monitor_dimension" {
-  description = "The dimension the monitor evaluates for anomalies"
+  description = "The dimension the monitor evaluates for anomalies. Ignored when monitor_arn is set."
   type        = string
   default     = "SERVICE"
 
@@ -13,6 +13,12 @@ variable "monitor_dimension" {
     condition     = contains(["COST_CATEGORY", "LINKED_ACCOUNT", "SERVICE", "TAG"], var.monitor_dimension)
     error_message = "monitor_dimension must be one of \"COST_CATEGORY\", \"LINKED_ACCOUNT\", \"SERVICE\", \"TAG\"."
   }
+}
+
+variable "monitor_arn" {
+  description = "ARN of an existing Cost Anomaly Detection monitor to subscribe to instead of creating a new one. AWS allows only one DIMENSIONAL monitor per dimension per account and auto-creates a SERVICE one, so a fresh SERVICE monitor often can't be created; find an existing one with `aws ce get-anomaly-monitors` and set this instead."
+  type        = string
+  default     = null
 }
 
 variable "subscription_name" {
