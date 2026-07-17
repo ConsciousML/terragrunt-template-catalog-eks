@@ -6,9 +6,9 @@ locals {
   github_repo_name_catalog = local.github_locals.github_repo_name_catalog
 }
 
-stack "billing_alarms" {
-  source = "github.com/${local.github_username_catalog}/${local.github_repo_name_catalog}//stacks/billing_alarms?ref=${local.version}"
-  path   = "billing_alarms"
+stack "billing_budgets" {
+  source = "github.com/${local.github_username_catalog}/${local.github_repo_name_catalog}//stacks/billing_budgets?ref=${local.version}"
+  path   = "billing_budgets"
   values = {
     version = local.version
 
@@ -16,10 +16,7 @@ stack "billing_alarms" {
     thresholds_usd = [33.3, 66.6, 99.9]
     emails         = ["you@example.com"]
 
-    alarm_name_prefix   = "estimated-charges"
-    period              = 3600
-    evaluation_periods  = 1
-    datapoints_to_alarm = 1
-    tags                = {}
+    budget_name = "estimated-charges"
+    tags        = {}
   }
 }
