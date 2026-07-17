@@ -118,6 +118,9 @@ jobs:
       - name: Ensure EC2 Spot service-linked role exists
         run: aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 
+      - name: Run Trivy config scan
+        run: make trivy
+
       - name: Run Terragrunt stack generate and plan
         run: |
           cd ${{ env.TG_STACK_PATH }}

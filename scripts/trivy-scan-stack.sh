@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
-# Scans only the Terraform modules Terragrunt actually rendered with real
-# input values (identified by terragrunt.values.hcl + the backend.tf that
-# root.hcl generates on every unit), skipping unrelated sibling modules and
-# nested stack directories that get copied into .terragrunt-cache as a side
-# effect of cloning each unit's source repo.
+# We can't just run `trivy config .` over the generated pipelines/ tree: each
+# unit's .terragrunt-cache clones its full source repo, so a single unit's
+# cache directory contains every sibling module too, not just the one it
+# actually references. Scanning naively would rescan the same modules over
+# and over across units, and count vendored siblings that were never used.
+#
+# Instead, this scans only the Terraform modules Terragrunt actually rendered
+# with real input values (identified by terragrunt.values.hcl + the backend.tf
+# that root.hcl generates on every unit), skipping those unrelated sibling
+# modules and nested stack directories.
 #
 # Requires a stack to already be generated and initialized
-# (`terragrunt stack run init`) — this script does not generate one itself.
+# (`terragrunt stack run init`). This script does not generate one itself.
 set -euo pipefail
 
 repo_root="$(git rev-parse --show-toplevel)"
@@ -24,6 +29,10 @@ fi
 
 failed=0
 for dir in "${targets[@]}"; do
+  # terragrunt.values.hcl is plain tfvars-style HCL, just under a name Trivy
+  # doesn't auto-detect, so we point --tf-vars at it directly to resolve real
+  # input values. It only covers inputs sourced through the stack's values.*,
+  # not ones hardcoded as literals directly in a unit's `inputs` block.
   if output=$(trivy config --quiet --ignorefile "$repo_root/.trivyignore.yaml" --tf-vars "$dir/terragrunt.values.hcl" "$dir" 2>&1); then
     continue
   fi

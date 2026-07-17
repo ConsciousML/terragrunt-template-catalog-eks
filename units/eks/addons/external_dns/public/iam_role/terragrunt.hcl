@@ -22,7 +22,6 @@ inputs = {
   namespace       = "external-dns"
   service_account = "external-dns-public"
 
-  # tfsec:ignore:aws-iam-no-policy-wildcards - official policy from external-dns docs, already scoped to hostedzone/*
   iam_policy_json = jsonencode({
     Version = "2012-10-17"
     Statement = [
