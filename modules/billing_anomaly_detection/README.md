@@ -29,7 +29,8 @@ This module creates a Cost Anomaly Detection monitor and alert subscription that
 |------|-------------|------|---------|:--------:|
 | <a name="input_emails"></a> [emails](#input\_emails) | Email addresses notified when an anomaly reaches or exceeds threshold\_usd | `list(string)` | `[]` | no |
 | <a name="input_frequency"></a> [frequency](#input\_frequency) | How often anomaly alerts are sent. Valid values: DAILY, IMMEDIATE, WEEKLY | `string` | `"DAILY"` | no |
-| <a name="input_monitor_dimension"></a> [monitor\_dimension](#input\_monitor\_dimension) | The dimension the monitor evaluates for anomalies | `string` | `"SERVICE"` | no |
+| <a name="input_monitor_arn"></a> [monitor\_arn](#input\_monitor\_arn) | ARN of an existing Cost Anomaly Detection monitor to subscribe to instead of creating a new one. AWS allows only one DIMENSIONAL monitor per dimension per account and auto-creates a SERVICE one, so a fresh SERVICE monitor often can't be created; find an existing one with `aws ce get-anomaly-monitors` and set this instead. | `string` | `null` | no |
+| <a name="input_monitor_dimension"></a> [monitor\_dimension](#input\_monitor\_dimension) | The dimension the monitor evaluates for anomalies. Ignored when monitor\_arn is set. | `string` | `"SERVICE"` | no |
 | <a name="input_monitor_name"></a> [monitor\_name](#input\_monitor\_name) | Name of the Cost Anomaly Detection monitor | `string` | `"anomaly-monitor"` | no |
 | <a name="input_subscription_name"></a> [subscription\_name](#input\_subscription\_name) | Name of the Cost Anomaly Detection alert subscription | `string` | `"anomaly-subscription"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to assign to the monitor and subscription | `map(string)` | `{}` | no |
@@ -39,6 +40,6 @@ This module creates a Cost Anomaly Detection monitor and alert subscription that
 
 | Name | Description |
 |------|-------------|
-| <a name="output_monitor_arn"></a> [monitor\_arn](#output\_monitor\_arn) | The ARN of the Cost Anomaly Detection monitor |
+| <a name="output_monitor_arn"></a> [monitor\_arn](#output\_monitor\_arn) | The ARN of the Cost Anomaly Detection monitor, whether created by this module or reused via var.monitor\_arn |
 | <a name="output_subscription_arn"></a> [subscription\_arn](#output\_subscription\_arn) | The ARN of the Cost Anomaly Detection alert subscription |
 <!-- END_TF_DOCS -->
