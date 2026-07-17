@@ -128,11 +128,13 @@ unit "cluster" {
       vpc-cni = {
         before_compute = true
         addon_version  = "v1.21.2-eksbuild.2"
-        # Prefix delegation: nodes need more IPs than one-per-ENI allows
         configuration_values = jsonencode({
+          # Prefix delegation: nodes need more IPs than one-per-ENI allows
           env = {
             ENABLE_PREFIX_DELEGATION = "true"
           }
+          # Enables enforcement of NetworkPolicy resources, without this they are accepted but ignored
+          enableNetworkPolicy = "true"
         })
       }
     }
