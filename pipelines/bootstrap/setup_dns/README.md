@@ -36,7 +36,7 @@ locals {
 
 ### Deploy
 
-Repeat the following for each environment (replacing `<environment>` with `dev` and then `ci`):
+Repeat the following for each environment (replacing `<environment>` with `dev` and then `ci`), from the root directory of this repository:
 
 ```bash
 source .env
