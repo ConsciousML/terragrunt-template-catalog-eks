@@ -216,6 +216,8 @@ Or flush the DNS cache:
 sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder
 ```
 
+As a last resort, delete cookies from your browser.
+
 ## Accessing ArgoCD When It Doesn't Resolve on the Private Hosted Zone
 
 If `argocd-server`'s hostname isn't resolving yet (ExternalDNS hasn't written the record, Tailscale isn't set up, or you just need quick access), port-forward straight to the service instead:
