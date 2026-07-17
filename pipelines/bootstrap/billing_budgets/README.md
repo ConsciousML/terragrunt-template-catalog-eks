@@ -1,6 +1,6 @@
 # Billing Budgets Bootstrap
 
-Creates an AWS Budget that emails a notification for each configured USD threshold whenever actual monthly spend exceeds it.
+Creates two AWS Budgets: one that emails a notification for each configured USD threshold whenever actual monthly spend exceeds it, and one that does the same based on forecasted monthly spend, giving an earlier warning.
 
 ## Purpose
 
@@ -13,13 +13,13 @@ Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate
 
 ### Configuration
 
-Update `terragrunt.stack.hcl` in this directory with your thresholds and notification emails:
+Update the `locals` block in `terragrunt.stack.hcl` in this directory with your thresholds and notification emails:
 
 ```hcl
-values = {
-  thresholds_usd = [33.3, 66.6, 99.9]
-  emails         = ["you@example.com"]
-  # ... other values can remain as defaults
+locals {
+  thresholds_usd            = [33.3, 66.6, 99.9]
+  forecasted_thresholds_usd = [66.6, 133.2, 199.8]
+  emails                    = ["you@example.com"]
 }
 ```
 
