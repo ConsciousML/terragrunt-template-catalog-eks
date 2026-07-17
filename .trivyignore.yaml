@@ -1,0 +1,16 @@
+misconfigurations:
+  - id: AWS-0040
+    paths:
+      - "main.tf"
+    statement: >
+      Public EKS endpoint access is required for initial bootstrapping (ArgoCD/Tailscale
+      setup) before the cluster's private access path exists, then disabled manually
+      afterward. See README.md#disable-the-public-eks-endpoint.
+
+  - id: AWS-0041
+    paths:
+      - "main.tf"
+    statement: >
+      Same bootstrapping trade-off as AWS-0040: the public CIDR is required until the
+      Tailscale Connector routes into the VPC, then narrowed manually.
+      See README.md#disable-the-public-eks-endpoint.

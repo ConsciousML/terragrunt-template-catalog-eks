@@ -1,0 +1,14 @@
+scan:
+  skip-dirs:
+    - "**/examples"
+    - "**/tests"
+
+misconfiguration:
+  scanners:
+    - terraform
+
+severity:
+  - HIGH
+  - CRITICAL
+
+exit-code: 1
