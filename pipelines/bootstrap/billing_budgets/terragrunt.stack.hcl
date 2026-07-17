@@ -14,7 +14,7 @@ stack "billing_budgets" {
 
     # Edit these before deploying
     thresholds_usd = [33.3, 66.6, 99.9]
-    emails         = ["you@example.com"]
+    emails         = ["axelmendoza@hotmail.fr"]
 
     budget_name = "estimated-charges"
     tags        = {}
