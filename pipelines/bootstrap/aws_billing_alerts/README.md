@@ -20,14 +20,18 @@ Update the `locals` block and each `stack` block's `values` in `terragrunt.stack
 
 ```hcl
 locals {
-  thresholds_usd            = [33.3, 66.6, 99.9]
-  forecasted_thresholds_usd = [66.6, 133.2, 199.8]
-  emails                    = ["you@example.com"]
+  thresholds_usd            = [33.3, 66.6, 99.9]   # USD amounts that trigger an actual-spend budget alert
+  forecasted_thresholds_usd = [66.6, 133.2, 199.8] # USD amounts that trigger a forecasted-spend budget alert
+  emails                    = ["you@example.com"]  # notified by both budgets and the anomaly subscription
 }
 
 stack "billing_anomaly_detection" {
   values = {
-    threshold_usd = 3
+    monitor_name      = "anomaly-monitor"      # name of the Cost Anomaly Detection monitor (only used if one is created, see below)
+    monitor_dimension = "SERVICE"              # dimension the monitor evaluates: SERVICE, LINKED_ACCOUNT, COST_CATEGORY, or TAG
+    subscription_name = "anomaly-subscription" # name of the alert subscription
+    threshold_usd     = 3                      # minimum anomaly cost impact (USD) that triggers a notification
+    frequency         = "DAILY"                # DAILY, WEEKLY, or IMMEDIATE (IMMEDIATE requires an SNS subscriber, not email)
     # ...
   }
 }
