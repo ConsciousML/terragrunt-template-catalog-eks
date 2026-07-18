@@ -110,6 +110,11 @@ jobs:
           ts-audience: ${{ secrets.TS_AUDIENCE }}
           ts-tags: ${{ secrets.TS_TAGS }}
 
+      - name: Run Trivy config scan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: make trivy
+
       # Runs the checks as in pre-commits with prek (tflint, ...)
       # This prevents any discrepancies between the pre-commit checks and the CI checks 
       - name: Run pre-commit hooks (prek)
@@ -117,9 +122,6 @@ jobs:
 
       - name: Ensure EC2 Spot service-linked role exists
         run: aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
-
-      - name: Run Trivy config scan
-        run: make trivy
 
       - name: Run Terragrunt stack generate and plan
         run: |
