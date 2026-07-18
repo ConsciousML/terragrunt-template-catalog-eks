@@ -1,10 +1,19 @@
 # Vendored modules (e.g. terraform-aws-modules/eks/aws) ship their own example
 # and test fixtures. Without this, Trivy scans those as unrelated root modules
 # and reports noise that has nothing to do with how we actually use the module.
+#
+# .terragrunt-stack and .terragrunt-cache are generated output: terragrunt
+# renders resolved input values (terragrunt.values.hcl) into them, which can
+# contain real secrets pulled from get_env() at generation time. They're
+# gitignored, but still present on disk during local scans, so skip them here
+# too rather than relying solely on git to keep them out of scope.
 scan:
   skip-dirs:
     - "**/examples"
     - "**/tests"
+  skip-files:
+    - .env
+    - "**/terragrunt.values.hcl"
 
 misconfiguration:
   scanners:

@@ -6,3 +6,11 @@ repos:
       - id: tofu-validate
       - id: tflint
       - id: terragrunt-hcl-fmt
+  - repo: local
+    hooks:
+      - id: trivy-secrets
+        name: Trivy secret scan
+        language: system
+        entry: trivy fs .
+        pass_filenames: false
+        always_run: true
