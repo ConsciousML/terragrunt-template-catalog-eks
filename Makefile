@@ -9,8 +9,7 @@ sync-lock-files:
 	./scripts/sync-lock-files.sh
 
 trivy:
-	cd pipelines && terragrunt stack run init
 	./scripts/trivy-scan-stack.sh
 
 trivy-local:
-	. ./.env && $(MAKE) trivy
+	. ./.env && cd pipelines && terragrunt stack run init && cd - && $(MAKE) trivy
