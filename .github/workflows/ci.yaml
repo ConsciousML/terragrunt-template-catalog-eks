@@ -114,6 +114,8 @@ jobs:
         run: aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 
       - name: Initialize Terragrunt stack
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd pipelines
           terragrunt stack run init
