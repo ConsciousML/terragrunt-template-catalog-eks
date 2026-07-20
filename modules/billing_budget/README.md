@@ -8,19 +8,19 @@ This module creates an AWS Budget that sends an email notification for each conf
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | = 6.55.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | = 6.55.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aws_budgets_budget.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/budgets_budget) | resource |
+| [aws_budgets_budget.this](https://registry.terraform.io/providers/hashicorp/aws/6.55.0/docs/resources/budgets_budget) | resource |
 
 ## Inputs
 

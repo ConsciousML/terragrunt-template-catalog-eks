@@ -9,19 +9,19 @@ The outputs (`client_id`, `client_secret`) can be used to authenticate with the 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.1 |
-| <a name="requirement_tailscale"></a> [tailscale](#requirement\_tailscale) | ~> 0.28.0 |
+| <a name="requirement_tailscale"></a> [tailscale](#requirement\_tailscale) | = 0.28.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_tailscale"></a> [tailscale](#provider\_tailscale) | ~> 0.28.0 |
+| <a name="provider_tailscale"></a> [tailscale](#provider\_tailscale) | = 0.28.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [tailscale_oauth_client.this](https://registry.terraform.io/providers/tailscale/tailscale/latest/docs/resources/oauth_client) | resource |
+| [tailscale_oauth_client.this](https://registry.terraform.io/providers/tailscale/tailscale/0.28.0/docs/resources/oauth_client) | resource |
 
 ## Inputs
 

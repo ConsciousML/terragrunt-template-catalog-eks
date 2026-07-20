@@ -9,23 +9,23 @@ Deploy keys are SSH keys that grant access to a specific repository (usually rea
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.1 |
-| <a name="requirement_github"></a> [github](#requirement\_github) | ~> 6.6.0 |
-| <a name="requirement_tls"></a> [tls](#requirement\_tls) | ~> 4.1 |
+| <a name="requirement_github"></a> [github](#requirement\_github) | = 6.6.0 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | = 4.3.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_github"></a> [github](#provider\_github) | ~> 6.6.0 |
-| <a name="provider_tls"></a> [tls](#provider\_tls) | ~> 4.1 |
+| <a name="provider_github"></a> [github](#provider\_github) | = 6.6.0 |
+| <a name="provider_tls"></a> [tls](#provider\_tls) | = 4.3.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [github_actions_secret.deploy_key](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) | resource |
-| [github_repository_deploy_key.deploy_key](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_deploy_key) | resource |
-| [tls_private_key.deploy_key](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
+| [github_actions_secret.deploy_key](https://registry.terraform.io/providers/integrations/github/6.6.0/docs/resources/actions_secret) | resource |
+| [github_repository_deploy_key.deploy_key](https://registry.terraform.io/providers/integrations/github/6.6.0/docs/resources/repository_deploy_key) | resource |
+| [tls_private_key.deploy_key](https://registry.terraform.io/providers/hashicorp/tls/4.3.0/docs/resources/private_key) | resource |
 
 ## Inputs
 

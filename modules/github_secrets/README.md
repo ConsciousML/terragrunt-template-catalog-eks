@@ -8,19 +8,19 @@ This module creates GitHub Actions secrets from a map of name-value pairs. Use i
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.1 |
-| <a name="requirement_github"></a> [github](#requirement\_github) | ~> 6.6.0 |
+| <a name="requirement_github"></a> [github](#requirement\_github) | = 6.6.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_github"></a> [github](#provider\_github) | ~> 6.6.0 |
+| <a name="provider_github"></a> [github](#provider\_github) | = 6.6.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [github_actions_secret.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) | resource |
+| [github_actions_secret.this](https://registry.terraform.io/providers/integrations/github/6.6.0/docs/resources/actions_secret) | resource |
 
 ## Inputs
 
