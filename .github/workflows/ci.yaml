@@ -110,16 +110,27 @@ jobs:
           ts-audience: ${{ secrets.TS_AUDIENCE }}
           ts-tags: ${{ secrets.TS_TAGS }}
 
-      # Runs the checks as in pre-commits with prek (tflint, ...)
-      # This prevents any discrepancies between the pre-commit checks and the CI checks 
-      - name: Run pre-commit hooks (prek)
-        uses: j178/prek-action@v2.0.4
-
       - name: Ensure EC2 Spot service-linked role exists
         run: aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 
-      - name: Run Terragrunt stack generate and plan
+      - name: Initialize Terragrunt stack
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd pipelines
+          terragrunt stack run init
+
+      - name: Run Trivy config scan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: make trivy
+
+      # Runs the checks as in pre-commits with prek (tflint, ...)
+      # This prevents any discrepancies between the pre-commit checks and the CI checks
+      - name: Run pre-commit hooks (prek)
+        uses: j178/prek-action@v2.0.4
+
+      - name: Run Terragrunt plan
         run: |
           cd ${{ env.TG_STACK_PATH }}
-          terragrunt stack generate
           terragrunt run --all plan --backend-bootstrap --non-interactive --no-stack-generate

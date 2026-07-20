@@ -1,4 +1,4 @@
-.PHONY: clean sync-lock-files
+.PHONY: clean sync-lock-files trivy trivy-local
 
 clean:
 	terragrunt stack clean
@@ -7,3 +7,9 @@ clean:
 
 sync-lock-files:
 	./scripts/sync-lock-files.sh
+
+trivy:
+	./scripts/trivy-scan-stack.sh
+
+trivy-local:
+	. ./.env && cd pipelines && terragrunt stack run init && cd - && $(MAKE) trivy

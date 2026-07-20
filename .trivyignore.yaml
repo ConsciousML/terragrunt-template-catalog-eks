@@ -1,0 +1,24 @@
+misconfigurations:
+  - id: AWS-0040
+    paths:
+      - "main.tf"
+    statement: >
+      Public EKS endpoint access is required for initial bootstrapping (ArgoCD/Tailscale
+      setup) before the cluster's private access path exists, then disabled manually
+      afterward. See README.md#disable-the-public-eks-endpoint.
+
+  - id: AWS-0041
+    paths:
+      - "main.tf"
+    statement: >
+      Same bootstrapping trade-off as AWS-0040: the public CIDR is required until the
+      Tailscale Connector routes into the VPC, then narrowed manually.
+      See README.md#disable-the-public-eks-endpoint.
+
+  - id: AWS-0104
+    paths:
+      - "node_groups.tf"
+    statement: >
+      terraform-aws-modules/eks default: worker nodes need broad outbound access to reach
+      ECR, the EKS/AWS APIs, and container registries. Restricting it would require VPC
+      endpoints for every external destination nodes talk to.

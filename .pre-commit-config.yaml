@@ -6,8 +6,11 @@ repos:
       - id: tofu-validate
       - id: tflint
       - id: terragrunt-hcl-fmt
-
-  - repo: https://github.com/aquasecurity/tfsec
-    rev: v1.28.14  # Use the latest stable version or pin your preferred one
+  - repo: local
     hooks:
-      - id: tfsec
+      - id: trivy-secrets
+        name: Trivy secret scan
+        language: system
+        entry: trivy fs .
+        pass_filenames: false
+        always_run: true

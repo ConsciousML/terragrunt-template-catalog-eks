@@ -8,19 +8,19 @@ Creates a Tailscale federated identity backed by GitHub Actions OIDC, enabling C
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.1 |
-| <a name="requirement_tailscale"></a> [tailscale](#requirement\_tailscale) | ~> 0.28.0 |
+| <a name="requirement_tailscale"></a> [tailscale](#requirement\_tailscale) | = 0.28.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_tailscale"></a> [tailscale](#provider\_tailscale) | ~> 0.28.0 |
+| <a name="provider_tailscale"></a> [tailscale](#provider\_tailscale) | = 0.28.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [tailscale_federated_identity.this](https://registry.terraform.io/providers/tailscale/tailscale/latest/docs/resources/federated_identity) | resource |
+| [tailscale_federated_identity.this](https://registry.terraform.io/providers/tailscale/tailscale/0.28.0/docs/resources/federated_identity) | resource |
 
 ## Inputs
 

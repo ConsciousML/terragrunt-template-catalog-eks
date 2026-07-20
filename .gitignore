@@ -1,6 +1,7 @@
 # Terragrunt
 .terragrunt-cache
 .terragrunt-stack
+*.terragrunt.values.hcl
 
 # OpenTofu/Terraform
 .terraform

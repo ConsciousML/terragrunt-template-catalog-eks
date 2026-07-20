@@ -8,19 +8,19 @@ Fetches a URL and exposes the response body as an output.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.1 |
-| <a name="requirement_http"></a> [http](#requirement\_http) | ~> 3.6 |
+| <a name="requirement_http"></a> [http](#requirement\_http) | = 3.6.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_http"></a> [http](#provider\_http) | ~> 3.6 |
+| <a name="provider_http"></a> [http](#provider\_http) | = 3.6.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [http_http.this](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
+| [http_http.this](https://registry.terraform.io/providers/hashicorp/http/3.6.0/docs/data-sources/http) | data source |
 
 ## Inputs
 

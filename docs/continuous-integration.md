@@ -22,14 +22,25 @@ If you create new Terraform modules in `modules/`, read the [documentation instr
 Fails fast if the previous job pushed a new commit, so the workflow re-triggers on that commit instead of testing a stale one. Seeing this job fail with "terraform-docs created a new commit" is expected, not a bug.
 
 ### Code Quality Checks
-Runs the pre-commit checks, then `terragrunt plan`:
+Runs the pre-commit checks, a Trivy config scan, then `terragrunt plan`:
 - **Format validation**: ensures Terragrunt (TG) and Terraform (TF) files are properly formatted
 - **Linting**: validates configuration syntax and best practices with TFLint
-- **Security scanning**: checks for security issues and vulnerabilities with TFSec
 - **Terragrunt validation**: ensures the TF and TG files have valid syntax
+- **Security scanning**: checks the modules with their real, rendered input values (see below)
 - **Plan**: verifies infrastructure changes without applying them
 
 **Note**: Read the [pre-commit configuration](../.pre-commit-config.yaml) to learn more about the run checks.
+
+### Trivy Config Scan
+[Trivy](https://trivy.dev/) is an open-source scanner that checks Terraform for security misconfigurations.
+
+[`make trivy`](../Makefile) initializes the full `pipelines/` stack tree (`terragrunt stack run init`), then runs [`scripts/trivy-scan-stack.sh`](../scripts/trivy-scan-stack.sh), read its header comment for why it scans this way instead of a plain `trivy config .`, and how it resolves each unit's real input values.
+
+Skipped directories are explained in [`trivy.yaml`](../trivy.yaml). Known, accepted findings are suppressed in [`.trivyignore.yaml`](../.trivyignore.yaml), each with a `statement` explaining why.
+
+Run `make trivy` locally to reproduce the same scan; it requires the stack to be initialized first, which is why it isn't wired into pre-commit (too slow to run on every commit).
+
+When it fails, either fix the underlying misconfiguration, or if it's a known, accepted trade-off (like the two examples already in `.trivyignore.yaml`), add an entry there with a `statement` explaining why it's safe to ignore.
 
 ## Setup
 ### Initial Setup

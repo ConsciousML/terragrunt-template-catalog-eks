@@ -8,20 +8,20 @@ This module creates a Cost Anomaly Detection monitor and alert subscription that
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | = 6.55.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | = 6.55.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aws_ce_anomaly_monitor.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ce_anomaly_monitor) | resource |
-| [aws_ce_anomaly_subscription.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ce_anomaly_subscription) | resource |
+| [aws_ce_anomaly_monitor.this](https://registry.terraform.io/providers/hashicorp/aws/6.55.0/docs/resources/ce_anomaly_monitor) | resource |
+| [aws_ce_anomaly_subscription.this](https://registry.terraform.io/providers/hashicorp/aws/6.55.0/docs/resources/ce_anomaly_subscription) | resource |
 
 ## Inputs
 

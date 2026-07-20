@@ -8,23 +8,23 @@ Generates a random password and stores it (plaintext and bcrypt hash) in a singl
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.0 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | = 6.55.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | = 3.9.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | ~> 3.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | = 6.55.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | = 3.9.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aws_secretsmanager_secret.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
-| [aws_secretsmanager_secret_version.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
-| [random_password.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
+| [aws_secretsmanager_secret.this](https://registry.terraform.io/providers/hashicorp/aws/6.55.0/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret_version.this](https://registry.terraform.io/providers/hashicorp/aws/6.55.0/docs/resources/secretsmanager_secret_version) | resource |
+| [random_password.this](https://registry.terraform.io/providers/hashicorp/random/3.9.0/docs/resources/password) | resource |
 
 ## Inputs
 
