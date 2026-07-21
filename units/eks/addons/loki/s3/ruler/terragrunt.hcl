@@ -8,7 +8,9 @@ terraform {
 }
 
 inputs = {
-  bucket = "${include.root.locals.environment}-loki-ruler"
+  # Suffixed with the account ID and region for global S3 bucket-name uniqueness, same
+  # pattern as the state bucket in pipelines/root.hcl.
+  bucket = "${include.root.locals.environment}-loki-ruler-${get_aws_account_id()}-${include.root.locals.aws_region}"
 
   server_side_encryption_configuration = {
     rule = {
