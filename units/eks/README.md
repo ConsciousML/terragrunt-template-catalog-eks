@@ -6,6 +6,7 @@ The cluster supports:
 
 - Persistent storage via EBS-backed `PersistentVolumeClaim`s
 - Cluster and workload metrics via Prometheus, Alertmanager, and Grafana
+- Log aggregation via Loki
 - Public and private traffic routing via ALB and Gateway API
 - Automated DNS and TLS termination
 - Secrets synced from AWS Secrets Manager
@@ -36,6 +37,7 @@ This stack is instantiated in:
 - **[addons/aws_load_balancer_controller](addons/aws_load_balancer_controller/README.md)**: provisions ALBs from `Ingress` and `Gateway` resources
 - **[addons/external_dns](addons/external_dns/README.md)**: syncs DNS records for cluster services to the private and public hosted zones
 - **[addons/external_secrets_operator](addons/external_secrets_operator/README.md)**: syncs secrets from AWS Secrets Manager into Kubernetes `Secret` objects
+- **[addons/loki](addons/loki/README.md)**: cluster-wide log aggregation backed by S3
 - **[addons/argocd](addons/argocd/README.md)**: GitOps controller for declarative application delivery
 - **[addons/argocd/app_of_apps](addons/argocd/app_of_apps/)**: deploys the root ArgoCD `Application` that bootstraps all child apps from the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template)
 - **[addons/tailscale](addons/tailscale/README.md)**: VPN access to internal cluster services via subnet routing and split DNS
