@@ -260,6 +260,9 @@ unit "loki_s3_chunks" {
   values = {
     version = local.version_s3
     tags    = {}
+    # Allows this dev stack to be destroyed without manually emptying the bucket first.
+    # Set to false for prod.
+    force_destroy = true
   }
 }
 
@@ -270,6 +273,9 @@ unit "loki_s3_ruler" {
   values = {
     version = local.version_s3
     tags    = {}
+    # Allows this dev stack to be destroyed without manually emptying the bucket first.
+    # Set to false for prod.
+    force_destroy = true
   }
 }
 
