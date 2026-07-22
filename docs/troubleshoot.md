@@ -198,6 +198,31 @@ export PREFIX="dev/eks/stack/.terragrunt-stack/eks/addons"
 - **EC2**: no leftover instances/ENIs (e.g. from Karpenter-provisioned nodes)
 - **EKS**: no cluster/node group left in a stuck state
 
+## Destroying App of Apps Fails
+
+`terragrunt destroy` on `argocd_app_of_apps` (or a full stack destroy that reaches it) can fail with:
+
+```
+Error: Error uninstalling release
+
+Unable to uninstall Helm release app-of-apps: uninstallation completed with
+2 error(s): Get
+"https://<cluster-endpoint>/apis/argoproj.io/v1alpha1/namespaces/argocd/applications/app-of-apps":
+read tcp <local-ip>:<port>-><vpc-ip>:443: read: operation timed out;
+uninstall: Failed to purge the release: get: failed to get
+"sh.helm.release.v1.app-of-apps.v1": Get
+"https://<cluster-endpoint>/api/v1/namespaces/argocd/secrets/sh.helm.release.v1.app-of-apps.v1":
+dial tcp <vpc-ip>:443: i/o timeout
+```
+
+`helm-tailscale-connector` advertises the whole VPC CIDR as a subnet route (`advertiseRoutes` in `units/eks/addons/argocd/app_of_apps/terragrunt.hcl`), so with `tailscale up` active, API server traffic routes through it even against the public endpoint. The connector is part of the same release being uninstalled, so its pod gets deleted mid-uninstall, the route disappears, and whichever API call is in flight times out. Disconnect first:
+
+```bash
+tailscale down
+```
+
+The cluster itself is usually fine after this error. Confirm with `kubectl get ns` and retry the destroy.
+
 ## Can't Connect with Tailscale to Internal Endpoints on macOS
 macOS doesn't automatically re-push DNS config.
 

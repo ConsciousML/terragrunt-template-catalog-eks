@@ -91,6 +91,27 @@ dependency "iam_role_eso" {
   skip_outputs = true
 }
 
+dependency "loki_s3_chunks" {
+  config_path = "../../loki/s3/chunks"
+  mock_outputs = {
+    s3_bucket_id = "mock-loki-chunks"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
+dependency "loki_s3_ruler" {
+  config_path = "../../loki/s3/ruler"
+  mock_outputs = {
+    s3_bucket_id = "mock-loki-ruler"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
+dependency "iam_role_loki" {
+  config_path  = "../../loki/iam_role"
+  skip_outputs = true
+}
+
 dependency "argocd_password" {
   config_path = "../aws_secret_password"
   mock_outputs = {
@@ -187,6 +208,21 @@ inputs = {
           # The %%% is for escaping Terragrunt templates
           txtPrefix     = "%%%{record_type}-external-dns-public-${dependency.eks_cluster.outputs.cluster_name}."
           domainFilters = [dependency.route53_hosted_zone_public.outputs.domain_name]
+        }
+      }
+      "helm-loki" = {
+        loki = {
+          loki = {
+            storage = {
+              bucketNames = {
+                chunks = dependency.loki_s3_chunks.outputs.s3_bucket_id
+                ruler  = dependency.loki_s3_ruler.outputs.s3_bucket_id
+              }
+              s3 = {
+                region = local.region
+              }
+            }
+          }
         }
       }
       "argocd-secrets" = {

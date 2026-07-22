@@ -204,8 +204,6 @@ terragrunt apply --non-interactive
 
 From this point on, `kubectl` and the AWS CLI can only reach the API server while connected to Tailscale.
 
-**Caution**: Before destroying the stack, set `endpoint_public_access` back to `true` and apply the `cluster` unit first. `terragrunt run --all destroy` tears down the Tailscale Connector alongside the Helm releases, and once it's gone there is no path left to the private API server to finish uninstalling them.
-
 ### Access the Monitoring UIs
 
 Grafana, Prometheus, and Alertmanager are only reachable via Tailscale, same as ArgoCD.
@@ -238,6 +236,13 @@ terragrunt apply --non-interactive
 From this point on, `kubectl` and the AWS CLI can only reach the API server while connected to Tailscale.
 
 ### Destroy the Infrastructure
+
+Destroying the [App of Apps unit](units/eks/addons/argocd/app_of_apps/) removes the Tailscale Connector, which is what routes API server traffic into the private endpoint. Once it's gone, you lose access to the cluster API unless you've already restored the public endpoint.
+
+**Caution**: Before destroying the stack:
+1. Set `endpoint_public_access` back to `true` (if you disabled the public EKS endpoint) and apply the `cluster` unit first
+2. Run `tailscale down` (see [Destroying App of Apps Fails](docs/troubleshoot.md#destroying-app-of-apps-fails))
+
 Finally, cleanup by destroying the infrastructure (cwd in `pipelines/dev/eks/stack`):
 
 ```bash

@@ -17,7 +17,9 @@ URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `promet
 - **[Prometheus](https://prometheus.io/docs/introduction/overview/)**: scrapes and stores metrics
 - **[Prometheus Operator](https://prometheus-operator.dev/)**: manages Prometheus/Alertmanager via `ServiceMonitor`, `PodMonitor`, and `PrometheusRule` CRDs
 - **[Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/)**: routes and dedupes firing alerts
-- **[Grafana](https://grafana.com/docs/grafana/latest/)**: dashboards over the Prometheus datasource
+- **[Grafana](https://grafana.com/docs/grafana/latest/)**: dashboards and Explore over the Prometheus and Loki datasources
+- **[Loki](https://grafana.com/docs/loki/latest/)**: log aggregation and storage, backed by S3
+- **[Alloy](https://grafana.com/docs/alloy/latest/)**: ships pod logs and Kubernetes cluster events to Loki
 - **[kube-state-metrics](https://github.com/kubernetes/kube-state-metrics)**: exposes cluster object state (Deployments, Pods, Nodes, ...) as metrics
 - **[node-exporter](https://github.com/prometheus/node_exporter)**: exposes host-level metrics (CPU, memory, disk, network) per node
 
@@ -44,7 +46,14 @@ aws secretsmanager get-secret-value \
 - **Control plane health** (API server, scheduler, controller manager, etcd): [EKS Observability dashboard](https://docs.aws.amazon.com/eks/latest/userguide/eks-observe.html) in the AWS Console
 - **Raw control plane metrics**, when you need to query a specific one directly: [`metrics.eks.amazonaws.com`](https://docs.aws.amazon.com/eks/latest/userguide/view-raw-metrics.html)
 - **Node, pod, workload, and addon-level metrics** (ArgoCD, ExternalDNS, ESO, Karpenter): Grafana
+- **Pod logs and Kubernetes cluster events**: Grafana Explore, Loki datasource
 - **Alerting**: Alertmanager
+
+### How to Browse Logs
+
+Open [Grafana](#accessing-the-uis), go to **Explore**, and select the **Loki** datasource. See Grafana's [Explore](https://grafana.com/docs/grafana/latest/explore/) docs and Loki's [LogQL](https://grafana.com/docs/loki/latest/query/) docs for how to build and run queries there.
+
+Labels available on every stream are set in [`helm-alloy/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-alloy/values.yaml)'s `discovery.relabel` and `loki.process` blocks.
 
 ## Monitoring a New Component
 

@@ -12,6 +12,7 @@ locals {
   # app-of-apps repo's helm-kube-prometheus-stack/Chart.yaml, both track the same
   # prometheus-operator CRD version.
   version_prometheus_operator_crds = "30.0.1"
+  version_s3                       = "5.15.1"
 
   environment       = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
   cluster_name_full = read_terragrunt_config(find_in_parent_folders("cluster_name_env.hcl")).locals.cluster_name_full
@@ -241,6 +242,46 @@ unit "acm_certificate" {
 unit "iam_role_eso" {
   source = "${get_repo_root()}/units/eks/addons/external_secrets_operator/iam_role"
   path   = "eks/addons/external_secrets_operator/iam_role"
+
+  values = {
+    version = local.version
+    tags    = {}
+  }
+}
+
+# --- Loki ---
+# Only the S3/Pod Identity resources are Terraform-managed. The Helm release lives in
+# app-of-apps.
+
+unit "loki_s3_chunks" {
+  source = "${get_repo_root()}/units/eks/addons/loki/s3/chunks"
+  path   = "eks/addons/loki/s3/chunks"
+
+  values = {
+    version = local.version_s3
+    tags    = {}
+    # Allows this dev stack to be destroyed without manually emptying the bucket first.
+    # Set to false for prod.
+    force_destroy = true
+  }
+}
+
+unit "loki_s3_ruler" {
+  source = "${get_repo_root()}/units/eks/addons/loki/s3/ruler"
+  path   = "eks/addons/loki/s3/ruler"
+
+  values = {
+    version = local.version_s3
+    tags    = {}
+    # Allows this dev stack to be destroyed without manually emptying the bucket first.
+    # Set to false for prod.
+    force_destroy = true
+  }
+}
+
+unit "iam_role_loki" {
+  source = "${get_repo_root()}/units/eks/addons/loki/iam_role"
+  path   = "eks/addons/loki/iam_role"
 
   values = {
     version = local.version
