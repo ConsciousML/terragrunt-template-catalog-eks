@@ -55,3 +55,18 @@ The bot is a member of each channel by default, but you aren't. Join them from t
 1. Click "Directories" in the sidebar, then "Channels"
 2. Search for each channel name in `channels.txt`
 3. Click "Join" on each one
+
+### Deploy
+
+From the root directory of this repository, run:
+
+```bash
+source .env
+cd pipelines/bootstrap/slack
+terragrunt stack generate
+terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
+```
+
+## Module Details
+
+See the [`units/slack`](../../../units/slack/README.md) group README for what each unit provisions and how they compose.
