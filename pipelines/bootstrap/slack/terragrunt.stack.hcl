@@ -15,6 +15,5 @@ stack "slack" {
     github_token     = get_env("GITHUB_TOKEN")
     github_repo_name = local.github_repo_name_catalog
     bot_token        = get_env("SLACK_BOT_TOKEN")
-    app_url          = get_env("SLACK_APP_URL")
   }
 }

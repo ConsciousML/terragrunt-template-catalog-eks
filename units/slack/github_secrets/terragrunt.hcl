@@ -13,6 +13,5 @@ inputs = {
   github_repo_name = values.github_repo_name
   secrets = {
     SLACK_BOT_TOKEN = values.bot_token
-    SLACK_APP_URL   = values.app_url
   }
 }

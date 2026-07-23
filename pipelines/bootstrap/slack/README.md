@@ -1,10 +1,10 @@
 # Slack Bootstrap
 
-Registers the Slack bot token and app URL as GitHub Actions secrets so CI-deployed Alertmanager instances can send notifications to Slack.
+Registers the Slack bot token as a GitHub Actions secret so CI-deployed Alertmanager instances can send notifications to Slack.
 
 ## Purpose
 
-Run this **once**, after manually creating and installing a Slack app. Pushes `SLACK_BOT_TOKEN` and `SLACK_APP_URL` into this repository's GitHub Actions secrets, so CI-driven environments can inject them into Alertmanager without managing the values by hand. `dev` reads the same two values directly from local `.env` instead of going through this bootstrap.
+Run this **once**, after manually creating and installing a Slack app. Pushes `SLACK_BOT_TOKEN` into this repository's GitHub Actions secrets, so CI-driven environments can inject it into Alertmanager without managing the value by hand. `dev` reads the same value directly from local `.env` instead of going through this bootstrap.
 
 ## Quick Start
 
@@ -39,7 +39,7 @@ On the app's "OAuth & Permissions" page, below "OAuth Tokens", click "Install to
 
 ### Configuration
 
-Set up `GITHUB_TOKEN`, `SLACK_BOT_TOKEN`, and `SLACK_APP_URL` following the [environment variables guide](../../../docs/environment-variables.md).
+Set up `GITHUB_TOKEN` and `SLACK_BOT_TOKEN` following the [environment variables guide](../../../docs/environment-variables.md).
 
 Create the channels the routing config in [`helm-kube-prometheus-stack`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-kube-prometheus-stack/values.yaml) sends to:
 

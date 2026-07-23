@@ -48,21 +48,15 @@ export TAILSCALE_OAUTH_CLIENT_ID=<your_client_id>
 export TAILSCALE_OAUTH_CLIENT_SECRET=<your_client_secret>
 ```
 
-## `SLACK_BOT_TOKEN` and `SLACK_APP_URL`
+## `SLACK_BOT_TOKEN`
 
 **Required by**: `pipelines/bootstrap/slack/` and the EKS stack's `alertmanager/aws_secret_slack_bot` unit
 
-Credentials for the Slack app that Alertmanager posts notifications through. Created by following [`pipelines/bootstrap/slack/README.md`](../pipelines/bootstrap/slack/README.md) up to installing the app to your workspace.
+Credential for the Slack app that Alertmanager posts notifications through. Created by following [`pipelines/bootstrap/slack/README.md`](../pipelines/bootstrap/slack/README.md) up to installing the app to your workspace.
 
 Copy the Bot User OAuth Token (starts with `xoxb-`) shown under "OAuth Tokens" on the app's "OAuth & Permissions" page. Add it to your `.env`:
 ```bash
 export SLACK_BOT_TOKEN=<your-bot-token>
-```
-
-Copy the App ID from the app's "Basic Information" page. `SLACK_APP_URL` is derived from it:
-```bash
-export SLACK_APP_ID=<your-app-id>
-export SLACK_APP_URL=https://api.slack.com/apps/${SLACK_APP_ID}
 ```
 
 ## `AWS_REGION`

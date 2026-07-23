@@ -397,7 +397,6 @@ unit "argocd_app_of_apps" {
     sync_options          = ["CreateNamespace=true"]
     prune                 = true
     helm_chart_version    = local.version_argocd_apps
-    slack_app_url         = get_env("SLACK_APP_URL")
     retry = {
       limit = 7
       backoff = {

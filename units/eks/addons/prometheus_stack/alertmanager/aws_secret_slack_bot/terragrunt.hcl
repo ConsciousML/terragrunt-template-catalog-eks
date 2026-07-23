@@ -11,9 +11,7 @@ inputs = {
   name = "${include.root.locals.environment}-alertmanager-slack-bot"
   # Key here (bot_token) must match the remoteProperty value in
   # helm-eso-secret-sync/alertmanager-secrets-values.yaml (argocd-app-of-apps-template repo),
-  # which pulls it into the alertmanager-slack-bot Secret Alertmanager mounts. app_url isn't a
-  # secret (Alertmanager's app_url field takes a literal string, not a file) and isn't stored
-  # here, it's threaded straight from SLACK_APP_URL into appParams instead.
+  # which pulls it into the alertmanager-slack-bot Secret Alertmanager mounts.
   secret_data = {
     bot_token = values.bot_token
   }

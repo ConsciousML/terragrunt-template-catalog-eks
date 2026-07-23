@@ -7,6 +7,5 @@ unit "slack_github_secrets" {
     github_token     = values.github_token
     github_repo_name = values.github_repo_name
     bot_token        = values.bot_token
-    app_url          = values.app_url
   }
 }
