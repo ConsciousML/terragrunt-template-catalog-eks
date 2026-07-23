@@ -145,6 +145,14 @@ dependency "grafana_password" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
+dependency "alertmanager_slack_bot_secret" {
+  config_path = "../../prometheus_stack/alertmanager/aws_secret_slack_bot"
+  mock_outputs = {
+    secret_name = "mock-alertmanager-slack-bot"
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
 dependency "ebs_csi_driver_addon" {
   config_path  = "../../ebs_csi_driver/addon"
   skip_outputs = true
@@ -256,6 +264,11 @@ inputs = {
         secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
         awsRegion       = include.root.locals.aws_region
         remoteKey       = dependency.grafana_password.outputs.secret_name
+      }
+      "alertmanager-secrets" = {
+        secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
+        awsRegion       = include.root.locals.aws_region
+        remoteKey       = dependency.alertmanager_slack_bot_secret.outputs.secret_name
       }
       # See local.kube_prometheus_stack_release above: fullnameOverride and the 3
       # helm-httproute backendRef names below must all agree on this same literal, and only
