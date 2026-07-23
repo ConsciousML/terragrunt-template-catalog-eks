@@ -277,6 +277,9 @@ inputs = {
         "kube-prometheus-stack" = {
           fullnameOverride = local.kube_prometheus_stack_release
           alertmanager = {
+            alertmanagerSpec = {
+              externalUrl = "https://${local.domain_private_alertmanager}"
+            }
             config = {
               global = {
                 slack_app_url = values.slack_app_url
