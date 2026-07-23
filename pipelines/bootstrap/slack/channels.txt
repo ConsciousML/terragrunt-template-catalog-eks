@@ -3,3 +3,4 @@ k8s-warning
 prometheus-stack-critical
 prometheus-stack-warning
 watchdog
+unrouted

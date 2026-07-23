@@ -397,6 +397,7 @@ unit "argocd_app_of_apps" {
     sync_options          = ["CreateNamespace=true"]
     prune                 = true
     helm_chart_version    = local.version_argocd_apps
+    slack_app_url         = get_env("SLACK_APP_URL")
     retry = {
       limit = 7
       backoff = {
@@ -539,7 +540,6 @@ unit "alertmanager_slack_bot_secret" {
   values = {
     version                 = local.version
     bot_token               = get_env("SLACK_BOT_TOKEN")
-    app_url                 = get_env("SLACK_APP_URL")
     recovery_window_in_days = 0
     tags                    = {}
   }

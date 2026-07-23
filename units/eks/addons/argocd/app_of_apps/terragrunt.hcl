@@ -234,12 +234,12 @@ inputs = {
         }
       }
       "argocd-secrets" = {
-        secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
+        secretStoreName = "${include.root.locals.environment}-aws-secrets-manager-argocd"
         awsRegion       = include.root.locals.aws_region
         remoteKey       = dependency.argocd_password.outputs.secret_name
       }
       "tailscale-secrets" = {
-        secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
+        secretStoreName = "${include.root.locals.environment}-aws-secrets-manager-tailscale"
         awsRegion       = include.root.locals.aws_region
         remoteKey       = dependency.tailscale_oauth_client_secret.outputs.secret_name
       }
@@ -261,12 +261,12 @@ inputs = {
         clusterName = dependency.eks_cluster.outputs.cluster_name
       }
       "grafana-secrets" = {
-        secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
+        secretStoreName = "${include.root.locals.environment}-aws-secrets-manager-grafana"
         awsRegion       = include.root.locals.aws_region
         remoteKey       = dependency.grafana_password.outputs.secret_name
       }
       "alertmanager-secrets" = {
-        secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
+        secretStoreName = "${include.root.locals.environment}-aws-secrets-manager-alertmanager"
         awsRegion       = include.root.locals.aws_region
         remoteKey       = dependency.alertmanager_slack_bot_secret.outputs.secret_name
       }
@@ -276,6 +276,13 @@ inputs = {
       "helm-kube-prometheus-stack" = {
         "kube-prometheus-stack" = {
           fullnameOverride = local.kube_prometheus_stack_release
+          alertmanager = {
+            config = {
+              global = {
+                slack_app_url = values.slack_app_url
+              }
+            }
+          }
         }
       }
       "grafana-httproute" = {
