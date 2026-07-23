@@ -384,11 +384,12 @@ unit "argocd_app_of_apps" {
   path   = "eks/addons/argocd/app_of_apps"
 
   values = {
-    version               = local.version
-    name                  = "app-of-apps"
-    namespace             = "argocd"
-    path                  = "apps"
-    target_revision       = "main"
+    version   = local.version
+    name      = "app-of-apps"
+    namespace = "argocd"
+    path      = "apps"
+    #target_revision       = "main"
+    target_revision       = "alertmanager-slack"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"

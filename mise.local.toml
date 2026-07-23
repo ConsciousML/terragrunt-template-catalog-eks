@@ -2,3 +2,4 @@
 kubectl = "1.36.2"
 jq = "1.8.2"
 argocd = "3.4.5"
+"ubi:slackapi/slack-cli[exe=slack]" = "4.5.0"
