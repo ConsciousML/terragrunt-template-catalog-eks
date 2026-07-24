@@ -116,6 +116,7 @@ jobs:
       - name: Initialize Terragrunt stack
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         run: |
           cd pipelines
           terragrunt stack run init
@@ -123,6 +124,7 @@ jobs:
       - name: Run Trivy config scan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         run: make trivy
 
       # Runs the checks as in pre-commits with prek (tflint, ...)
@@ -131,6 +133,8 @@ jobs:
         uses: j178/prek-action@v2.0.4
 
       - name: Run Terragrunt plan
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         run: |
           cd ${{ env.TG_STACK_PATH }}
           terragrunt run --all plan --backend-bootstrap --non-interactive --no-stack-generate
