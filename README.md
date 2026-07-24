@@ -68,7 +68,7 @@ locals {
 
 3. Set `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` in your `.env` (see the [environment variables guide](docs/environment-variables.md))
 
-4. Karpenter's NodePool is capped at 10 vCPUs by default and provisions `spot` instances. Raise `spec.limits.cpu` or switch `karpenter.sh/capacity-type` to `on-demand` in the [EKS stack](pipelines/dev/eks/stack/terragrunt.stack.hcl) for production stability.
+4. Karpenter's NodePool provisions `spot` instances by default and caps total vCPUs via `spec.limits.cpu` in [`helm-karpenter-config/templates/node-pool.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-karpenter-config/templates/node-pool.yaml) in the App of Apps repository. Raise that limit or switch `karpenter.sh/capacity-type` to `on-demand` for production stability.
 
 ### Installation
 
@@ -110,6 +110,7 @@ For more information on how to use mise, read their [getting started guide](http
 - [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
 - [jq](https://jqlang.org/download/)
 - [ArgoCD CLI](https://argo-cd.readthedocs.io/en/stable/cli_installation/)
+- [Slack CLI](https://docs.slack.dev/tools/slack-cli/)
 
 See [mise.toml](./mise.toml) and [mise.local.toml](./mise.local.toml) for specific versions.
 
@@ -122,10 +123,7 @@ aws configure
 For more information, read the [AWS CLI authentication documentation](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
 
 ### Run the Bootstrap Pipelines
-Run the following Terragrunt pipelines once per repository:
-- [AWS GitHub Actions Auth](pipelines/bootstrap/aws_gh_actions_auth/README.md): authenticates GitHub Actions with AWS
-- [Setup DNS](pipelines/bootstrap/setup_dns/README.md): creates one public [Route53 hosted zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html) per environment, shared by all apps, delegated once at your registrar
-- [Tailscale](pipelines/bootstrap/tailscale/README.md): creates [Tailscale](https://tailscale.com/) resources needed to connect with tools exposed internally in your EKS cluster (ArgoCD, etc.)
+Run each pipeline listed in [`pipelines/bootstrap/README.md`](pipelines/bootstrap/README.md) once per repository.
 
 Also run the following once per AWS account:
 ```bash
@@ -204,36 +202,15 @@ terragrunt apply --non-interactive
 
 From this point on, `kubectl` and the AWS CLI can only reach the API server while connected to Tailscale.
 
-### Access the Monitoring UIs
+### Monitoring
 
-Grafana, Prometheus, and Alertmanager are only reachable via Tailscale, same as ArgoCD.
-
-- Grafana: `https://grafana.private.dev.<base_domain>`, log in with username `admin` and:
-  ```bash
-  aws secretsmanager get-secret-value \
-    --secret-id dev-grafana-password \
-    --query SecretString \
-    --output text | jq -r .plaintext
-  ```
-- Prometheus: `https://prometheus.private.dev.<base_domain>` (no login required)
-- Alertmanager: `https://alertmanager.private.dev.<base_domain>` (no login required)
+Grafana, Prometheus, and Alertmanager are only reachable via Tailscale, same as ArgoCD. See the [monitoring guide](docs/monitoring.md) for UI URLs, what each tool is for, and how Alertmanager routes alerts to Slack.
 
 ### Access the Guestbook App
 
 Open `https://guestbook.public.dev.<base_domain>` in your browser. No login required.
 
 Apps are deployed using the [App of Apps](https://github.com/ConsciousML/argocd-app-of-apps-template) pattern: a single ArgoCD Application bootstraps all child apps from that repository.
-
-### Disable the Public EKS Endpoint
-
-Logging into ArgoCD over Tailscale confirms the Tailscale Connector is routing into the VPC. For improved security, set `endpoint_public_access` to `false` in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](pipelines/dev/eks/stack/terragrunt.stack.hcl), then re-apply just the `cluster` unit:
-
-```bash
-cd pipelines/dev/eks/stack/.terragrunt-stack/eks/cluster
-terragrunt apply --non-interactive
-```
-
-From this point on, `kubectl` and the AWS CLI can only reach the API server while connected to Tailscale.
 
 ### Destroy the Infrastructure
 
