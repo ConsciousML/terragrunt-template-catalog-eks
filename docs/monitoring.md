@@ -16,7 +16,7 @@ URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `promet
 
 - **[Prometheus](https://prometheus.io/docs/introduction/overview/)**: scrapes and stores metrics
 - **[Prometheus Operator](https://prometheus-operator.dev/)**: manages Prometheus/Alertmanager via `ServiceMonitor`, `PodMonitor`, and `PrometheusRule` CRDs
-- **[Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/)**: routes and dedupes firing alerts
+- **[Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/)**: routes and dedupes firing alerts, sends them to Slack
 - **[Grafana](https://grafana.com/docs/grafana/latest/)**: dashboards and Explore over the Prometheus and Loki datasources
 - **[Loki](https://grafana.com/docs/loki/latest/)**: log aggregation and storage, backed by S3
 - **[Alloy](https://grafana.com/docs/alloy/latest/)**: ships pod logs and Kubernetes cluster events to Loki
@@ -30,6 +30,7 @@ URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `promet
 | Grafana | `https://grafana.private.<environment>.<base_domain>` | Dashboards over node, pod, and addon metrics |
 | Prometheus | `https://prometheus.private.<environment>.<base_domain>` | Ad-hoc PromQL queries, checking target/scrape health |
 | Alertmanager | `https://alertmanager.private.<environment>.<base_domain>` | Viewing and silencing firing alerts |
+| Slack | Your Slack workspace, [channels listed here](../pipelines/bootstrap/slack/channels.txt) | Receiving alert notifications |
 
 ### Grafana Login
 
@@ -47,7 +48,8 @@ aws secretsmanager get-secret-value \
 - **Raw control plane metrics**, when you need to query a specific one directly: [`metrics.eks.amazonaws.com`](https://docs.aws.amazon.com/eks/latest/userguide/view-raw-metrics.html)
 - **Node, pod, workload, and addon-level metrics** (ArgoCD, ExternalDNS, ESO, Karpenter): Grafana
 - **Pod logs and Kubernetes cluster events**: Grafana Explore, Loki datasource
-- **Alerting**: Alertmanager
+- **Viewing and silencing firing alerts**: Alertmanager
+- **Alert notifications**: Slack
 
 ### How to Browse Logs
 
@@ -61,9 +63,15 @@ Prometheus is configured with `serviceMonitorSelectorNilUsesHelmValues: false` a
 
 To alert on a new metric, add a [`PrometheusRule`](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.PrometheusRule) the same way.
 
-## Configuring Alert Targets
+## Alerting
 
-TODO: Alertmanager currently ships with the chart's default receiver (no-op). Configure a real receiver (Slack, PagerDuty, email, ...) in [`helm-kube-prometheus-stack/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-kube-prometheus-stack/values.yaml) before relying on alerting in `staging`/`prod`.
+Alertmanager posts to Slack.
+
+Routing is by `component` (`k8s` or `prometheus-stack`, set per rule group via `defaultRules.additionalRuleGroupLabels` in [`helm-kube-prometheus-stack/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-kube-prometheus-stack/values.yaml)), then by `severity` (`warning` or `critical`), each combination landing in its own channel. `Watchdog` gets its own channel instead, confirming the alerting pipeline itself is alive.
+
+Anything matching neither a known `component` nor `Watchdog` falls into `#unrouted` instead of mixing silently into `#prometheus-stack-warning`, so a gap in the routing tree stays visible. Alerts with `severity: info` or `severity: none` (other than `Watchdog`) aren't sent to Slack at all. Resolved alerts post a follow-up notification in the same channel.
+
+Channel names are listed in [`pipelines/bootstrap/slack/channels.txt`](../pipelines/bootstrap/slack/channels.txt), created once via the [Slack bootstrap](../pipelines/bootstrap/slack/README.md).
 
 ## Dev-only Deviations
 

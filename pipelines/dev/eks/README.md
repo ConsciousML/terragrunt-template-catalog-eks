@@ -5,5 +5,5 @@ Local development instantiation of the [EKS Cluster Stack](../../../units/eks/RE
 ## Dev-specific Configuration
 
 - Module sources use `get_repo_root()` to point at the local catalog rather than a pinned git ref, so changes are picked up immediately without pushing a tag
-- Secrets Manager secrets (ArgoCD password, Grafana password, Tailscale OAuth client) have `recovery_window_in_days = 0` for fast teardown during local iteration
+- Secrets Manager secrets (ArgoCD password, Grafana password, Tailscale OAuth client, Alertmanager Slack bot) have `recovery_window_in_days = 0` for fast teardown during local iteration
 - Node groups use `t3.medium` instances to minimize cost

@@ -384,11 +384,12 @@ unit "argocd_app_of_apps" {
   path   = "eks/addons/argocd/app_of_apps"
 
   values = {
-    version               = local.version
-    name                  = "app-of-apps"
-    namespace             = "argocd"
-    path                  = "apps"
-    target_revision       = "main"
+    version   = local.version
+    name      = "app-of-apps"
+    namespace = "argocd"
+    path      = "apps"
+    #target_revision       = "main"
+    target_revision       = "alertmanager-slack"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
@@ -515,8 +516,9 @@ unit "karpenter_iam" {
 }
 
 # --- Prometheus stack ---
-# Only the Grafana admin password (Secrets Manager) is Terraform-managed; the Helm release,
-# HTTPRoutes, and SecretStore/ExternalSecret live in app-of-apps.
+# Only the Grafana admin password and the Alertmanager Slack bot secret (both Secrets Manager)
+# are Terraform-managed; the Helm release, HTTPRoutes, and SecretStore/ExternalSecret live in
+# app-of-apps.
 
 unit "grafana_password" {
   source = "${get_repo_root()}/units/eks/addons/prometheus_stack/grafana/aws_secret_password"
@@ -525,6 +527,18 @@ unit "grafana_password" {
   values = {
     version                 = local.version
     length                  = 16
+    recovery_window_in_days = 0
+    tags                    = {}
+  }
+}
+
+unit "alertmanager_slack_bot_secret" {
+  source = "${get_repo_root()}/units/eks/addons/prometheus_stack/alertmanager/aws_secret_slack_bot"
+  path   = "eks/addons/prometheus_stack/alertmanager/aws_secret_slack_bot"
+
+  values = {
+    version                 = local.version
+    bot_token               = get_env("SLACK_BOT_TOKEN")
     recovery_window_in_days = 0
     tags                    = {}
   }
