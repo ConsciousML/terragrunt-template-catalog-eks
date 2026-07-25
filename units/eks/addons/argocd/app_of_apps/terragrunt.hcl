@@ -276,6 +276,7 @@ inputs = {
       "helm-kube-prometheus-stack" = {
         "kube-prometheus-stack" = {
           fullnameOverride = local.kube_prometheus_stack_release
+          environment      = include.root.locals.environment
           alertmanager = {
             alertmanagerSpec = {
               externalUrl = "https://${local.domain_private_alertmanager}"
