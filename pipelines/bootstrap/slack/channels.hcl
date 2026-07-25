@@ -8,6 +8,8 @@ locals {
     "k8s-warning",
     "prometheus-stack-critical",
     "prometheus-stack-warning",
+    "loki-critical",
+    "loki-warning",
     "watchdog",
     "unrouted",
   ]
