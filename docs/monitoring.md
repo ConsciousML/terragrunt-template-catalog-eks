@@ -30,7 +30,7 @@ URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `promet
 | Grafana | `https://grafana.private.<environment>.<base_domain>` | Dashboards over node, pod, and addon metrics |
 | Prometheus | `https://prometheus.private.<environment>.<base_domain>` | Ad-hoc PromQL queries, checking target/scrape health |
 | Alertmanager | `https://alertmanager.private.<environment>.<base_domain>` | Viewing and silencing firing alerts |
-| Slack | Your Slack workspace, [channels listed here](../pipelines/bootstrap/slack/channels.txt) | Receiving alert notifications |
+| Slack | Your Slack workspace, [base channel names listed here](../pipelines/bootstrap/slack/channels.hcl), each prefixed with the environment (e.g. `#dev-k8s-critical`) | Receiving alert notifications |
 
 ### Grafana Login
 
@@ -69,9 +69,9 @@ Alertmanager posts to Slack.
 
 Routing is by `component` (`k8s` or `prometheus-stack`, set per rule group via `defaultRules.additionalRuleGroupLabels` in [`helm-kube-prometheus-stack/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-kube-prometheus-stack/values.yaml)), then by `severity` (`warning` or `critical`), each combination landing in its own channel. `Watchdog` gets its own channel instead, confirming the alerting pipeline itself is alive.
 
-Anything matching neither a known `component` nor `Watchdog` falls into `#unrouted` instead of mixing silently into `#prometheus-stack-warning`, so a gap in the routing tree stays visible. Alerts with `severity: info` or `severity: none` (other than `Watchdog`) aren't sent to Slack at all. Resolved alerts post a follow-up notification in the same channel.
+Anything matching neither a known `component` nor `Watchdog` falls into `#<environment>-unrouted` instead of mixing silently into `#<environment>-prometheus-stack-warning`, so a gap in the routing tree stays visible. Alerts with `severity: info` or `severity: none` (other than `Watchdog`) aren't sent to Slack at all. Resolved alerts post a follow-up notification in the same channel.
 
-Channel names are listed in [`pipelines/bootstrap/slack/channels.txt`](../pipelines/bootstrap/slack/channels.txt), created once via the [Slack bootstrap](../pipelines/bootstrap/slack/README.md).
+Base channel names are listed in [`pipelines/bootstrap/slack/channels.hcl`](../pipelines/bootstrap/slack/channels.hcl). Each is prefixed with the environment name so the same shared Slack bot can post every environment's alerts without colliding on one channel. Channels are created per environment via the [Slack bootstrap](../pipelines/bootstrap/slack/README.md)'s `channels` pipeline.
 
 ## Dev-only Deviations
 
