@@ -150,11 +150,10 @@ unit "cluster" {
         # aws ssm get-parameters-by-path --path /aws/service/eks/optimized-ami/1.36/amazon-linux-2023/x86_64/standard --query 'Parameters[].Name'
         ami_release_version = "1.36.2-20260709"
 
-        # Use cheapest config for testing purposes
-        instance_types = ["t3.medium"]
+        #instance_types = ["t3.medium"]
+        instance_types = ["m5.large"]
 
-        # Use at least `min_size = 2` or upgrade the `instance_types`
-        # Otherwise some important system components will be stuck in `PENDING` (too many nodes)
+        # Use at least `min_size = 2`
         min_size     = 3
         max_size     = 10
         desired_size = 3
@@ -384,12 +383,11 @@ unit "argocd_app_of_apps" {
   path   = "eks/addons/argocd/app_of_apps"
 
   values = {
-    version   = local.version
-    name      = "app-of-apps"
-    namespace = "argocd"
-    path      = "apps"
-    #target_revision       = "main"
-    target_revision       = "alertmanager-slack"
+    version               = local.version
+    name                  = "app-of-apps"
+    namespace             = "argocd"
+    path                  = "apps"
+    target_revision       = "main"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
