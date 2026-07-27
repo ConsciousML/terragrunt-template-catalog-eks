@@ -7,6 +7,7 @@ Exposes the domain name of each user-facing tool as a Terraform state output, on
 - **[argocd](argocd/)**: private domain for ArgoCD
 - **[guestbook](guestbook/)**: public domain for the guestbook app
 - **[prometheus](prometheus/)**, **[alertmanager](alertmanager/)**, **[grafana](grafana/)**: private domains for the `kube-prometheus-stack` UIs
+- **[goldilocks](goldilocks/)**: private domain for the Goldilocks dashboard
 
 ## Upstream Dependencies
 

@@ -126,6 +126,9 @@ unit "cluster" {
       kube-proxy = {
         addon_version = "v1.36.0-eksbuild.7"
       }
+      metrics-server = {
+        addon_version = "v0.9.0-eksbuild.2"
+      }
       vpc-cni = {
         before_compute = true
         addon_version  = "v1.21.2-eksbuild.2"
@@ -383,11 +386,12 @@ unit "argocd_app_of_apps" {
   path   = "eks/addons/argocd/app_of_apps"
 
   values = {
-    version               = local.version
-    name                  = "app-of-apps"
-    namespace             = "argocd"
-    path                  = "apps"
-    target_revision       = "main"
+    version   = local.version
+    name      = "app-of-apps"
+    namespace = "argocd"
+    path      = "apps"
+    #target_revision       = "main"
+    target_revision       = "goldilocks"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
@@ -583,6 +587,15 @@ unit "domain_name_alertmanager" {
 unit "domain_name_grafana" {
   source = "${get_repo_root()}/units/eks/domain_name/grafana"
   path   = "eks/domain_name/grafana"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "domain_name_goldilocks" {
+  source = "${get_repo_root()}/units/eks/domain_name/goldilocks"
+  path   = "eks/domain_name/goldilocks"
 
   values = {
     version = local.version
