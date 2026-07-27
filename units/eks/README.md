@@ -6,6 +6,7 @@ The cluster supports:
 
 - Persistent storage via EBS-backed `PersistentVolumeClaim`s
 - Cluster and workload metrics via Prometheus, Alertmanager, and Grafana
+- Workload resource-sizing recommendations via the VPA recommender and Goldilocks
 - Log aggregation via Loki
 - Public and private traffic routing via ALB and Gateway API
 - Automated DNS and TLS termination

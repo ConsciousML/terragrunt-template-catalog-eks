@@ -27,6 +27,7 @@ locals {
   domain_private_grafana      = read_terragrunt_config(local.domains_hcl).locals.domain_private_grafana
   domain_private_prometheus   = read_terragrunt_config(local.domains_hcl).locals.domain_private_prometheus
   domain_private_alertmanager = read_terragrunt_config(local.domains_hcl).locals.domain_private_alertmanager
+  domain_private_goldilocks   = read_terragrunt_config(local.domains_hcl).locals.domain_private_goldilocks
 
   region_hcl = find_in_parent_folders("region.hcl")
   region     = read_terragrunt_config(local.region_hcl).locals.region
@@ -301,6 +302,9 @@ inputs = {
         backendRef = {
           name = "${local.kube_prometheus_stack_release}-alertmanager"
         }
+      }
+      "goldilocks-httproute" = {
+        host = local.domain_private_goldilocks
       }
     }
   }

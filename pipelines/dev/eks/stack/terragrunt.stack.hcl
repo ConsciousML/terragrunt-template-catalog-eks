@@ -126,6 +126,9 @@ unit "cluster" {
       kube-proxy = {
         addon_version = "v1.36.0-eksbuild.7"
       }
+      metrics-server = {
+        addon_version = "v0.9.0-eksbuild.2"
+      }
       vpc-cni = {
         before_compute = true
         addon_version  = "v1.21.2-eksbuild.2"
@@ -150,11 +153,10 @@ unit "cluster" {
         # aws ssm get-parameters-by-path --path /aws/service/eks/optimized-ami/1.36/amazon-linux-2023/x86_64/standard --query 'Parameters[].Name'
         ami_release_version = "1.36.2-20260709"
 
-        # Use cheapest config for testing purposes
-        instance_types = ["t3.medium"]
+        #instance_types = ["t3.medium"]
+        instance_types = ["m5.large"]
 
-        # Use at least `min_size = 2` or upgrade the `instance_types`
-        # Otherwise some important system components will be stuck in `PENDING` (too many nodes)
+        # Use at least `min_size = 2`
         min_size     = 3
         max_size     = 10
         desired_size = 3
@@ -389,7 +391,7 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "alertmanager-slack"
+    target_revision       = "goldilocks"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
@@ -585,6 +587,15 @@ unit "domain_name_alertmanager" {
 unit "domain_name_grafana" {
   source = "${get_repo_root()}/units/eks/domain_name/grafana"
   path   = "eks/domain_name/grafana"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "domain_name_goldilocks" {
+  source = "${get_repo_root()}/units/eks/domain_name/goldilocks"
+  path   = "eks/domain_name/goldilocks"
 
   values = {
     version = local.version
