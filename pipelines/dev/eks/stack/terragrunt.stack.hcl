@@ -154,7 +154,7 @@ unit "cluster" {
         ami_release_version = "1.36.2-20260709"
 
         #instance_types = ["t3.medium"]
-        instance_types = ["m5.large"]
+        instance_types = ["c6a.xlarge"]
 
         # Use at least `min_size = 2`
         min_size     = 3
@@ -386,12 +386,11 @@ unit "argocd_app_of_apps" {
   path   = "eks/addons/argocd/app_of_apps"
 
   values = {
-    version   = local.version
-    name      = "app-of-apps"
-    namespace = "argocd"
-    path      = "apps"
-    #target_revision       = "main"
-    target_revision       = "goldilocks"
+    version               = local.version
+    name                  = "app-of-apps"
+    namespace             = "argocd"
+    path                  = "apps"
+    target_revision       = "main"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
