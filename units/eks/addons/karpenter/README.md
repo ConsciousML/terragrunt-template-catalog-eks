@@ -1,8 +1,10 @@
 # Karpenter
 
-Runs [Karpenter](https://karpenter.sh/) as the node autoscaler for the EKS cluster: the controller, its AWS-side IAM/Pod Identity resources, the shared `EC2NodeClass`, and the critical `NodePool`. The elastic `NodePool` is deployed separately, via app-of-apps.
+Runs [Karpenter](https://karpenter.sh/) as the node autoscaler for the EKS cluster: the controller, its AWS-side IAM/Pod Identity resources, the shared `EC2NodeClass`, and NodePools.
 
-> **Note**: The critical `NodePool` caps total vCPUs via `spec.limits.cpu` in [node_pool/critical](node_pool/critical/), and the elastic one does the same in [`helm-karpenter-node-pool/templates/node-pool.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-karpenter-node-pool/templates/node-pool.yaml) in the App of Apps repository. Raise either limit if that pool needs more headroom.
+Two NodePools split workloads by how disruption-sensitive they are. The critical pool takes a `workload-class=critical` taint with a conservative disruption policy, for workloads that shouldn't be evicted just because a node looks underutilized. The elastic pool consolidates more aggressively, for everything else. A workload opts into a pool with a matching `nodeSelector` and toleration.
+
+> **Note**: Each NodePool's vCPU limit and capacity-type requirement are set in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](../../../../pipelines/dev/eks/stack/terragrunt.stack.hcl). Raise a limit if a pool needs more headroom, and switch the critical NodePool's capacity-type to on-demand for prod.
 
 ## Prerequisites
 
@@ -23,7 +25,9 @@ aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 
 - **[iam](iam/)**: Creates the controller IAM role (bound to the `karpenter` service account in `kube-system` via Pod Identity), the node IAM role with its access entry so Karpenter-provisioned nodes can join the cluster, and the SQS queue with EventBridge rules for spot interruption and capacity rebalancing
 - **[helm](helm/)**: Deploys the Karpenter controller itself via the upstream `karpenter` chart
-- **[`helm-karpenter-config`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-karpenter-config)** (app-of-apps): deploys the `EC2NodeClass` and `NodePool`. Not deployed by this unit
+- **[ec2_node_class](ec2_node_class/)**: Deploys the `EC2NodeClass` both NodePools reference, via a chart bundled locally under [`charts/karpenter-ec2-node-class`](../../../../charts/karpenter-ec2-node-class/)
+- **[node_pool/critical](node_pool/critical/)**: Deploys the critical `NodePool`, via a chart bundled locally under [`charts/karpenter-node-pool`](../../../../charts/karpenter-node-pool/)
+- **[node_pool/elastic](node_pool/elastic/)**: Deploys the elastic `NodePool`, via the same bundled chart as the critical one
 
 ## Upstream Dependencies
 

@@ -54,6 +54,19 @@ locals {
       values   = ["nano", "micro", "metal"]
     }
   ]
+
+  # Required onto the critical NodePool, no fallback to the MNG.
+  critical_node_selector = {
+    "karpenter.sh/nodepool" = "critical"
+  }
+  critical_tolerations = [
+    {
+      key      = "karpenter.sh/workload-class"
+      operator = "Equal"
+      value    = "critical"
+      effect   = "NoSchedule"
+    }
+  ]
 }
 
 # --- Issue #153: dev stack pared down to what's needed for ArgoCD + app-of-apps bootstrap.
@@ -435,6 +448,8 @@ unit "argocd" {
           requests = { cpu = "2400m", memory = "1471M" }
           limits   = { memory = "1471M" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
       repoServer = {
         metrics = {
@@ -447,6 +462,8 @@ unit "argocd" {
           requests = { cpu = "323m", memory = "500M" }
           limits   = { memory = "500M" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
       notifications = {
         metrics = {
@@ -459,30 +476,40 @@ unit "argocd" {
           requests = { cpu = "15m", memory = "100Mi" }
           limits   = { cpu = "15m", memory = "100Mi" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
       applicationSet = {
         resources = {
           requests = { cpu = "15m", memory = "100Mi" }
           limits   = { cpu = "15m", memory = "100Mi" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
       server = {
         resources = {
           requests = { cpu = "23m", memory = "100Mi" }
           limits   = { cpu = "92m", memory = "100Mi" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
       redis = {
         resources = {
           requests = { cpu = "15m", memory = "100Mi" }
           limits   = { cpu = "75m", memory = "100Mi" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
       dex = {
         resources = {
           requests = { cpu = "15m", memory = "100Mi" }
           limits   = { cpu = "75m", memory = "100Mi" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
     }
   }
