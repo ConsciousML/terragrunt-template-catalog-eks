@@ -4,10 +4,11 @@ locals {
   version_cluster = "21.15.1"
   # Keep in sync with the aws-load-balancer-controller chart dependency version pinned in
   # the app-of-apps repo's aws-load-balancer-controller/Chart.yaml
-  version_aws_lbc       = "3.2.1"
-  version_argocd        = "9.5.0"
-  version_argocd_apps   = "2.0.5"
-  version_karpenter_iam = "21.24.0"
+  version_aws_lbc        = "3.2.1"
+  version_argocd         = "9.5.0"
+  version_argocd_apps    = "2.0.5"
+  version_karpenter_iam  = "21.24.0"
+  version_karpenter_helm = "1.13.0"
   # Keep in sync with the appVersion the kube-prometheus-stack chart dependency pins in the
   # app-of-apps repo's helm-kube-prometheus-stack/Chart.yaml, both track the same
   # prometheus-operator CRD version.
@@ -589,8 +590,8 @@ unit "tailscale_split_dns_eks_endpoint" {
 }
 
 # --- Karpenter ---
-# Only the AWS-side IAM/Pod Identity resources are Terraform-managed; the controller and its
-# node configuration (EC2NodeClass, NodePool) live in app-of-apps.
+# The controller and its AWS-side IAM/Pod Identity resources are Terraform-managed; only its
+# node configuration (EC2NodeClass, NodePool) still lives in app-of-apps.
 
 unit "karpenter_iam" {
   source = "${get_repo_root()}/units/eks/addons/karpenter/iam"
@@ -601,6 +602,31 @@ unit "karpenter_iam" {
     # Set to true when using `SPOT` instances
     enable_spot_termination = true
     tags                    = {}
+  }
+}
+
+unit "karpenter_helm" {
+  source = "${get_repo_root()}/units/eks/addons/karpenter/helm"
+  path   = "eks/addons/karpenter/helm"
+
+  values = {
+    version            = local.version
+    helm_chart_version = local.version_karpenter_helm
+    helm_values = {
+      settings = {
+        enableZonalShift = false
+      }
+      controller = {
+        resources = {
+          requests = { cpu = "49m", memory = "298M" }
+          limits   = { memory = "298M" }
+        }
+      }
+      # Requires the ServiceMonitor CRD from prometheus_operator_crds.
+      serviceMonitor = {
+        enabled = true
+      }
+    }
   }
 }
 

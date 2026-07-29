@@ -22,7 +22,7 @@ aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 ## What's Inside
 
 - **[iam](iam/)**: Creates the controller IAM role (bound to the `karpenter` service account in `kube-system` via Pod Identity), the node IAM role with its access entry so Karpenter-provisioned nodes can join the cluster, and the SQS queue with EventBridge rules for spot interruption and capacity rebalancing
-- **[`helm-karpenter`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-karpenter)** (app-of-apps): deploys the controller itself. Not deployed by this unit
+- **[helm](helm/)**: Deploys the Karpenter controller itself via the upstream `karpenter` chart
 - **[`helm-karpenter-config`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-karpenter-config)** (app-of-apps): deploys the `EC2NodeClass` and `NodePool`. Not deployed by this unit
 
 ## Upstream Dependencies

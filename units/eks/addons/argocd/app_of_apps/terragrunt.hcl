@@ -138,6 +138,11 @@ dependency "karpenter_iam" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
+dependency "karpenter_helm" {
+  config_path  = "../../karpenter/helm"
+  skip_outputs = true
+}
+
 dependency "grafana_password" {
   config_path = "../../prometheus_stack/grafana/aws_secret_password"
   mock_outputs = {
@@ -248,14 +253,6 @@ inputs = {
         name            = "${dependency.eks_cluster.outputs.cluster_name}-connector"
         hostnamePrefix  = dependency.eks_cluster.outputs.cluster_name
         advertiseRoutes = [dependency.vpc.outputs.vpc_cidr_block]
-      }
-      "helm-karpenter" = {
-        karpenter = {
-          settings = {
-            clusterName       = dependency.eks_cluster.outputs.cluster_name
-            interruptionQueue = dependency.karpenter_iam.outputs.queue_name
-          }
-        }
       }
       "helm-karpenter-config" = {
         nodeRole    = dependency.karpenter_iam.outputs.node_iam_role_name
