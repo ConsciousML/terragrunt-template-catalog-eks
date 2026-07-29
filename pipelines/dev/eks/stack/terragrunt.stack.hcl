@@ -118,16 +118,40 @@ unit "cluster" {
       # aws-ebs-csi-driver is installed from units/eks/addons/ebs_csi_driver/addon
       coredns = {
         addon_version = "v1.14.2-eksbuild.4"
+        configuration_values = jsonencode({
+          resources = {
+            requests = { cpu = "15m", memory = "100Mi" }
+            limits   = { cpu = "75m", memory = "100Mi" }
+          }
+        })
       }
       eks-pod-identity-agent = {
         before_compute = true
         addon_version  = "v1.3.10-eksbuild.3"
+        configuration_values = jsonencode({
+          resources = {
+            requests = { cpu = "15m", memory = "100Mi" }
+            limits   = { cpu = "75m", memory = "100Mi" }
+          }
+        })
       }
       kube-proxy = {
         addon_version = "v1.36.0-eksbuild.7"
+        configuration_values = jsonencode({
+          resources = {
+            requests = { cpu = "15m", memory = "100Mi" }
+            limits   = { cpu = "75m", memory = "100Mi" }
+          }
+        })
       }
       metrics-server = {
         addon_version = "v0.9.0-eksbuild.2"
+        configuration_values = jsonencode({
+          resources = {
+            requests = { cpu = "15m", memory = "100Mi" }
+            limits   = { cpu = "75m", memory = "100Mi" }
+          }
+        })
       }
       vpc-cni = {
         before_compute = true
@@ -139,6 +163,18 @@ unit "cluster" {
           }
           # Enables enforcement of NetworkPolicy resources, without this they are accepted but ignored
           enableNetworkPolicy = "true"
+          # aws-node container
+          resources = {
+            requests = { cpu = "11m", memory = "64M" }
+            limits   = { cpu = "55m", memory = "64M" }
+          }
+          # aws-eks-nodeagent container, enabled by enableNetworkPolicy above
+          nodeAgent = {
+            resources = {
+              requests = { cpu = "49m", memory = "184M" }
+              limits   = { cpu = "196m", memory = "184M" }
+            }
+          }
         })
       }
     }
@@ -202,6 +238,21 @@ unit "ebs_csi_driver_addon" {
     version       = local.version
     addon_version = "v1.62.0-eksbuild.1"
     tags          = {}
+    configuration_values = jsonencode({
+      # Single resources block per pod, applied to every sidecar container in it
+      controller = {
+        resources = {
+          requests = { cpu = "11m", memory = "24M" }
+          limits   = { memory = "24M" }
+        }
+      }
+      node = {
+        resources = {
+          requests = { cpu = "11m", memory = "35M" }
+          limits   = { cpu = "11m", memory = "35M" }
+        }
+      }
+    })
   }
 }
 
@@ -348,6 +399,10 @@ unit "argocd" {
             enabled = true
           }
         }
+        resources = {
+          requests = { cpu = "2400m", memory = "1471M" }
+          limits   = { memory = "1471M" }
+        }
       }
       repoServer = {
         metrics = {
@@ -356,6 +411,10 @@ unit "argocd" {
             enabled = true
           }
         }
+        resources = {
+          requests = { cpu = "323m", memory = "500M" }
+          limits   = { memory = "500M" }
+        }
       }
       notifications = {
         metrics = {
@@ -363,6 +422,34 @@ unit "argocd" {
           serviceMonitor = {
             enabled = true
           }
+        }
+        resources = {
+          requests = { cpu = "15m", memory = "100Mi" }
+          limits   = { cpu = "15m", memory = "100Mi" }
+        }
+      }
+      applicationSet = {
+        resources = {
+          requests = { cpu = "15m", memory = "100Mi" }
+          limits   = { cpu = "15m", memory = "100Mi" }
+        }
+      }
+      server = {
+        resources = {
+          requests = { cpu = "23m", memory = "100Mi" }
+          limits   = { cpu = "92m", memory = "100Mi" }
+        }
+      }
+      redis = {
+        resources = {
+          requests = { cpu = "15m", memory = "100Mi" }
+          limits   = { cpu = "75m", memory = "100Mi" }
+        }
+      }
+      dex = {
+        resources = {
+          requests = { cpu = "15m", memory = "100Mi" }
+          limits   = { cpu = "75m", memory = "100Mi" }
         }
       }
     }
@@ -386,11 +473,12 @@ unit "argocd_app_of_apps" {
   path   = "eks/addons/argocd/app_of_apps"
 
   values = {
-    version               = local.version
-    name                  = "app-of-apps"
-    namespace             = "argocd"
-    path                  = "apps"
-    target_revision       = "main"
+    version   = local.version
+    name      = "app-of-apps"
+    namespace = "argocd"
+    path      = "apps"
+    #target_revision       = "main"
+    target_revision       = "right-sizing"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"

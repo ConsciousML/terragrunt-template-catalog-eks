@@ -22,8 +22,9 @@ dependency "iam_role" {
 }
 
 inputs = {
-  cluster_name  = dependency.cluster.outputs.cluster_name
-  addon_name    = "aws-ebs-csi-driver"
-  addon_version = values.addon_version
-  tags          = values.tags
+  cluster_name         = dependency.cluster.outputs.cluster_name
+  addon_name           = "aws-ebs-csi-driver"
+  addon_version        = values.addon_version
+  configuration_values = try(values.configuration_values, null)
+  tags                 = values.tags
 }
