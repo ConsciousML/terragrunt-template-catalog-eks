@@ -118,16 +118,40 @@ unit "cluster" {
       # aws-ebs-csi-driver is installed from units/eks/addons/ebs_csi_driver/addon
       coredns = {
         addon_version = "v1.14.2-eksbuild.4"
+        configuration_values = jsonencode({
+          resources = {
+            requests = { cpu = "15m", memory = "100Mi" }
+            limits   = { cpu = "75m", memory = "100Mi" }
+          }
+        })
       }
       eks-pod-identity-agent = {
         before_compute = true
         addon_version  = "v1.3.10-eksbuild.3"
+        configuration_values = jsonencode({
+          resources = {
+            requests = { cpu = "15m", memory = "100Mi" }
+            limits   = { cpu = "75m", memory = "100Mi" }
+          }
+        })
       }
       kube-proxy = {
         addon_version = "v1.36.0-eksbuild.7"
+        configuration_values = jsonencode({
+          resources = {
+            requests = { cpu = "15m", memory = "100Mi" }
+            limits   = { cpu = "75m", memory = "100Mi" }
+          }
+        })
       }
       metrics-server = {
         addon_version = "v0.9.0-eksbuild.2"
+        configuration_values = jsonencode({
+          resources = {
+            requests = { cpu = "15m", memory = "100Mi" }
+            limits   = { cpu = "75m", memory = "100Mi" }
+          }
+        })
       }
       vpc-cni = {
         before_compute = true
@@ -139,6 +163,18 @@ unit "cluster" {
           }
           # Enables enforcement of NetworkPolicy resources, without this they are accepted but ignored
           enableNetworkPolicy = "true"
+          # aws-node container
+          resources = {
+            requests = { cpu = "11m", memory = "64M" }
+            limits   = { cpu = "55m", memory = "64M" }
+          }
+          # aws-eks-nodeagent container, enabled by enableNetworkPolicy above
+          nodeAgent = {
+            resources = {
+              requests = { cpu = "49m", memory = "184M" }
+              limits   = { cpu = "196m", memory = "184M" }
+            }
+          }
         })
       }
     }
@@ -202,6 +238,21 @@ unit "ebs_csi_driver_addon" {
     version       = local.version
     addon_version = "v1.62.0-eksbuild.1"
     tags          = {}
+    configuration_values = jsonencode({
+      # Single resources block per pod, applied to every sidecar container in it
+      controller = {
+        resources = {
+          requests = { cpu = "11m", memory = "24M" }
+          limits   = { memory = "24M" }
+        }
+      }
+      node = {
+        resources = {
+          requests = { cpu = "11m", memory = "35M" }
+          limits   = { cpu = "11m", memory = "35M" }
+        }
+      }
+    })
   }
 }
 
