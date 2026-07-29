@@ -400,7 +400,7 @@ unit "argocd" {
           }
         }
         resources = {
-          requests = { cpu = "1388m", memory = "1471M" }
+          requests = { cpu = "2400m", memory = "1471M" }
           limits   = { memory = "1471M" }
         }
       }
