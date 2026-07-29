@@ -1,0 +1,6 @@
+name: ""
+ec2NodeClassName: ""
+requirements: []
+taints: []
+consolidationPolicy: ""
+limitsCpu: ""

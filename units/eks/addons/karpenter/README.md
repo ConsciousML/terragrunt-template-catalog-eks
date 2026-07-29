@@ -1,8 +1,8 @@
 # Karpenter
 
-Provisions the AWS-side IAM/Pod Identity resources required to run [Karpenter](https://karpenter.sh/) as the node autoscaler for the EKS cluster.
+Runs [Karpenter](https://karpenter.sh/) as the node autoscaler for the EKS cluster: the controller, its AWS-side IAM/Pod Identity resources, the shared `EC2NodeClass`, and the critical `NodePool`. The elastic `NodePool` is deployed separately, via app-of-apps.
 
-> **Note**: Karpenter's NodePool provisions `spot` instances by default and caps total vCPUs via `spec.limits.cpu` in [`helm-karpenter-config/templates/node-pool.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-karpenter-config/templates/node-pool.yaml) in the App of Apps repository. Raise that limit or switch `karpenter.sh/capacity-type` to `on-demand` for production stability.
+> **Note**: The critical `NodePool` caps total vCPUs via `spec.limits.cpu` in [node_pool/critical](node_pool/critical/), and the elastic one does the same in [`helm-karpenter-node-pool/templates/node-pool.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-karpenter-node-pool/templates/node-pool.yaml) in the App of Apps repository. Raise either limit if that pool needs more headroom.
 
 ## Prerequisites
 

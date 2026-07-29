@@ -22,6 +22,38 @@ locals {
 
   private_subnets = [cidrsubnet(local.vpc_cidr, 8, 1), cidrsubnet(local.vpc_cidr, 8, 2)]
   public_subnets  = [cidrsubnet(local.vpc_cidr, 8, 3), cidrsubnet(local.vpc_cidr, 8, 4)]
+
+  # Shared by every Karpenter NodePool. Only capacity-type differs per pool.
+  karpenter_node_pool_base_requirements = [
+    {
+      key      = "kubernetes.io/arch"
+      operator = "In"
+      values   = ["amd64"]
+    },
+    {
+      key      = "kubernetes.io/os"
+      operator = "In"
+      values   = ["linux"]
+    },
+    # Diversify across instance families and sizes for deeper, cheaper spot pools.
+    {
+      key      = "karpenter.k8s.aws/instance-category"
+      operator = "In"
+      values   = ["c", "m", "r", "t"]
+    },
+    {
+      key      = "karpenter.k8s.aws/instance-generation"
+      operator = "Gt"
+      values   = ["2"]
+    },
+    # Exclude oversized instances so Karpenter never bin-packs onto an expensive
+    # instance. nano and micro instances are too small to be useful.
+    {
+      key      = "karpenter.k8s.aws/instance-size"
+      operator = "NotIn"
+      values   = ["nano", "micro", "metal"]
+    }
+  ]
 }
 
 # --- Issue #153: dev stack pared down to what's needed for ArgoCD + app-of-apps bootstrap.
@@ -588,8 +620,8 @@ unit "tailscale_split_dns_eks_endpoint" {
 }
 
 # --- Karpenter ---
-# The controller and its AWS-side IAM/Pod Identity resources are Terraform-managed; only its
-# node configuration (EC2NodeClass, NodePool) still lives in app-of-apps.
+# The controller, its AWS-side IAM/Pod Identity resources, the shared EC2NodeClass, and the
+# critical NodePool are Terraform-managed. The elastic NodePool still lives in app-of-apps.
 
 unit "karpenter_iam" {
   source = "${get_repo_root()}/units/eks/addons/karpenter/iam"
@@ -625,6 +657,75 @@ unit "karpenter_helm" {
         enabled = true
       }
     }
+  }
+}
+
+unit "karpenter_ec2_node_class" {
+  source = "${get_repo_root()}/units/eks/addons/karpenter/ec2_node_class"
+  path   = "eks/addons/karpenter/ec2_node_class"
+
+  values = {
+    version   = local.version
+    name      = "default"
+    ami_alias = "al2023@latest"
+  }
+}
+
+unit "karpenter_node_pool_critical" {
+  source = "${get_repo_root()}/units/eks/addons/karpenter/node_pool/critical"
+  path   = "eks/addons/karpenter/node_pool/critical"
+
+  values = {
+    version = local.version
+    name    = "critical"
+    requirements = concat(
+      [
+        {
+          key      = "karpenter.sh/capacity-type"
+          operator = "In"
+          values   = ["spot"]
+        }
+      ],
+      local.karpenter_node_pool_base_requirements
+    )
+    taints = [
+      {
+        key    = "workload-class"
+        value  = "critical"
+        effect = "NoSchedule"
+      }
+    ]
+    consolidation_policy = "WhenEmpty"
+    limits_cpu           = "10"
+  }
+}
+
+unit "karpenter_node_pool_elastic" {
+  source = "${get_repo_root()}/units/eks/addons/karpenter/node_pool/elastic"
+  path   = "eks/addons/karpenter/node_pool/elastic"
+
+  values = {
+    version = local.version
+    name    = "elastic"
+    requirements = concat(
+      [
+        {
+          key      = "karpenter.sh/capacity-type"
+          operator = "In"
+          values   = ["spot"]
+        }
+      ],
+      local.karpenter_node_pool_base_requirements
+    )
+    taints = [
+      {
+        key    = "karpenter.sh/provisioned"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    ]
+    consolidation_policy = "WhenEmptyOrUnderutilized"
+    limits_cpu           = "10"
   }
 }
 
