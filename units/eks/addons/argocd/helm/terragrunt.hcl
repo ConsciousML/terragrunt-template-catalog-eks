@@ -30,6 +30,11 @@ dependency "prometheus_operator_crds" {
   skip_outputs = true
 }
 
+dependency "karpenter_node_pool_critical" {
+  config_path  = "../../karpenter/node_pool/critical"
+  skip_outputs = true
+}
+
 inputs = {
   cluster_name     = dependency.eks_cluster.outputs.cluster_name
   name             = "argocd"

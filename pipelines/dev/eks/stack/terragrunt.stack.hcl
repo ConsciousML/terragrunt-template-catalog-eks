@@ -690,7 +690,7 @@ unit "karpenter_node_pool_critical" {
     )
     taints = [
       {
-        key    = "workload-class"
+        key    = "karpenter.sh/workload-class"
         value  = "critical"
         effect = "NoSchedule"
       }
@@ -719,8 +719,8 @@ unit "karpenter_node_pool_elastic" {
     )
     taints = [
       {
-        key    = "karpenter.sh/provisioned"
-        value  = "true"
+        key    = "karpenter.sh/workload-class"
+        value  = "elastic"
         effect = "NoSchedule"
       }
     ]
