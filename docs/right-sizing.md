@@ -26,9 +26,9 @@ Give it a reasonable amount of time before trusting the numbers, long enough to 
 
 ## Read the Recommendation
 
-Open `https://goldilocks.private.<environment>.<base_domain>`. It lists every namespace and workload, each with a lower bound, a target, and an upper bound for CPU and memory.
+Open `https://goldilocks.private.<environment>.<base_domain>`. It lists every namespace and workload, each container showing a **Guaranteed** and a **Burstable** recommendation, both with a paste-ready `resources` YAML block.
 
-Use the **target** column as your new request. It already has the percentile and safety margin tuning described in [Tuning the Recommendation Strategy](#tuning-the-recommendation-strategy) baked in, no further adjustment needed for typical workloads.
+Use the **Guaranteed** block's request as your target. It's already tuned with the percentile and safety margin described in [Tuning the Recommendation Strategy](#tuning-the-recommendation-strategy). Ignore the block's limit and the Burstable recommendation entirely.
 
 ## Apply the Recommendation
 
@@ -37,7 +37,65 @@ Goldilocks and the recommender only compute and display numbers. Nothing in this
 - For a Terraform-managed workload, edit its `resources` in this repo (`units/` or the module's `values`) and re-apply
 - For a Helm-deployed workload, edit its `resources` in the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template) and let ArgoCD sync it
 
-Set the request to the target. For CPU, set the limit to 2 to 5 times the request, so the workload can burst without throttling. For memory, set the limit to the target itself, since headroom above it only delays an OOM kill instead of preventing one.
+## How to Set `requests` and `limits`
+
+The target is the **Guaranteed QoS** block's request from the dashboard (see [Read the Recommendation](#read-the-recommendation)). Ignore its limit, then infer both limits from the request using the rules below.
+
+- **Request**: set to the target
+- **CPU limit**: 2 to 5 times the request, so the workload can burst without throttling
+- **Memory limit**: the request itself, since headroom above it only delays an OOM kill instead of preventing one
+
+### Different Patterns for Different Workloads
+
+That default, a CPU limit at a multiple of the request and a memory limit pinned to the request, fits latency-sensitive workloads. Adjust it for other workload shapes:
+
+**Web API (latency-sensitive)**: needs headroom to absorb request bursts without throttling, which would otherwise increase latency. Memory stays stable and predictable.
+
+```yaml
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m      # Allow 5x CPU burst for request handling spikes
+    memory: 512Mi   # Memory should be stable for web workloads
+```
+
+**Background worker (throughput-focused)**: prioritizes throughput over latency. Dropping the CPU limit lets it use any available CPU, maximizing processing speed.
+
+```yaml
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    # No CPU limit - let it use available CPU for maximum throughput
+    memory: 1Gi     # Memory limit prevents runaway consumption
+```
+
+**Lightweight worker (idle, event-driven)**: reconciles infrequent events and does very little work between them. It never approaches its baseline, so there's no headroom to burst into. Setting request equal to limit gets Guaranteed QoS at negligible cost instead of leaving a CPU limit that's never exercised.
+
+```yaml
+resources:
+  requests:
+    cpu: 15m
+    memory: 100Mi
+  limits:
+    cpu: 15m        # Usage never approaches baseline, no burst to plan for
+    memory: 100Mi   # Guaranteed QoS class, cheap given the tiny footprint
+```
+
+**Batch job (predictable)**: has predictable resource needs. Setting request equal to limit, the target from the Guaranteed QoS block, guarantees resources and avoids noisy-neighbor issues.
+
+```yaml
+resources:
+  requests:
+    cpu: 1000m
+    memory: 2Gi
+  limits:
+    cpu: 1000m      # Predictable workload - set request = limit
+    memory: 2Gi     # Guaranteed QoS class for consistent performance
+```
 
 ## Verify
 
@@ -55,3 +113,6 @@ Memory is tuned to a higher percentile than CPU. An undersized memory request en
 ## Adding a New Workload
 
 Goldilocks runs in `on-by-default` mode (`controller.flags.on-by-default` in [`helm-goldilocks/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-goldilocks/values.yaml)), so a new workload controller gets a `VerticalPodAutoscaler` and shows up on the dashboard without any per-namespace labeling.
+
+## Sources
+- [One Up Time](https://oneuptime.com/blog/post/2026-01-06-kubernetes-right-size-resources/view)
