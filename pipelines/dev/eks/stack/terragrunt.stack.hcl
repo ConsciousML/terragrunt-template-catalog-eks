@@ -348,6 +348,10 @@ unit "argocd" {
             enabled = true
           }
         }
+        resources = {
+          requests = { cpu = "1388m", memory = "1471M" }
+          limits   = { memory = "1471M" }
+        }
       }
       repoServer = {
         metrics = {
@@ -356,6 +360,10 @@ unit "argocd" {
             enabled = true
           }
         }
+        resources = {
+          requests = { cpu = "323m", memory = "273M" }
+          limits   = { memory = "273M" }
+        }
       }
       notifications = {
         metrics = {
@@ -363,6 +371,34 @@ unit "argocd" {
           serviceMonitor = {
             enabled = true
           }
+        }
+        resources = {
+          requests = { cpu = "15m", memory = "100Mi" }
+          limits   = { cpu = "15m", memory = "100Mi" }
+        }
+      }
+      applicationSet = {
+        resources = {
+          requests = { cpu = "15m", memory = "100Mi" }
+          limits   = { cpu = "15m", memory = "100Mi" }
+        }
+      }
+      server = {
+        resources = {
+          requests = { cpu = "23m", memory = "100Mi" }
+          limits   = { cpu = "92m", memory = "100Mi" }
+        }
+      }
+      redis = {
+        resources = {
+          requests = { cpu = "15m", memory = "100Mi" }
+          limits   = { cpu = "75m", memory = "100Mi" }
+        }
+      }
+      dex = {
+        resources = {
+          requests = { cpu = "15m", memory = "100Mi" }
+          limits   = { cpu = "75m", memory = "100Mi" }
         }
       }
     }
