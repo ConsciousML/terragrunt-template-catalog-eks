@@ -532,11 +532,12 @@ unit "argocd_app_of_apps" {
   path   = "eks/addons/argocd/app_of_apps"
 
   values = {
-    version               = local.version
-    name                  = "app-of-apps"
-    namespace             = "argocd"
-    path                  = "apps"
-    target_revision       = "main"
+    version   = local.version
+    name      = "app-of-apps"
+    namespace = "argocd"
+    path      = "apps"
+    #target_revision       = "main"
+    target_revision       = "minimal-mng-w-karpenter"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
@@ -724,6 +725,10 @@ unit "karpenter_node_pool_critical" {
     ]
     consolidation_policy = "WhenEmpty"
     limits_cpu           = "10"
+    # Matches kubelet's own default (what the MNG's nodes already get). Without this, Karpenter
+    # computes a lower ceiling from the plain per-ENI formula, blind to the VPC CNI addon's
+    # ENABLE_PREFIX_DELEGATION setting, which starves small instance types of pod slots.
+    kubelet_max_pods = 110
   }
 }
 
@@ -753,6 +758,8 @@ unit "karpenter_node_pool_elastic" {
     ]
     consolidation_policy = "WhenEmptyOrUnderutilized"
     limits_cpu           = "10"
+    # See karpenter_node_pool_critical's kubelet_max_pods comment above.
+    kubelet_max_pods = 110
   }
 }
 

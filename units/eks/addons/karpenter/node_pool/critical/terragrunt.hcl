@@ -47,5 +47,6 @@ inputs = {
     taints              = values.taints
     consolidationPolicy = values.consolidation_policy
     limitsCpu           = values.limits_cpu
+    kubeletMaxPods      = values.kubelet_max_pods
   }
 }

@@ -4,3 +4,4 @@ requirements: []
 taints: []
 consolidationPolicy: ""
 limitsCpu: ""
+kubeletMaxPods: 0
