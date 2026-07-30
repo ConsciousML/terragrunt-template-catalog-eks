@@ -44,9 +44,10 @@ inputs = {
   namespace        = "kube-system"
   create_namespace = false
   helm_values = {
-    name        = values.name
-    nodeRole    = dependency.karpenter_iam.outputs.node_iam_role_name
-    clusterName = dependency.eks_cluster.outputs.cluster_name
-    amiAlias    = values.ami_alias
+    name           = values.name
+    nodeRole       = dependency.karpenter_iam.outputs.node_iam_role_name
+    clusterName    = dependency.eks_cluster.outputs.cluster_name
+    amiAlias       = values.ami_alias
+    kubeletMaxPods = values.kubelet_max_pods
   }
 }

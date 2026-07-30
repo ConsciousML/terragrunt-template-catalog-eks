@@ -46,7 +46,6 @@ inputs = {
     requirements           = values.requirements
     taints                 = values.taints
     limitsCpu              = values.limits_cpu
-    kubeletMaxPods         = values.kubelet_max_pods
     terminationGracePeriod = try(values.termination_grace_period, null)
     expireAfter            = try(values.expire_after, null)
     disruption             = values.disruption

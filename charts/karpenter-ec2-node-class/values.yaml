@@ -2,3 +2,4 @@ name: ""
 nodeRole: ""
 clusterName: ""
 amiAlias: ""
+kubeletMaxPods: 0

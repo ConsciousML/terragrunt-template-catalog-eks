@@ -654,8 +654,6 @@ unit "tailscale_split_dns_eks_endpoint" {
 }
 
 # --- Karpenter ---
-# The controller, its AWS-side IAM/Pod Identity resources, the shared EC2NodeClass, and the
-# critical NodePool are Terraform-managed. The elastic NodePool still lives in app-of-apps.
 
 unit "karpenter_iam" {
   source = "${get_repo_root()}/units/eks/addons/karpenter/iam"
@@ -702,6 +700,10 @@ unit "karpenter_ec2_node_class" {
     version   = local.version
     name      = "default"
     ami_alias = "al2023@latest"
+    # Matches kubelet's own default (what the MNG's nodes already get). Without this, Karpenter
+    # computes a lower ceiling from the plain per-ENI formula, blind to the VPC CNI addon's
+    # ENABLE_PREFIX_DELEGATION setting, which starves small instance types of pod slots.
+    kubelet_max_pods = 110
   }
 }
 
@@ -740,10 +742,6 @@ unit "karpenter_node_pool_critical" {
       ]
     }
     limits_cpu = "10"
-    # Matches kubelet's own default (what the MNG's nodes already get). Without this, Karpenter
-    # computes a lower ceiling from the plain per-ENI formula, blind to the VPC CNI addon's
-    # ENABLE_PREFIX_DELEGATION setting, which starves small instance types of pod slots.
-    kubelet_max_pods = 110
     # Long enough for Loki/Prometheus/ArgoCD to shut down cleanly, short enough to bound how
     # long a blocking PDB can delay a drift-driven AMI/CVE patch.
     termination_grace_period = "30m"
@@ -785,8 +783,6 @@ unit "karpenter_node_pool_elastic" {
       ]
     }
     limits_cpu = "10"
-    # See karpenter_node_pool_critical's kubelet_max_pods comment above.
-    kubelet_max_pods = 110
     # Bounds worst-case drain time for elastic workloads, which tolerate disruption well.
     termination_grace_period = "2m"
     expire_after             = "720h"

@@ -17,12 +17,6 @@ spec:
         {{- end }}
       taints:
         {{- toYaml .Values.taints | nindent 8 }}
-      {{- if .Values.kubeletMaxPods }}
-      # Karpenter computes max-pods per instance type from the plain per-ENI IPv4 formula,
-      # blind to the cluster's VPC CNI prefix-delegation setting, without this override.
-      kubelet:
-        maxPods: {{ .Values.kubeletMaxPods }}
-      {{- end }}
       expireAfter: {{ .Values.expireAfter | default "720h" | quote }}
       {{- if .Values.terminationGracePeriod }}
       terminationGracePeriod: {{ .Values.terminationGracePeriod | quote }}

@@ -12,3 +12,9 @@ spec:
   securityGroupSelectorTerms:
     - tags:
         karpenter.sh/discovery: {{ .Values.clusterName | quote }}
+  {{- if .Values.kubeletMaxPods }}
+  # Karpenter computes max-pods per instance type from the plain per-ENI IPv4 formula,
+  # blind to the cluster's VPC CNI prefix-delegation setting, without this override.
+  kubelet:
+    maxPods: {{ .Values.kubeletMaxPods }}
+  {{- end }}

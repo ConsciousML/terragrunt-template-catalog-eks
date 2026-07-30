@@ -3,7 +3,6 @@ ec2NodeClassName: ""
 requirements: []
 taints: []
 limitsCpu: ""
-kubeletMaxPods: 0
 terminationGracePeriod: ""
 expireAfter: ""
 disruption: {}
