@@ -42,11 +42,13 @@ inputs = {
     name = values.name
     # helm_release's "name" output equals the EC2NodeClass's metadata.name, the chart
     # templates it straight from .Values.name.
-    ec2NodeClassName    = dependency.karpenter_ec2_node_class.outputs.name
-    requirements        = values.requirements
-    taints              = values.taints
-    consolidationPolicy = values.consolidation_policy
-    limitsCpu           = values.limits_cpu
-    kubeletMaxPods      = values.kubelet_max_pods
+    ec2NodeClassName       = dependency.karpenter_ec2_node_class.outputs.name
+    requirements           = values.requirements
+    taints                 = values.taints
+    limitsCpu              = values.limits_cpu
+    kubeletMaxPods         = values.kubelet_max_pods
+    terminationGracePeriod = try(values.termination_grace_period, null)
+    expireAfter            = try(values.expire_after, null)
+    disruption             = values.disruption
   }
 }

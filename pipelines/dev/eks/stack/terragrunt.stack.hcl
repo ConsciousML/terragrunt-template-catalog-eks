@@ -450,7 +450,7 @@ unit "argocd" {
           }
         }
         resources = {
-          requests = { cpu = "2400m", memory = "1471M" }
+          requests = { cpu = "1388m", memory = "1471M" }
           limits   = { memory = "1471M" }
         }
         nodeSelector = local.critical_node_selector
@@ -716,7 +716,8 @@ unit "karpenter_node_pool_critical" {
         {
           key      = "karpenter.sh/capacity-type"
           operator = "In"
-          values   = ["spot"]
+          # DEV: spot is dev-only, prod should use on-demand for the critical NodePool.
+          values = ["spot"]
         }
       ],
       local.karpenter_node_pool_base_requirements
@@ -728,12 +729,24 @@ unit "karpenter_node_pool_critical" {
         effect = "NoSchedule"
       }
     ]
-    consolidation_policy = "WhenEmpty"
-    limits_cpu           = "10"
+    disruption = {
+      consolidationPolicy = "Balanced"
+      consolidateAfter    = "15m"
+      budgets = [
+        {
+          nodes = "1"
+        }
+      ]
+    }
+    limits_cpu = "10"
     # Matches kubelet's own default (what the MNG's nodes already get). Without this, Karpenter
     # computes a lower ceiling from the plain per-ENI formula, blind to the VPC CNI addon's
     # ENABLE_PREFIX_DELEGATION setting, which starves small instance types of pod slots.
     kubelet_max_pods = 110
+    # Long enough for Loki/Prometheus/ArgoCD to shut down cleanly, short enough to bound how
+    # long a blocking PDB can delay a drift-driven AMI/CVE patch.
+    termination_grace_period = "30m"
+    expire_after             = "720h"
   }
 }
 
@@ -761,10 +774,21 @@ unit "karpenter_node_pool_elastic" {
         effect = "NoSchedule"
       }
     ]
-    consolidation_policy = "WhenEmptyOrUnderutilized"
-    limits_cpu           = "10"
+    disruption = {
+      consolidationPolicy = "WhenEmptyOrUnderutilized"
+      consolidateAfter    = "2m"
+      budgets = [
+        {
+          nodes = "50%"
+        }
+      ]
+    }
+    limits_cpu = "10"
     # See karpenter_node_pool_critical's kubelet_max_pods comment above.
     kubelet_max_pods = 110
+    # Bounds worst-case drain time for elastic workloads, which tolerate disruption well.
+    termination_grace_period = "2m"
+    expire_after             = "720h"
   }
 }
 

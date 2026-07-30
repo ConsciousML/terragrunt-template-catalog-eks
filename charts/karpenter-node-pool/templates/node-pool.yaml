@@ -23,9 +23,11 @@ spec:
       kubelet:
         maxPods: {{ .Values.kubeletMaxPods }}
       {{- end }}
-      expireAfter: 720h
+      expireAfter: {{ .Values.expireAfter | default "720h" | quote }}
+      {{- if .Values.terminationGracePeriod }}
+      terminationGracePeriod: {{ .Values.terminationGracePeriod | quote }}
+      {{- end }}
   limits:
     cpu: {{ .Values.limitsCpu | quote }}
   disruption:
-    consolidationPolicy: {{ .Values.consolidationPolicy | quote }}
-    consolidateAfter: 1m
+    {{- toYaml .Values.disruption | nindent 4 }}

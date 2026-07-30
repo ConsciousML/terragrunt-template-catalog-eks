@@ -2,6 +2,8 @@ name: ""
 ec2NodeClassName: ""
 requirements: []
 taints: []
-consolidationPolicy: ""
 limitsCpu: ""
 kubeletMaxPods: 0
+terminationGracePeriod: ""
+expireAfter: ""
+disruption: {}
