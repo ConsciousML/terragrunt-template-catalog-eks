@@ -49,16 +49,26 @@ locals {
     # Exclude oversized instances so Karpenter never bin-packs onto an expensive
     # instance. nano, micro, and small are too small to be useful: every node runs the same
     # fixed floor of DaemonSets (aws-node, kube-proxy, ebs-csi-node, eks-pod-identity-agent,
-    # alloy, loki-canary) regardless of size, so provisioning more, smaller nodes just pays
-    # that per-node DaemonSet overhead more times over instead of amortizing it. small
-    # instances also leave too little headroom once that DaemonSet floor lands alongside the
-    # pool's real workload. Per-pool instance-cpu/instance-memory requirements below raise the
-    # real floor further: size labels are family-relative (a "medium" can be 1 vCPU in one
-    # family, 2 in another).
+    # alloy, loki-canary) regardless of size, so provisioning more.
+    # instance-cpu/instance-memory requirements below raise the real
+    # floor further: size labels are family-relative (a "medium" can be 1 vCPU in one family,
+    # 2 in another).
     {
       key      = "karpenter.k8s.aws/instance-size"
       operator = "NotIn"
       values   = ["nano", "micro", "small", "metal"]
+    },
+    # >= 2 vCPU
+    {
+      key      = "karpenter.k8s.aws/instance-cpu"
+      operator = "Gt"
+      values   = ["1"]
+    },
+    # >= 4 Gb RAM
+    {
+      key      = "karpenter.k8s.aws/instance-memory"
+      operator = "Gt"
+      values   = ["4095"]
     }
   ]
 
