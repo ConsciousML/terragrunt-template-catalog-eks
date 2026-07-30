@@ -238,7 +238,7 @@ unit "cluster" {
         # aws ssm get-parameters-by-path --path /aws/service/eks/optimized-ami/1.36/amazon-linux-2023/x86_64/standard --query 'Parameters[].Name'
         ami_release_version = "1.36.2-20260709"
 
-        instance_types = ["t3.medium"]
+        instance_types = ["t3.small"]
 
         # Use at least `min_size = 2`
         min_size     = 2
