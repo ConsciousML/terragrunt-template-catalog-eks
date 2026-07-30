@@ -47,11 +47,14 @@ locals {
       values   = ["2"]
     },
     # Exclude oversized instances so Karpenter never bin-packs onto an expensive
-    # instance. nano and micro instances are too small to be useful.
+    # instance. nano, micro, and small are too small to be useful: every node runs the same
+    # fixed floor of DaemonSets (aws-node, kube-proxy, ebs-csi-node, eks-pod-identity-agent,
+    # alloy, loki-canary) regardless of size, so provisioning more, smaller nodes just pays
+    # that per-node DaemonSet overhead more times over instead of amortizing it.
     {
       key      = "karpenter.k8s.aws/instance-size"
       operator = "NotIn"
-      values   = ["nano", "micro", "metal"]
+      values   = ["nano", "micro", "small", "metal"]
     }
   ]
 
