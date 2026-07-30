@@ -8,7 +8,7 @@ locals {
   version_argocd         = "9.5.0"
   version_argocd_apps    = "2.0.5"
   version_karpenter_iam  = "21.24.0"
-  version_karpenter_helm = "1.13.0"
+  version_karpenter_helm = "1.14.0"
   # Keep in sync with the appVersion the kube-prometheus-stack chart dependency pins in the
   # app-of-apps repo's helm-kube-prometheus-stack/Chart.yaml, both track the same
   # prometheus-operator CRD version.
@@ -151,8 +151,9 @@ unit "cluster" {
       tier = "standard"
     }
 
-    # Control plane logging disabled to cut CloudWatch costs.
-    # Dev-only: do not port this to staging/prod, re-enable there.
+    # DEV: control plane logging disabled to cut CloudWatch costs, do not port this to
+    # staging/prod, re-enable there. See
+    # https://github.com/ConsciousML/terragrunt-template-live-eks/issues/40 for details.
     enabled_log_types = []
     # Infrequent Access cuts cost ~50% but doesn't support all Standard class features:
     # https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatch_Logs_Log_Classes.html
@@ -363,8 +364,8 @@ unit "loki_s3_chunks" {
   values = {
     version = local.version_s3
     tags    = {}
-    # Allows this dev stack to be destroyed without manually emptying the bucket first.
-    # Set to false for prod.
+    # DEV: allows this dev stack to be destroyed without manually emptying the bucket first,
+    # set to false for prod.
     force_destroy = true
   }
 }
@@ -376,8 +377,8 @@ unit "loki_s3_ruler" {
   values = {
     version = local.version_s3
     tags    = {}
-    # Allows this dev stack to be destroyed without manually emptying the bucket first.
-    # Set to false for prod.
+    # DEV: allows this dev stack to be destroyed without manually emptying the bucket first,
+    # set to false for prod.
     force_destroy = true
   }
 }
