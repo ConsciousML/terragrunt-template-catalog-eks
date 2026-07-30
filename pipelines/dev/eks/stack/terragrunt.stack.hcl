@@ -47,16 +47,18 @@ locals {
       values   = ["2"]
     },
     # Exclude oversized instances so Karpenter never bin-packs onto an expensive
-    # instance. nano and micro are too small to be useful: every node runs the same fixed
-    # floor of DaemonSets (aws-node, kube-proxy, ebs-csi-node, eks-pod-identity-agent, alloy,
-    # loki-canary) regardless of size, so provisioning more, smaller nodes just pays that
-    # per-node DaemonSet overhead more times over instead of amortizing it. Per-pool
-    # instance-cpu/instance-memory requirements below raise the real floor further: size
-    # labels are family-relative (a "medium" can be 1 vCPU in one family, 2 in another).
+    # instance. nano, micro, and small are too small to be useful: every node runs the same
+    # fixed floor of DaemonSets (aws-node, kube-proxy, ebs-csi-node, eks-pod-identity-agent,
+    # alloy, loki-canary) regardless of size, so provisioning more, smaller nodes just pays
+    # that per-node DaemonSet overhead more times over instead of amortizing it. small
+    # instances also leave too little headroom once that DaemonSet floor lands alongside the
+    # pool's real workload. Per-pool instance-cpu/instance-memory requirements below raise the
+    # real floor further: size labels are family-relative (a "medium" can be 1 vCPU in one
+    # family, 2 in another).
     {
       key      = "karpenter.k8s.aws/instance-size"
       operator = "NotIn"
-      values   = ["nano", "micro", "metal"]
+      values   = ["nano", "micro", "small", "metal"]
     }
   ]
 
@@ -241,7 +243,7 @@ unit "cluster" {
         # aws ssm get-parameters-by-path --path /aws/service/eks/optimized-ami/1.36/amazon-linux-2023/x86_64/standard --query 'Parameters[].Name'
         ami_release_version = "1.36.2-20260709"
 
-        instance_types = ["t3.small"]
+        instance_types = ["t3.medium"]
 
         # Use at least `min_size = 2`
         min_size     = 2
@@ -454,8 +456,12 @@ unit "argocd" {
           requests = { cpu = "1388m", memory = "1471M" }
           limits   = { memory = "1471M" }
         }
-        nodeSelector = local.critical_node_selector
-        tolerations  = local.critical_tolerations
+        # Outranks the DaemonSets' daemonset-critical (argocd-app-of-apps-template's
+        # priority-classes/), so it can no longer be preempted to make room for one of them
+        # on a full node.
+        priorityClassName = "system-node-critical"
+        nodeSelector      = local.critical_node_selector
+        tolerations       = local.critical_tolerations
       }
       repoServer = {
         metrics = {
@@ -741,7 +747,7 @@ unit "karpenter_node_pool_critical" {
         }
       ]
     }
-    limits_cpu = "10"
+    limits_cpu = "16"
     # Long enough for Loki/Prometheus/ArgoCD to shut down cleanly, short enough to bound how
     # long a blocking PDB can delay a drift-driven AMI/CVE patch.
     termination_grace_period = "30m"
@@ -782,7 +788,7 @@ unit "karpenter_node_pool_elastic" {
         }
       ]
     }
-    limits_cpu = "10"
+    limits_cpu = "16"
     # Bounds worst-case drain time for elastic workloads, which tolerate disruption well.
     termination_grace_period = "2m"
     expire_after             = "720h"
