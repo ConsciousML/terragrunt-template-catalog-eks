@@ -230,7 +230,8 @@ unit "cluster" {
             requests = { cpu = "15m", memory = "100Mi" }
             limits   = { cpu = "75m", memory = "100Mi" }
           }
-          tolerations = local.bootstrap_tolerations
+          # No tolerations key: this addon's configuration schema doesn't support one, and its
+          # default manifest already tolerates everything.
         })
       }
       metrics-server = {
