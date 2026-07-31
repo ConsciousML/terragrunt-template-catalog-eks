@@ -301,6 +301,9 @@ unit "cluster" {
         }
 
         # Reserves the MNG for pods that tolerate it (Karpenter's controller).
+        # The taint alone doesn't attract those pods, mng_node_selector also needs this label.
+        labels = local.mng_node_selector
+
         taints = {
           mng = {
             key    = "node-role.kubernetes.io/mng"
