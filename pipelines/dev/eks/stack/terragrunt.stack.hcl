@@ -266,6 +266,15 @@ unit "cluster" {
           http_put_response_hop_limit = 1
           http_endpoint               = "enabled"
         }
+
+        # Reserves the MNG for pods that tolerate it (Karpenter's controller).
+        taints = {
+          mng = {
+            key    = "node-role.kubernetes.io/mng"
+            value  = "true"
+            effect = "NO_SCHEDULE"
+          }
+        }
       }
     }
 
@@ -704,6 +713,17 @@ unit "karpenter_helm" {
       serviceMonitor = {
         enabled = true
       }
+      nodeSelector = {
+        "node-role.kubernetes.io/mng" = "true"
+      }
+      tolerations = [
+        {
+          key      = "node-role.kubernetes.io/mng"
+          operator = "Equal"
+          value    = "true"
+          effect   = "NoSchedule"
+        }
+      ]
     }
   }
 }
