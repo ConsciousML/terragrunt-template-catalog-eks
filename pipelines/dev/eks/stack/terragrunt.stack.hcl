@@ -97,6 +97,15 @@ locals {
       effect   = "NoSchedule"
     }
   ]
+
+  # For DaemonSets that must run on every node, ready or not (they're what makes a node
+  # ready). mng_tolerations alone deadlocks: a booting node also carries the built-in
+  # not-ready taint, which these pods would then also need to tolerate.
+  bootstrap_tolerations = [
+    {
+      operator = "Exists"
+    }
+  ]
 }
 
 # --- Issue #153: dev stack pared down to what's needed for ArgoCD + app-of-apps bootstrap.
@@ -211,7 +220,7 @@ unit "cluster" {
             requests = { cpu = "15m", memory = "100Mi" }
             limits   = { cpu = "75m", memory = "100Mi" }
           }
-          tolerations = local.mng_tolerations
+          tolerations = local.bootstrap_tolerations
         })
       }
       kube-proxy = {
@@ -221,7 +230,7 @@ unit "cluster" {
             requests = { cpu = "15m", memory = "100Mi" }
             limits   = { cpu = "75m", memory = "100Mi" }
           }
-          tolerations = local.mng_tolerations
+          tolerations = local.bootstrap_tolerations
         })
       }
       metrics-server = {
@@ -256,7 +265,7 @@ unit "cluster" {
               limits   = { cpu = "196m", memory = "184M" }
             }
           }
-          tolerations = local.mng_tolerations
+          tolerations = local.bootstrap_tolerations
         })
       }
     }
