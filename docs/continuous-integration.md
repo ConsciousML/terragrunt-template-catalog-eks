@@ -22,7 +22,7 @@ If you create new Terraform modules in `modules/`, read the [documentation instr
 Fails fast if the previous job pushed a new commit, so the workflow re-triggers on that commit instead of testing a stale one. Seeing this job fail with "terraform-docs created a new commit" is expected, not a bug.
 
 ### Code Quality Checks
-Runs the pre-commit checks, a Trivy config scan, then `terragrunt plan`:
+Runs a Trivy config scan, the pre-commit checks, then `terragrunt plan`:
 - **Format validation**: ensures Terragrunt (TG) and Terraform (TF) files are properly formatted
 - **Linting**: validates configuration syntax and best practices with TFLint
 - **Terragrunt validation**: ensures the TF and TG files have valid syntax
@@ -38,7 +38,7 @@ Runs the pre-commit checks, a Trivy config scan, then `terragrunt plan`:
 
 Skipped directories are explained in [`trivy.yaml`](../trivy.yaml). Known, accepted findings are suppressed in [`.trivyignore.yaml`](../.trivyignore.yaml), each with a `statement` explaining why.
 
-Run `make trivy` locally to reproduce the same scan; it requires the stack to be initialized first, which is why it isn't wired into pre-commit (too slow to run on every commit).
+Run `make trivy` locally to reproduce the same scan. It requires the stack to be initialized first, which is why it isn't wired into pre-commit (too slow to run on every commit).
 
 When it fails, either fix the underlying misconfiguration, or if it's a known, accepted trade-off (like the two examples already in `.trivyignore.yaml`), add an entry there with a `statement` explaining why it's safe to ignore.
 

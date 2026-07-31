@@ -18,3 +18,7 @@ Run via [`pipelines/bootstrap/aws_gh_actions_auth`](../../pipelines/bootstrap/aw
 - **[secrets/action](secrets/action/)**: Stores the region and `iam_role`'s ARN as GitHub Actions secrets so workflows can assume the role without hardcoded credentials
 - **[secrets/eks_local_admin](secrets/eks_local_admin/)**: Stores `EKS_LOCAL_ADMIN_ARN` as a GitHub Actions secret. The [CD workflow](https://github.com/ConsciousML/terragrunt-template-live-eks/blob/main/.github/workflows/cd.yaml) reads it via `get_env` and injects it into the cluster `access_entries` (see [prod EKS stack](https://github.com/ConsciousML/terragrunt-template-live-eks/blob/main/live/prod/eks/terragrunt.stack.hcl)), so the local admin retains kubectl access after CI deploys the cluster
 - **[deploy_key](deploy_key/)**: Generates SSH deploy keys and registers them on target repositories, enabling Terragrunt to pull code from private repositories during CI. Instantiated twice in the bootstrap stack: once read-only (remote sources), once with write access (terraform-docs commits)
+
+## Upstream Dependencies
+
+- **[`units/aws_caller_identity`](../aws_caller_identity/)**: `secrets/eks_local_admin` reads its `arn` output to populate `EKS_LOCAL_ADMIN_ARN`

@@ -43,6 +43,11 @@ This stack is instantiated in:
 - **[addons/argocd/app_of_apps](addons/argocd/app_of_apps/)**: deploys the root ArgoCD `Application` that bootstraps all child apps from the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template)
 - **[addons/tailscale](addons/tailscale/README.md)**: VPN access to internal cluster services via subnet routing and split DNS
 - **[addons/karpenter](addons/karpenter/README.md)**: node autoscaler provisioning EC2 instances on demand
+- **[domain_name](domain_name/README.md)**: exposes each user-facing tool's domain name as a Terraform state output for the live repository's Terratest suite
+- **[`priority-classes`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/priority-classes)** (app-of-apps): `PriorityClass` for cluster-wide DaemonSets that need to land on every node
+- **[`crds-gateway-api`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/crds-gateway-api)**, **[`crds-aws-lbc-gateway-api`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/crds-aws-lbc-gateway-api)**, **[`helm-gateway-api-gateway-class`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-gateway-api-gateway-class)** (app-of-apps): Gateway API CRDs and the `GatewayClass` implemented by the AWS Load Balancer Controller, backing the `gateway-public` and `gateway-private` Gateways
+- **[`helm-vpa`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-vpa)**, **[`helm-goldilocks`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-goldilocks)** (app-of-apps): workload resource-sizing recommendations, see the [right-sizing guide](../../docs/right-sizing.md)
+- **[`guestbook`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/guestbook)** (app-of-apps): demo app used to verify an end-to-end deploy
 
 ## Dependency Graph
 

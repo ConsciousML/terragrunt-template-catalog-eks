@@ -31,5 +31,6 @@ aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 
 ## Upstream Dependencies
 
-- **[`units/eks/cluster`](../../cluster/)**: `iam` takes a dependency on the cluster for its name and to register the node role access entry
-- **[`units/vpc`](../../../vpc/)**: Subnets must carry the `karpenter.sh/discovery = <cluster-name>` tag (set via `private_subnet_tags` in the stack) so Karpenter can discover them when provisioning nodes
+- **[`units/eks/cluster`](../../cluster/)**: `iam` depends on it for the cluster name and to register the node role access entry
+- **[`units/eks/addons/prometheus_stack/crds`](../prometheus_stack/crds/)**: `helm` depends on it so the Prometheus Operator CRDs exist before Karpenter's own Helm release renders any `ServiceMonitor`
+- **[`units/vpc`](../../../vpc/)**: `ec2_node_class` requires subnets to carry the `karpenter.sh/discovery = <cluster-name>` tag (set via `private_subnet_tags` in the stack) so Karpenter can discover them when provisioning nodes

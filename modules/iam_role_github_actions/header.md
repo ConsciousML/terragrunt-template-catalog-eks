@@ -1,3 +1,3 @@
 # IAM Role GitHub Action Module
 
-Create a IAM role with specific role policy to be used with OpenID Connect.
+Creates an IAM role with a trust policy scoped to a GitHub repository and branch, to be used with OpenID Connect.
