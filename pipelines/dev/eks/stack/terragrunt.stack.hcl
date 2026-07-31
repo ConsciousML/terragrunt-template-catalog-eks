@@ -84,6 +84,19 @@ locals {
       effect   = "NoSchedule"
     }
   ]
+
+  # Required onto the MNG
+  mng_node_selector = {
+    "node-role.kubernetes.io/mng" = "true"
+  }
+  mng_tolerations = [
+    {
+      key      = "node-role.kubernetes.io/mng"
+      operator = "Equal"
+      value    = "true"
+      effect   = "NoSchedule"
+    }
+  ]
 }
 
 # --- Issue #153: dev stack pared down to what's needed for ArgoCD + app-of-apps bootstrap.
@@ -187,6 +200,7 @@ unit "cluster" {
             requests = { cpu = "15m", memory = "100Mi" }
             limits   = { cpu = "75m", memory = "100Mi" }
           }
+          tolerations = local.mng_tolerations
         })
       }
       eks-pod-identity-agent = {
@@ -197,6 +211,7 @@ unit "cluster" {
             requests = { cpu = "15m", memory = "100Mi" }
             limits   = { cpu = "75m", memory = "100Mi" }
           }
+          tolerations = local.mng_tolerations
         })
       }
       kube-proxy = {
@@ -206,6 +221,7 @@ unit "cluster" {
             requests = { cpu = "15m", memory = "100Mi" }
             limits   = { cpu = "75m", memory = "100Mi" }
           }
+          tolerations = local.mng_tolerations
         })
       }
       metrics-server = {
@@ -215,6 +231,7 @@ unit "cluster" {
             requests = { cpu = "15m", memory = "100Mi" }
             limits   = { cpu = "75m", memory = "100Mi" }
           }
+          tolerations = local.mng_tolerations
         })
       }
       vpc-cni = {
@@ -239,6 +256,7 @@ unit "cluster" {
               limits   = { cpu = "196m", memory = "184M" }
             }
           }
+          tolerations = local.mng_tolerations
         })
       }
     }
@@ -568,7 +586,7 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "minimal-mng-w-karpenter"
+    target_revision       = "toleration-daemonset"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
@@ -713,17 +731,8 @@ unit "karpenter_helm" {
       serviceMonitor = {
         enabled = true
       }
-      nodeSelector = {
-        "node-role.kubernetes.io/mng" = "true"
-      }
-      tolerations = [
-        {
-          key      = "node-role.kubernetes.io/mng"
-          operator = "Equal"
-          value    = "true"
-          effect   = "NoSchedule"
-        }
-      ]
+      nodeSelector = local.mng_node_selector
+      tolerations  = local.mng_tolerations
     }
   }
 }
