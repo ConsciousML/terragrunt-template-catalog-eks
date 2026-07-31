@@ -572,6 +572,12 @@ unit "argocd" {
         nodeSelector = local.critical_node_selector
         tolerations  = local.critical_tolerations
       }
+      # Separate Job from `redis` itself (initializes its auth secret), doesn't inherit
+      # redis's nodeSelector/tolerations, needs its own.
+      redisSecretInit = {
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
+      }
       dex = {
         resources = {
           requests = { cpu = "15m", memory = "100Mi" }
