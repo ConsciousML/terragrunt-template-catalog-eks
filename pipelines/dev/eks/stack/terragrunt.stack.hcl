@@ -276,9 +276,11 @@ unit "cluster" {
         ami_type = "AL2023_x86_64_STANDARD"
 
         # Pin to a specific AMI release to prevent unintended rolling node replacements on every apply.
+        # use_latest_ami_release_version defaults to true upstream, which silently ignores this pin.
         # Find available versions with:
         # aws ssm get-parameters-by-path --path /aws/service/eks/optimized-ami/1.36/amazon-linux-2023/x86_64/standard --query 'Parameters[].Name'
-        ami_release_version = "1.36.2-20260709"
+        use_latest_ami_release_version = false
+        ami_release_version            = "1.36.2-20260709"
 
         instance_types = ["t3.medium"]
 
