@@ -268,4 +268,11 @@ kubectl patch application <name> -n argocd --type=merge -p '{"metadata":{"finali
 ```
 
 This skips ArgoCD's own cascade-prune, so check for orphaned resources it was still managing afterward.
-```
+
+## Node Group Stuck in Deleting State
+
+Deleting:
+1. the Launch Template associated to the Node Group
+2. the instances created by the node group
+3. the Node Groups
+4. the Cluster.
