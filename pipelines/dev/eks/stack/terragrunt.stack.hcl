@@ -271,10 +271,10 @@ unit "cluster" {
         # aws ssm get-parameters-by-path --path /aws/service/eks/optimized-ami/1.36/amazon-linux-2023/x86_64/standard --query 'Parameters[].Name'
         ami_release_version = "1.36.2-20260709"
 
-        instance_types = ["t3.medium", "t3a.medium"]
+        instance_types = ["t3.medium"]
 
         # DEV: spot is dev-only, prod should use on-demand
-        capacity_type = "SPOT"
+        capacity_type = "ON_DEMAND"
 
         # Use at least `min_size = 2`
         min_size     = 2
@@ -338,12 +338,14 @@ unit "ebs_csi_driver_addon" {
           requests = { cpu = "11m", memory = "24M" }
           limits   = { memory = "24M" }
         }
+        tolerations = local.mng_tolerations
       }
       node = {
         resources = {
           requests = { cpu = "11m", memory = "35M" }
           limits   = { cpu = "11m", memory = "35M" }
         }
+        tolerations = local.mng_tolerations
       }
     })
   }
