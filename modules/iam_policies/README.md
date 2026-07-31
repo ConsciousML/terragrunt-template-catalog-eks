@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
 # Iam Policies Module
 
-This module creates and attaches policies to a IAM role
+This module attaches existing IAM policy ARNs to an IAM role
 
 ## Requirements
 
