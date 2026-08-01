@@ -45,7 +45,7 @@ In the [app of apps unit](../units/eks/addons/argocd/app_of_apps/terragrunt.hcl)
 
 ```hcl
 "argocd-secrets" = {
-  secretStoreName = "${include.root.locals.environment}-aws-secrets-manager"
+  secretStoreName = "${include.root.locals.environment}-aws-secrets-manager-argocd"
   awsRegion       = include.root.locals.aws_region
   remoteKey       = dependency.argocd_password.outputs.secret_name
 }

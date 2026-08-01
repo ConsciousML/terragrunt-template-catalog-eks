@@ -4,10 +4,11 @@ locals {
   version_cluster = "21.15.1"
   # Keep in sync with the aws-load-balancer-controller chart dependency version pinned in
   # the app-of-apps repo's aws-load-balancer-controller/Chart.yaml
-  version_aws_lbc       = "3.2.1"
-  version_argocd        = "9.5.0"
-  version_argocd_apps   = "2.0.5"
-  version_karpenter_iam = "21.24.0"
+  version_aws_lbc        = "3.2.1"
+  version_argocd         = "9.5.0"
+  version_argocd_apps    = "2.0.5"
+  version_karpenter_iam  = "21.24.0"
+  version_karpenter_helm = "1.14.0"
   # Keep in sync with the appVersion the kube-prometheus-stack chart dependency pins in the
   # app-of-apps repo's helm-kube-prometheus-stack/Chart.yaml, both track the same
   # prometheus-operator CRD version.
@@ -21,6 +22,90 @@ locals {
 
   private_subnets = [cidrsubnet(local.vpc_cidr, 8, 1), cidrsubnet(local.vpc_cidr, 8, 2)]
   public_subnets  = [cidrsubnet(local.vpc_cidr, 8, 3), cidrsubnet(local.vpc_cidr, 8, 4)]
+
+  # Shared by every Karpenter NodePool. Only capacity-type differs per pool.
+  karpenter_node_pool_base_requirements = [
+    {
+      key      = "kubernetes.io/arch"
+      operator = "In"
+      values   = ["amd64"]
+    },
+    {
+      key      = "kubernetes.io/os"
+      operator = "In"
+      values   = ["linux"]
+    },
+    # Diversify across instance families and sizes for deeper, cheaper spot pools.
+    {
+      key      = "karpenter.k8s.aws/instance-category"
+      operator = "In"
+      values   = ["c", "m", "r", "t"]
+    },
+    {
+      key      = "karpenter.k8s.aws/instance-generation"
+      operator = "Gt"
+      values   = ["2"]
+    },
+    # Exclude oversized instances so Karpenter never bin-packs onto an expensive
+    # instance. nano, micro, and small are too small to be useful: every node runs the same
+    # fixed floor of DaemonSets (aws-node, kube-proxy, ebs-csi-node, eks-pod-identity-agent,
+    # alloy, loki-canary) regardless of size, so provisioning more.
+    # instance-cpu/instance-memory requirements below raise the real
+    # floor further: size labels are family-relative (a "medium" can be 1 vCPU in one family,
+    # 2 in another).
+    {
+      key      = "karpenter.k8s.aws/instance-size"
+      operator = "NotIn"
+      values   = ["nano", "micro", "small", "metal"]
+    },
+    # >= 2 vCPU
+    {
+      key      = "karpenter.k8s.aws/instance-cpu"
+      operator = "Gt"
+      values   = ["1"]
+    },
+    # >= 4 Gb RAM
+    {
+      key      = "karpenter.k8s.aws/instance-memory"
+      operator = "Gt"
+      values   = ["4095"]
+    }
+  ]
+
+  # Required onto the critical NodePool, no fallback to the MNG.
+  critical_node_selector = {
+    "karpenter.sh/nodepool" = "critical"
+  }
+  critical_tolerations = [
+    {
+      key      = "karpenter.sh/workload-class"
+      operator = "Equal"
+      value    = "critical"
+      effect   = "NoSchedule"
+    }
+  ]
+
+  # Required onto the MNG
+  mng_node_selector = {
+    "node-role.kubernetes.io/mng" = "true"
+  }
+  mng_tolerations = [
+    {
+      key      = "node-role.kubernetes.io/mng"
+      operator = "Equal"
+      value    = "true"
+      effect   = "NoSchedule"
+    }
+  ]
+
+  # For DaemonSets that must run on every node, ready or not (they're what makes a node
+  # ready). mng_tolerations alone deadlocks: a booting node also carries the built-in
+  # not-ready taint, which these pods would then also need to tolerate.
+  bootstrap_tolerations = [
+    {
+      operator = "Exists"
+    }
+  ]
 }
 
 # --- Issue #153: dev stack pared down to what's needed for ArgoCD + app-of-apps bootstrap.
@@ -100,8 +185,9 @@ unit "cluster" {
       tier = "standard"
     }
 
-    # Control plane logging disabled to cut CloudWatch costs.
-    # Dev-only: do not port this to staging/prod, re-enable there.
+    # DEV: control plane logging disabled to cut CloudWatch costs, do not port this to
+    # staging/prod, re-enable there. See
+    # https://github.com/ConsciousML/terragrunt-template-live-eks/issues/40 for details.
     enabled_log_types = []
     # Infrequent Access cuts cost ~50% but doesn't support all Standard class features:
     # https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatch_Logs_Log_Classes.html
@@ -123,6 +209,7 @@ unit "cluster" {
             requests = { cpu = "15m", memory = "100Mi" }
             limits   = { cpu = "75m", memory = "100Mi" }
           }
+          tolerations = local.mng_tolerations
         })
       }
       eks-pod-identity-agent = {
@@ -133,6 +220,7 @@ unit "cluster" {
             requests = { cpu = "15m", memory = "100Mi" }
             limits   = { cpu = "75m", memory = "100Mi" }
           }
+          tolerations = local.bootstrap_tolerations
         })
       }
       kube-proxy = {
@@ -142,6 +230,8 @@ unit "cluster" {
             requests = { cpu = "15m", memory = "100Mi" }
             limits   = { cpu = "75m", memory = "100Mi" }
           }
+          # No tolerations key: this addon's configuration schema doesn't support one, and its
+          # default manifest already tolerates everything.
         })
       }
       metrics-server = {
@@ -151,6 +241,7 @@ unit "cluster" {
             requests = { cpu = "15m", memory = "100Mi" }
             limits   = { cpu = "75m", memory = "100Mi" }
           }
+          tolerations = local.mng_tolerations
         })
       }
       vpc-cni = {
@@ -175,6 +266,7 @@ unit "cluster" {
               limits   = { cpu = "196m", memory = "184M" }
             }
           }
+          tolerations = local.bootstrap_tolerations
         })
       }
     }
@@ -185,23 +277,39 @@ unit "cluster" {
         ami_type = "AL2023_x86_64_STANDARD"
 
         # Pin to a specific AMI release to prevent unintended rolling node replacements on every apply.
+        # use_latest_ami_release_version defaults to true upstream, which silently ignores this pin.
         # Find available versions with:
         # aws ssm get-parameters-by-path --path /aws/service/eks/optimized-ami/1.36/amazon-linux-2023/x86_64/standard --query 'Parameters[].Name'
-        ami_release_version = "1.36.2-20260709"
+        use_latest_ami_release_version = false
+        ami_release_version            = "1.36.2-20260709"
 
-        #instance_types = ["t3.medium"]
-        instance_types = ["c6a.xlarge"]
+        instance_types = ["t3.medium"]
+
+        # DEV: spot is dev-only, prod should use on-demand
+        capacity_type = "ON_DEMAND"
 
         # Use at least `min_size = 2`
-        min_size     = 3
+        min_size     = 2
+        desired_size = 2
         max_size     = 10
-        desired_size = 3
 
         # Blocks pods from reaching instance metadata: pods sit at hop 2, only the node itself (hop 1) can get a token
         metadata_options = {
           http_tokens                 = "required"
           http_put_response_hop_limit = 1
           http_endpoint               = "enabled"
+        }
+
+        # Reserves the MNG for pods that tolerate it (Karpenter's controller).
+        # The taint alone doesn't attract those pods, mng_node_selector also needs this label.
+        labels = local.mng_node_selector
+
+        taints = {
+          mng = {
+            key    = "node-role.kubernetes.io/mng"
+            value  = "true"
+            effect = "NO_SCHEDULE"
+          }
         }
       }
     }
@@ -245,12 +353,14 @@ unit "ebs_csi_driver_addon" {
           requests = { cpu = "11m", memory = "24M" }
           limits   = { memory = "24M" }
         }
+        tolerations = local.mng_tolerations
       }
       node = {
         resources = {
           requests = { cpu = "11m", memory = "35M" }
           limits   = { cpu = "11m", memory = "35M" }
         }
+        tolerations = local.mng_tolerations
       }
     })
   }
@@ -313,8 +423,8 @@ unit "loki_s3_chunks" {
   values = {
     version = local.version_s3
     tags    = {}
-    # Allows this dev stack to be destroyed without manually emptying the bucket first.
-    # Set to false for prod.
+    # DEV: allows this dev stack to be destroyed without manually emptying the bucket first,
+    # set to false for prod.
     force_destroy = true
   }
 }
@@ -326,8 +436,8 @@ unit "loki_s3_ruler" {
   values = {
     version = local.version_s3
     tags    = {}
-    # Allows this dev stack to be destroyed without manually emptying the bucket first.
-    # Set to false for prod.
+    # DEV: allows this dev stack to be destroyed without manually emptying the bucket first,
+    # set to false for prod.
     force_destroy = true
   }
 }
@@ -400,9 +510,15 @@ unit "argocd" {
           }
         }
         resources = {
-          requests = { cpu = "2400m", memory = "1471M" }
+          requests = { cpu = "1388m", memory = "1471M" }
           limits   = { memory = "1471M" }
         }
+        # Outranks the DaemonSets' daemonset-critical (argocd-app-of-apps-template's
+        # priority-classes/), so it can no longer be preempted to make room for one of them
+        # on a full node.
+        priorityClassName = "system-node-critical"
+        nodeSelector      = local.critical_node_selector
+        tolerations       = local.critical_tolerations
       }
       repoServer = {
         metrics = {
@@ -415,6 +531,8 @@ unit "argocd" {
           requests = { cpu = "323m", memory = "500M" }
           limits   = { memory = "500M" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
       notifications = {
         metrics = {
@@ -427,30 +545,46 @@ unit "argocd" {
           requests = { cpu = "15m", memory = "100Mi" }
           limits   = { cpu = "15m", memory = "100Mi" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
       applicationSet = {
         resources = {
           requests = { cpu = "15m", memory = "100Mi" }
           limits   = { cpu = "15m", memory = "100Mi" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
       server = {
         resources = {
           requests = { cpu = "23m", memory = "100Mi" }
           limits   = { cpu = "92m", memory = "100Mi" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
       redis = {
         resources = {
           requests = { cpu = "15m", memory = "100Mi" }
           limits   = { cpu = "75m", memory = "100Mi" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
+      }
+      # Separate Job from `redis` itself (initializes its auth secret), doesn't inherit
+      # redis's nodeSelector/tolerations, needs its own.
+      redisSecretInit = {
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
       dex = {
         resources = {
           requests = { cpu = "15m", memory = "100Mi" }
           limits   = { cpu = "75m", memory = "100Mi" }
         }
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
     }
   }
@@ -478,7 +612,7 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "right-sizing"
+    target_revision       = "toleration-daemonset"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
@@ -589,8 +723,6 @@ unit "tailscale_split_dns_eks_endpoint" {
 }
 
 # --- Karpenter ---
-# Only the AWS-side IAM/Pod Identity resources are Terraform-managed; the controller and its
-# node configuration (EC2NodeClass, NodePool) live in app-of-apps.
 
 unit "karpenter_iam" {
   source = "${get_repo_root()}/units/eks/addons/karpenter/iam"
@@ -601,6 +733,130 @@ unit "karpenter_iam" {
     # Set to true when using `SPOT` instances
     enable_spot_termination = true
     tags                    = {}
+  }
+}
+
+unit "karpenter_helm" {
+  source = "${get_repo_root()}/units/eks/addons/karpenter/helm"
+  path   = "eks/addons/karpenter/helm"
+
+  values = {
+    version            = local.version
+    helm_chart_version = local.version_karpenter_helm
+    helm_values = {
+      settings = {
+        enableZonalShift = false
+      }
+      controller = {
+        resources = {
+          requests = { cpu = "49m", memory = "298M" }
+          limits   = { memory = "298M" }
+        }
+      }
+      # Requires the ServiceMonitor CRD from prometheus_operator_crds.
+      serviceMonitor = {
+        enabled = true
+      }
+      nodeSelector = local.mng_node_selector
+      tolerations  = local.mng_tolerations
+    }
+  }
+}
+
+unit "karpenter_ec2_node_class" {
+  source = "${get_repo_root()}/units/eks/addons/karpenter/ec2_node_class"
+  path   = "eks/addons/karpenter/ec2_node_class"
+
+  values = {
+    version   = local.version
+    name      = "default"
+    ami_alias = "al2023@latest"
+    # Matches kubelet's own default (what the MNG's nodes already get). Without this, Karpenter
+    # computes a lower ceiling from the plain per-ENI formula, blind to the VPC CNI addon's
+    # ENABLE_PREFIX_DELEGATION setting, which starves small instance types of pod slots.
+    kubelet_max_pods = 110
+  }
+}
+
+unit "karpenter_node_pool_critical" {
+  source = "${get_repo_root()}/units/eks/addons/karpenter/node_pool/critical"
+  path   = "eks/addons/karpenter/node_pool/critical"
+
+  values = {
+    version = local.version
+    name    = "critical"
+    requirements = concat(
+      [
+        {
+          key      = "karpenter.sh/capacity-type"
+          operator = "In"
+          # DEV: spot is dev-only, prod should use on-demand for the critical NodePool.
+          values = ["spot"]
+        }
+      ],
+      local.karpenter_node_pool_base_requirements
+    )
+    taints = [
+      {
+        key    = "karpenter.sh/workload-class"
+        value  = "critical"
+        effect = "NoSchedule"
+      }
+    ]
+    disruption = {
+      consolidationPolicy = "Balanced"
+      consolidateAfter    = "15m"
+      budgets = [
+        {
+          nodes = "1"
+        }
+      ]
+    }
+    limits_cpu = "16"
+    # Long enough for Loki/Prometheus/ArgoCD to shut down cleanly, short enough to bound how
+    # long a blocking PDB can delay a drift-driven AMI/CVE patch.
+    termination_grace_period = "30m"
+    expire_after             = "720h"
+  }
+}
+
+unit "karpenter_node_pool_elastic" {
+  source = "${get_repo_root()}/units/eks/addons/karpenter/node_pool/elastic"
+  path   = "eks/addons/karpenter/node_pool/elastic"
+
+  values = {
+    version = local.version
+    name    = "elastic"
+    requirements = concat(
+      [
+        {
+          key      = "karpenter.sh/capacity-type"
+          operator = "In"
+          values   = ["spot"]
+        },
+      ],
+      local.karpenter_node_pool_base_requirements
+    )
+    taints = [
+      {
+        key    = "karpenter.sh/workload-class"
+        value  = "elastic"
+        effect = "NoSchedule"
+      }
+    ]
+    disruption = {
+      consolidationPolicy = "WhenEmptyOrUnderutilized"
+      consolidateAfter    = "2m"
+      budgets = [
+        {
+          nodes = "50%"
+        }
+      ]
+    }
+    limits_cpu = "16"
+    # Bounds worst-case drain time for elastic workloads, which tolerate disruption well.
+    termination_grace_period = "2m"
+    expire_after             = "720h"
   }
 }
 

@@ -129,7 +129,7 @@ If we need to destroy by hand, work around Terragrunt entirely instead of fighti
 REGION=us-east-1
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ENVIRONMENT=dev
-BUCKET="tofu-state-${ACCOUNT_ID}-${ENVIRONMENT}"
+BUCKET="tofu-state-${ACCOUNT_ID}-${REGION}-${ENVIRONMENT}"
 CLUSTER_NAME="${ENVIRONMENT}-<cluster_name>"
 ```
 
@@ -183,7 +183,7 @@ terragrunt run --all destroy --no-stack-generate
 Excluded units keep their state file, which now points to resources that no longer exist. Remove it wholesale rather than per-resource by following [Manually Removing a Directory of Terragrunt States](#manually-removing-a-directory-of-terragrunt-states) with:
 
 ```bash
-export BUCKET="tofu-state-${ACCOUNT_ID}-${ENVIRONMENT}"
+export BUCKET="tofu-state-${ACCOUNT_ID}-${REGION}-${ENVIRONMENT}"
 export PREFIX="dev/eks/stack/.terragrunt-stack/eks/addons"
 ```
 
@@ -268,4 +268,11 @@ kubectl patch application <name> -n argocd --type=merge -p '{"metadata":{"finali
 ```
 
 This skips ArgoCD's own cascade-prune, so check for orphaned resources it was still managing afterward.
-```
+
+## Node Group Stuck in Deleting State
+
+Deleting:
+1. the Launch Template associated to the Node Group
+2. the instances created by the node group
+3. the Node Groups
+4. the Cluster.

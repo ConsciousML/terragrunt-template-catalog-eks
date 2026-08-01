@@ -1,8 +1,10 @@
 # Karpenter
 
-Provisions the AWS-side IAM/Pod Identity resources required to run [Karpenter](https://karpenter.sh/) as the node autoscaler for the EKS cluster.
+Runs [Karpenter](https://karpenter.sh/) as the node autoscaler for the EKS cluster: the controller, its AWS-side IAM/Pod Identity resources, the shared `EC2NodeClass`, and NodePools.
 
-> **Note**: Karpenter's NodePool provisions `spot` instances by default and caps total vCPUs via `spec.limits.cpu` in [`helm-karpenter-config/templates/node-pool.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-karpenter-config/templates/node-pool.yaml) in the App of Apps repository. Raise that limit or switch `karpenter.sh/capacity-type` to `on-demand` for production stability.
+Two NodePools split workloads by how disruption-sensitive they are. The critical pool takes a `workload-class=critical` taint with a conservative disruption policy, for workloads that shouldn't be evicted just because a node looks underutilized. The elastic pool consolidates more aggressively, for everything else. A workload opts into a pool with a matching `nodeSelector` and toleration.
+
+> **Note**: Each NodePool's vCPU limit and capacity-type requirement are set in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](../../../../pipelines/dev/eks/stack/terragrunt.stack.hcl). Raise a limit if a pool needs more headroom, and switch the critical NodePool's capacity-type to on-demand for prod.
 
 ## Prerequisites
 
@@ -22,10 +24,13 @@ aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 ## What's Inside
 
 - **[iam](iam/)**: Creates the controller IAM role (bound to the `karpenter` service account in `kube-system` via Pod Identity), the node IAM role with its access entry so Karpenter-provisioned nodes can join the cluster, and the SQS queue with EventBridge rules for spot interruption and capacity rebalancing
-- **[`helm-karpenter`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-karpenter)** (app-of-apps): deploys the controller itself. Not deployed by this unit
-- **[`helm-karpenter-config`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-karpenter-config)** (app-of-apps): deploys the `EC2NodeClass` and `NodePool`. Not deployed by this unit
+- **[helm](helm/)**: Deploys the Karpenter controller itself via the upstream `karpenter` chart
+- **[ec2_node_class](ec2_node_class/)**: Deploys the `EC2NodeClass` both NodePools reference, via a chart bundled locally under [`charts/karpenter-ec2-node-class`](../../../../charts/karpenter-ec2-node-class/)
+- **[node_pool/critical](node_pool/critical/)**: Deploys the critical `NodePool`, via a chart bundled locally under [`charts/karpenter-node-pool`](../../../../charts/karpenter-node-pool/)
+- **[node_pool/elastic](node_pool/elastic/)**: Deploys the elastic `NodePool`, via the same bundled chart as the critical one
 
 ## Upstream Dependencies
 
-- **[`units/eks/cluster`](../../cluster/)**: `iam` takes a dependency on the cluster for its name and to register the node role access entry
-- **[`units/vpc`](../../../vpc/)**: Subnets must carry the `karpenter.sh/discovery = <cluster-name>` tag (set via `private_subnet_tags` in the stack) so Karpenter can discover them when provisioning nodes
+- **[`units/eks/cluster`](../../cluster/)**: `iam` depends on it for the cluster name and to register the node role access entry
+- **[`units/eks/addons/prometheus_stack/crds`](../prometheus_stack/crds/)**: `helm` depends on it so the Prometheus Operator CRDs exist before Karpenter's own Helm release renders any `ServiceMonitor`
+- **[`units/vpc`](../../../vpc/)**: `ec2_node_class` requires subnets to carry the `karpenter.sh/discovery = <cluster-name>` tag (set via `private_subnet_tags` in the stack) so Karpenter can discover them when provisioning nodes

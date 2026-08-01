@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
 # ACM Certificate
 
-Creates an TLS/SSL certificate using AWS Certificate Manager (ACM) and outputs its ARN.
+Creates a TLS/SSL certificate using AWS Certificate Manager (ACM) and outputs its ARN.
 
 ## Requirements
 

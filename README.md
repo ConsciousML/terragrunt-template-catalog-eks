@@ -68,7 +68,7 @@ locals {
 
 3. Set `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` in your `.env` (see the [environment variables guide](docs/environment-variables.md))
 
-4. Karpenter's NodePool provisions `spot` instances by default and caps total vCPUs via `spec.limits.cpu` in [`helm-karpenter-config/templates/node-pool.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-karpenter-config/templates/node-pool.yaml) in the App of Apps repository. Raise that limit or switch `karpenter.sh/capacity-type` to `on-demand` for production stability.
+4. Both Karpenter NodePools cap total vCPUs via `spec.limits.cpu` and default to spot capacity, set in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](pipelines/dev/eks/stack/terragrunt.stack.hcl). Raise a limit or switch a pool's `karpenter.sh/capacity-type` requirement to `on-demand` for production stability.
 
 ### Installation
 

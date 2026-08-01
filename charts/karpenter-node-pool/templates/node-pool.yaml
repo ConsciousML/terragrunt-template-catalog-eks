@@ -1,0 +1,32 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: {{ .Values.name | quote }}
+spec:
+  template:
+    metadata:
+      labels:
+        # Populates the ROLES column in `kubectl get nodes`, without this every
+        # Karpenter-provisioned node shows <none> regardless of which NodePool made it.
+        node-role.kubernetes.io/{{ .Values.name }}: "true"
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: {{ .Values.ec2NodeClassName | quote }}
+      requirements:
+        {{- range .Values.requirements }}
+        - key: {{ .key | quote }}
+          operator: {{ .operator | quote }}
+          values: {{ .values | toYaml | nindent 12 }}
+        {{- end }}
+      taints:
+        {{- toYaml .Values.taints | nindent 8 }}
+      expireAfter: {{ .Values.expireAfter | default "720h" | quote }}
+      {{- if .Values.terminationGracePeriod }}
+      terminationGracePeriod: {{ .Values.terminationGracePeriod | quote }}
+      {{- end }}
+  limits:
+    cpu: {{ .Values.limitsCpu | quote }}
+  disruption:
+    {{- toYaml .Values.disruption | nindent 4 }}

@@ -1,0 +1,8 @@
+name: ""
+ec2NodeClassName: ""
+requirements: []
+taints: []
+limitsCpu: ""
+terminationGracePeriod: ""
+expireAfter: ""
+disruption: {}

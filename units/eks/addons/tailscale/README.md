@@ -26,5 +26,5 @@ The ESO `SecretStore` and `ExternalSecret` that sync the OAuth credentials into 
 
 - **[`units/tailscale`](../../../tailscale/)**: provisions the WIF credential and GitHub secrets that allow CI to authenticate to Tailscale when deploying the operator
 - **[`units/eks/addons/external_secrets_operator`](../external_secrets_operator/)**: its IAM role must be in place before the ESO controller (deployed through app-of-apps) can read the OAuth secret
-- **[`units/eks/route53/hosted_zone_private`](../../route53/hosted_zone_private/)**: `split_dns/default` takes an ordering dependency to ensure the private zone exists before configuring Tailscale DNS. The intercepted domain is read from `domains.hcl` (`domain_env_private`), not from this unit's output
+- **[`units/eks/route53/hosted_zone_private`](../../route53/hosted_zone_private/)**: `split_dns/default` depends on it to ensure the private zone exists before configuring Tailscale DNS. The intercepted domain is read from `domains.hcl` (`domain_env_private`), not from this unit's output
 - **[`units/vpc`](../../../vpc/)**: `split_dns/default` and `split_dns/eks` both derive the VPC DNS resolver address from it

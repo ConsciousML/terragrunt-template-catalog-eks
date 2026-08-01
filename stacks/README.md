@@ -45,9 +45,9 @@ Stacks are **templates with inputs** that require configuration values to functi
 ## For Developpers
 **Caution**: if you want to change the code of these pipelines, make sure to change every occurence of the following in the `stacks/` folder:
 ```hcl
-source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/oidc_provider?ref=${values.version}"
+source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/<unit_path>?ref=${values.version}"
 ```
 by your forked repository (replacing `<your_github_username>` and `<your_forked_repo_name>`):
 ```hcl
-source = "git::git@github.com:<your_github_username>/<your_forked_repo_name>.git//units/oidc_provider?ref=${values.version}"
+source = "git::git@github.com:<your_github_username>/<your_forked_repo_name>.git//units/<unit_path>?ref=${values.version}"
 ```

@@ -13,8 +13,9 @@ variable "name" {
 }
 
 variable "repository" {
-  description = "URL of the Helm chart repository"
+  description = "URL of the Helm chart repository. Omit for a local chart (chart set to a directory path)."
   type        = string
+  default     = null
 }
 
 variable "chart" {
@@ -34,8 +35,9 @@ variable "create_namespace" {
 }
 
 variable "helm_chart_version" {
-  description = "Version of the Helm chart to install"
+  description = "Version of the Helm chart to install. Omit for a local chart, its own Chart.yaml already pins one."
   type        = string
+  default     = null
 }
 
 variable "helm_values" {

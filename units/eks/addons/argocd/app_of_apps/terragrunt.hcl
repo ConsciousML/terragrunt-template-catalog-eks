@@ -129,13 +129,19 @@ dependency "tailscale_oauth_client_secret" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
-dependency "karpenter_iam" {
-  config_path = "../../karpenter/iam"
-  mock_outputs = {
-    queue_name         = "mock-queue"
-    node_iam_role_name = "mock-node-role"
-  }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+dependency "karpenter_helm" {
+  config_path  = "../../karpenter/helm"
+  skip_outputs = true
+}
+
+dependency "karpenter_ec2_node_class" {
+  config_path  = "../../karpenter/ec2_node_class"
+  skip_outputs = true
+}
+
+dependency "karpenter_node_pool_elastic" {
+  config_path  = "../../karpenter/node_pool/elastic"
+  skip_outputs = true
 }
 
 dependency "grafana_password" {
@@ -248,18 +254,6 @@ inputs = {
         name            = "${dependency.eks_cluster.outputs.cluster_name}-connector"
         hostnamePrefix  = dependency.eks_cluster.outputs.cluster_name
         advertiseRoutes = [dependency.vpc.outputs.vpc_cidr_block]
-      }
-      "helm-karpenter" = {
-        karpenter = {
-          settings = {
-            clusterName       = dependency.eks_cluster.outputs.cluster_name
-            interruptionQueue = dependency.karpenter_iam.outputs.queue_name
-          }
-        }
-      }
-      "helm-karpenter-config" = {
-        nodeRole    = dependency.karpenter_iam.outputs.node_iam_role_name
-        clusterName = dependency.eks_cluster.outputs.cluster_name
       }
       "grafana-secrets" = {
         secretStoreName = "${include.root.locals.environment}-aws-secrets-manager-grafana"

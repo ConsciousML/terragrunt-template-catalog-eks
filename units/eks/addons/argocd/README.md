@@ -20,10 +20,20 @@ The ESO `SecretStore` and `ExternalSecret` that sync the admin password's bcrypt
 
 ## Upstream Dependencies
 
-- **[`units/eks/addons/prometheus_stack/crds`](../prometheus_stack/crds/)**: `helm` takes an ordering dependency on it so the Prometheus Operator CRDs exist before ArgoCD's own Helm release renders any `ServiceMonitor`
-- **[`units/eks/addons/external_secrets_operator`](../external_secrets_operator/)**: `app_of_apps` takes an ordering dependency on its IAM role so the ESO controller can read the admin password secret once deployed through app-of-apps
-- **[`units/eks/addons/aws_load_balancer_controller`](../aws_load_balancer_controller/)**: `app_of_apps` takes an ordering dependency on its IAM role so the Pod Identity association exists before ArgoCD deploys the controller
-- **[`units/eks/addons/external_dns`](../external_dns/)**: `app_of_apps` takes an ordering dependency on both IAM roles so the Pod Identity associations exist before ArgoCD deploys either instance
-- **[`units/eks/route53`](../../route53/)**: `helm` takes an ordering dependency on the private hosted zone. `app_of_apps` waits on both hosted zones so the ACM certificate exists before app-of-apps deploys `helm-argocd-ingress`, `gateway-public`, and `gateway-private`
-- **[`units/eks/addons/karpenter`](../karpenter/)**: `app_of_apps` takes an ordering dependency on `iam` so the interruption queue and node IAM role exist before ArgoCD deploys the controller and node pool config
-- **[`units/eks/addons/tailscale/oauth_client_secret`](../tailscale/oauth_client_secret/)**: `app_of_apps` takes an ordering dependency on it so the OAuth credentials exist before app-of-apps deploys `tailscale-secrets`
+### [Helm Unit](helm/)
+
+- **[`units/eks/addons/prometheus_stack/crds`](../prometheus_stack/crds/)**: depends on it so the Prometheus Operator CRDs exist before ArgoCD's own Helm release renders any `ServiceMonitor`
+- **[`units/eks/route53`](../../route53/)**: depends on the private hosted zone
+
+### [App of Apps Unit](app_of_apps/)
+
+- **[`units/vpc`](../../../vpc/)**: reads `vpc_id` and `vpc_cidr_block` to configure `helm-aws-lbc` and `helm-tailscale-connector`
+- **[`units/eks/addons/prometheus_stack`](../prometheus_stack/)**: reads the `grafana/aws_secret_password` and `alertmanager/aws_secret_slack_bot` secret names to configure `grafana-secrets` and `alertmanager-secrets`
+- **[`units/eks/addons/external_secrets_operator`](../external_secrets_operator/)**: depends on its IAM role so the ESO controller can read the admin password secret once deployed through app-of-apps
+- **[`units/eks/addons/aws_load_balancer_controller`](../aws_load_balancer_controller/)**: depends on its IAM role so the Pod Identity association exists before ArgoCD deploys the controller
+- **[`units/eks/addons/external_dns`](../external_dns/)**: depends on both IAM roles so the Pod Identity associations exist before ArgoCD deploys either instance
+- **[`units/eks/addons/loki`](../loki/)**: reads the chunks and ruler S3 bucket IDs to configure `helm-loki`, and depends on `iam_role` so Loki's Pod Identity association exists before ArgoCD deploys it
+- **[`units/eks/addons/ebs_csi_driver`](../ebs_csi_driver/)**: depends on `addon` so `PersistentVolumeClaim` provisioning is available before ArgoCD deploys workloads that request storage
+- **[`units/eks/route53`](../../route53/)**: waits on both hosted zones so the ACM certificate exists before app-of-apps deploys `helm-argocd-ingress`, `gateway-public`, and `gateway-private`
+- **[`units/eks/addons/karpenter`](../karpenter/)**: depends on `iam`, `helm`, `ec2_node_class`, and `node_pool/elastic` so the interruption queue, node IAM role, and node pool config exist before ArgoCD deploys anything that schedules onto Karpenter-provisioned nodes
+- **[`units/eks/addons/tailscale/oauth_client_secret`](../tailscale/oauth_client_secret/)**: depends on it so the OAuth credentials exist before app-of-apps deploys `tailscale-secrets`
