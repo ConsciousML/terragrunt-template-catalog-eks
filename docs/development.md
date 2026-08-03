@@ -4,7 +4,7 @@ This guide walks you through the complete development workflow for adding new in
 
 ## Overview
 
-The development process follows a structured approach with these layers:
+The development process has three layers:
 
 - **Terraform Module** (`modules/`): the core infrastructure code
 - **Terragrunt Unit** (`units/`): wrapper that makes the module reusable

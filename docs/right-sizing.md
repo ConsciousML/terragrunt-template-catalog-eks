@@ -10,7 +10,7 @@ The Helm releases are configured in the [App of Apps repository](https://github.
 - The [Tailscale client](../pipelines/bootstrap/tailscale/README.md#prerequisites) is installed and connected (the dashboard is private)
 - The [EKS stack](../units/eks/README.md) is deployed, in any environment (`dev`, `staging`, `prod`)
 
-URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `goldilocks.private.dev.axelmendoza.com` for the `dev` environment with `base_domain = axelmendoza.com` (see [`pipelines/dns.hcl`](../pipelines/dns.hcl)).
+URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `goldilocks.private.dev.axelmendoza.com` for `dev` with `base_domain = axelmendoza.com` (see [`pipelines/dns.hcl`](../pipelines/dns.hcl)).
 
 ## What's Deployed
 
@@ -20,7 +20,7 @@ URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `goldil
 
 ## Let the Workload Run Under Load
 
-Every workload controller gets a `VerticalPodAutoscaler` automatically (see [Adding a New Workload](#adding-a-new-workload)), and the recommender starts building a usage histogram from the moment the workload exists. Don't read a recommendation right after deploying a workload, it's built from too little history to mean anything.
+Every workload controller gets a `VerticalPodAutoscaler` automatically (see [Adding a New Workload](#adding-a-new-workload)), and the recommender starts building a usage histogram from the moment the workload exists. Don't read a recommendation right after deploying a workload. It's built from too little history to mean anything.
 
 Give it a reasonable amount of time before trusting the numbers, long enough to span the workload's peak and off-peak usage.
 
@@ -69,7 +69,7 @@ resources:
     cpu: 500m
     memory: 1Gi
   limits:
-    # No CPU limit - let it use available CPU for maximum throughput
+    # No CPU limit, let it use available CPU for maximum throughput
     memory: 1Gi     # Memory limit prevents runaway consumption
 ```
 
@@ -93,13 +93,13 @@ resources:
     cpu: 1000m
     memory: 2Gi
   limits:
-    cpu: 1000m      # Predictable workload - set request = limit
+    cpu: 1000m      # Predictable workload, set request = limit
     memory: 2Gi     # Guaranteed QoS class for consistent performance
 ```
 
 ## Verify
 
-After the change rolls out, watch the workload in [Grafana](monitoring.md) for CPU throttling or OOM kills over the next traffic cycle. Then check the Goldilocks dashboard again, the target should now sit close to the new request instead of pointing further away from it.
+After the change rolls out, watch the workload in [Grafana](monitoring.md) for CPU throttling or OOM kills over the next traffic cycle. Then check the Goldilocks dashboard again. The target should now sit close to the new request instead of pointing further away from it.
 
 ## Tuning the Recommendation Strategy
 

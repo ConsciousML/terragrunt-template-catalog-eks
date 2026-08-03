@@ -8,4 +8,4 @@ Run each of these pipelines **once** after forking this repository, before deplo
 - **[Slack](slack/README.md)**: registers the Slack bot token as a GitHub Actions secret so CI-deployed Alertmanager instances can send notifications to Slack
 - **[Tailscale](tailscale/README.md)**: sets up the ACL policy and OAuth client for the Tailscale Kubernetes operator
 
-**Caution**: if you want to change the code of these pipelines, read the [For Developpers section](../../stacks/README.md#for-developpers).
+**Caution**: if you want to change the code of these pipelines, read the [For Developers section](../../stacks/README.md#for-developers).

@@ -21,10 +21,10 @@ Comes with a production-grade [EKS Cluster](units/eks/README.md), deployable acr
 ## Catalog vs Live Infrastructure
 
 This toolkit uses two template repositories:
-- **Catalog repository** (this repo): Defines a collection of reusable IaC building blocks: Terraform/OpenTofu [modules](./modules/README.md), Terragrunt [units](./units/README.md), and [stacks](./stacks/README.md)
+- **Catalog repository** (this repo): Defines a collection of reusable IaC building blocks: Terraform and OpenTofu [modules](./modules/README.md), Terragrunt [units](./units/README.md), and [stacks](./stacks/README.md)
 - [**Live repository**](https://github.com/ConsciousML/terragrunt-template-live-eks): Uses these building blocks to deploy them in a multi-environment ecosystem with production CI/CD
 
-You're new to Terragrunt best practices? Read [Gruntwork's official production patterns](https://github.com/gruntwork-io/terragrunt-infrastructure-catalog-example) to get the foundations required to use this toolkit.
+New to Terragrunt best practices? Read [Gruntwork's official production patterns](https://github.com/gruntwork-io/terragrunt-infrastructure-catalog-example) for the foundations this toolkit assumes.
 
 ## What's Inside
 
@@ -68,7 +68,7 @@ locals {
 
 3. Set `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` in your `.env` (see the [environment variables guide](docs/environment-variables.md))
 
-4. Both Karpenter NodePools cap total vCPUs via `spec.limits.cpu` and default to spot capacity, set in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](pipelines/dev/eks/stack/terragrunt.stack.hcl). Raise a limit or switch a pool's `karpenter.sh/capacity-type` requirement to `on-demand` for production stability.
+4. Karpenter NodePools cap total vCPUs via `spec.limits.cpu`, set in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](pipelines/dev/eks/stack/terragrunt.stack.hcl). Raise a limit or switch a pool's `karpenter.sh/capacity-type` requirement to `on-demand` for production stability.
 
 ### Installation
 
@@ -158,7 +158,7 @@ Next, verify `kubectl` is connected:
 kubectl get pods -n kube-system
 ```
 
-You should see and output similar to:
+You should see an output similar to:
 ```text
 NAME                           READY   STATUS    RESTARTS   AGE
 aws-node-59ld8                 2/2     Running   0          41m
@@ -226,7 +226,7 @@ Finally, cleanup by destroying the infrastructure (cwd in `pipelines/dev/eks/sta
 terragrunt run --all destroy --non-interactive --no-stack-generate
 ```
 
-**Caution**: This workflow is only for development and testing. Use your catalog components in the [live repository](https://github.com/ConsciousML/terragrunt-template-live-eks) for multi-environment IaC, and production CI/CD.
+**Caution**: This workflow is only for development and testing. Use your catalog components in the [live repository](https://github.com/ConsciousML/terragrunt-template-live-eks) for multi-environment IaC and production CI/CD.
 
 ## Development Workflow
 
@@ -256,12 +256,12 @@ Read more in the [CI workflow guide](docs/continuous-integration.md).
 ### Pre-commit Setup (recommended)
 We use a more efficient framework than [pre-commit](https://github.com/pre-commit/pre-commit) called [prek](https://github.com/j178/prek).
 
-Wire hooks automatically into git automatically:
+Wire hooks into git automatically:
 ```bash
 prek install
 ```
 
-Run hooks on demande:
+Run hooks on demand:
 ```bash
 prek run
 ```

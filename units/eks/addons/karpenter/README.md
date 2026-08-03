@@ -1,8 +1,8 @@
 # Karpenter
 
-Runs [Karpenter](https://karpenter.sh/) as the node autoscaler for the EKS cluster: the controller, its AWS-side IAM/Pod Identity resources, the shared `EC2NodeClass`, and NodePools.
+Runs [Karpenter](https://karpenter.sh/) as the node autoscaler for the EKS cluster: the controller, its AWS-side IAM and Pod Identity resources, the shared `EC2NodeClass`, and NodePools.
 
-Two NodePools split workloads by how disruption-sensitive they are. The critical pool takes a `workload-class=critical` taint with a conservative disruption policy, for workloads that shouldn't be evicted just because a node looks underutilized. The elastic pool consolidates more aggressively, for everything else. A workload opts into a pool with a matching `nodeSelector` and toleration.
+NodePools split workloads by how disruption-sensitive they are. The critical pool takes a `workload-class=critical` taint with a conservative disruption policy, for workloads that shouldn't be evicted just because a node looks underutilized. The elastic pool consolidates more aggressively, for everything else. A workload opts into a pool with a matching `nodeSelector` and toleration.
 
 > **Note**: Each NodePool's vCPU limit and capacity-type requirement are set in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](../../../../pipelines/dev/eks/stack/terragrunt.stack.hcl). Raise a limit if a pool needs more headroom, and switch the critical NodePool's capacity-type to on-demand for prod.
 

@@ -6,16 +6,14 @@ Each unit represents a single piece of infrastructure that can be composed toget
 
 ## What are Units?
 
-A **unit** is a directory containing a `terragrunt.hcl` file that represents a single piece of infrastructure.
-
-You can think of a unit as a single instance of a Terraform module. Units can be combined together into [stacks](https://terragrunt.gruntwork.io/docs/features/stacks/) to create complete environments.
+A **unit** is a directory with a `terragrunt.hcl` file, wrapping a single Terraform module. Units combine into [stacks](https://terragrunt.gruntwork.io/docs/features/stacks/) to form complete environments.
 
 ## What's Inside?
-Each unit in this directory:
-- References a corresponding Terraform module in the `modules/` directory
+Each unit:
+- References a corresponding Terraform module in `modules/`
 - Defines input variables using the `values.*` pattern
-- Manages dependencies between other units
-- Includes environment-specific naming conventions
+- Manages dependencies on other units
+- Follows environment-specific naming conventions
 
 ## How to Use?
-Refer to the [stacks directory](../stacks/) to see how `units` are used.
+See the [stacks directory](../stacks/) for how units are used.

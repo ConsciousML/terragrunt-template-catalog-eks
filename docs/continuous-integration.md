@@ -2,9 +2,7 @@
 
 ## Overview
 
-The [CI](../.github/workflows/ci.yaml) automatically validates Terragrunt configurations on every pull request.
-
-It ensures the code is well-formed before merging.
+The [CI](../.github/workflows/ci.yaml) validates Terragrunt configurations on every pull request, ensuring the code is well-formed before merging.
 
 ## How It Works
 

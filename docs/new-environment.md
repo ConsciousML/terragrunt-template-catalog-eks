@@ -1,6 +1,6 @@
 # Create a New Environment
 
-Changes span both `pipelines/network.hcl` and the bootstrap setup. Two steps are hard prerequisites for the final EKS deploy: the Tailscale ACL must include the new VPC CIDR before the connector can route traffic, and the public Route53 hosted zone must exist before ACM can validate TLS certificates.
+Changes span both `pipelines/network.hcl` and the bootstrap setup. Hard prerequisites for the final EKS deploy: the Tailscale ACL must include the new VPC CIDR before the connector can route traffic, and the public Route53 hosted zone must exist before ACM can validate TLS certificates.
 
 > **Deploying a staging or production environment?** Those live in the live repo. Follow the [live repo new environment guide](https://github.com/ConsciousML/terragrunt-template-live-eks/blob/main/docs/new-environment.md) instead.
 

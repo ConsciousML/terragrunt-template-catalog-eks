@@ -7,14 +7,6 @@ on:
       - main
   workflow_dispatch:
 
-# Prevent CI to run concurrently
-# As this workflow runs Terragrunt, it would create lock states
-# Uncomment to enable concurrency limit:
-#concurrency:
-  #group: ci-${{ github.head_ref || github.run_id }}
-  # Disable canceling workflows as this would also create locks
-  #cancel-in-progress: false
-
 permissions:
   contents: 'write'
   id-token: 'write'
