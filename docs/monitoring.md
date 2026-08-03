@@ -10,12 +10,12 @@ The Helm release is configured in the [App of Apps repository](https://github.co
 - The [Tailscale client](../pipelines/bootstrap/tailscale/README.md#prerequisites) is installed and connected (every UI here is private)
 - The [EKS stack](../units/eks/README.md) is deployed, in any environment (`dev`, `staging`, `prod`)
 
-URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `prometheus.private.dev.axelmendoza.com` for the `dev` environment with `base_domain = axelmendoza.com` (see [`pipelines/dns.hcl`](../pipelines/dns.hcl)).
+URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `prometheus.private.dev.axelmendoza.com` for `dev` with `base_domain = axelmendoza.com` (see [`pipelines/dns.hcl`](../pipelines/dns.hcl)).
 
 ## What's Deployed
 
 - **[Prometheus](https://prometheus.io/docs/introduction/overview/)**: scrapes and stores metrics
-- **[Prometheus Operator](https://prometheus-operator.dev/)**: manages Prometheus/Alertmanager via `ServiceMonitor`, `PodMonitor`, and `PrometheusRule` CRDs
+- **[Prometheus Operator](https://prometheus-operator.dev/)**: manages Prometheus and Alertmanager via `ServiceMonitor`, `PodMonitor`, and `PrometheusRule` CRDs
 - **[Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/)**: routes and dedupes firing alerts, sends them to Slack
 - **[Grafana](https://grafana.com/docs/grafana/latest/)**: dashboards and Explore over the Prometheus and Loki datasources
 - **[Loki](https://grafana.com/docs/loki/latest/)**: log aggregation and storage, backed by S3
@@ -45,7 +45,7 @@ aws secretsmanager get-secret-value \
 ## Which Tool to Reach For
 
 - **Control plane health** (API server, scheduler, controller manager, etcd): [EKS Observability dashboard](https://docs.aws.amazon.com/eks/latest/userguide/eks-observe.html) in the AWS Console
-- **Raw control plane metrics**, when you need to query a specific one directly: [`metrics.eks.amazonaws.com`](https://docs.aws.amazon.com/eks/latest/userguide/view-raw-metrics.html)
+- **Raw control plane metrics**, to query one directly: [`metrics.eks.amazonaws.com`](https://docs.aws.amazon.com/eks/latest/userguide/view-raw-metrics.html)
 - **Node, pod, workload, and addon-level metrics** (ArgoCD, ExternalDNS, ESO, Karpenter): Grafana
 - **Pod logs and Kubernetes cluster events**: Grafana Explore, Loki datasource
 - **Viewing and silencing firing alerts**: Alertmanager
@@ -53,7 +53,7 @@ aws secretsmanager get-secret-value \
 
 ### How to Browse Logs
 
-Open [Grafana](#accessing-the-uis), go to **Explore**, and select the **Loki** datasource. See Grafana's [Explore](https://grafana.com/docs/grafana/latest/explore/) docs and Loki's [LogQL](https://grafana.com/docs/loki/latest/query/) docs for how to build and run queries there.
+Open [Grafana](#accessing-the-uis), go to **Explore**, and select the **Loki** datasource. See Grafana's [Explore](https://grafana.com/docs/grafana/latest/explore/) docs and Loki's [LogQL](https://grafana.com/docs/loki/latest/query/) docs for query syntax.
 
 Labels available on every stream are set in [`helm-alloy/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-alloy/values.yaml)'s `discovery.relabel` and `loki.process` blocks.
 
@@ -67,12 +67,12 @@ To alert on a new metric, add a [`PrometheusRule`](https://prometheus-operator.d
 
 Alertmanager posts to Slack.
 
-Routing is by `component` (`k8s` or `prometheus-stack`, set per rule group via `defaultRules.additionalRuleGroupLabels` in [`helm-kube-prometheus-stack/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-kube-prometheus-stack/values.yaml)), then by `severity` (`warning` or `critical`), each combination landing in its own channel. `Watchdog` gets its own channel instead, confirming the alerting pipeline itself is alive.
+Routing is by `component` (`k8s` or `prometheus-stack`, set per rule group via `defaultRules.additionalRuleGroupLabels` in [`helm-kube-prometheus-stack/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-kube-prometheus-stack/values.yaml)), then by `severity` (`warning` or `critical`), each combination landing in its own channel. `Watchdog` gets its own channel instead, confirming the pipeline is alive.
 
-Anything matching neither a known `component` nor `Watchdog` falls into `#<environment>-unrouted` instead of mixing silently into `#<environment>-prometheus-stack-warning`, so a gap in the routing tree stays visible. Alerts with `severity: info` or `severity: none` (other than `Watchdog`) aren't sent to Slack at all. Resolved alerts post a follow-up notification in the same channel.
+Anything matching neither a known `component` nor `Watchdog` falls into `#<environment>-unrouted` instead of mixing silently into `#<environment>-prometheus-stack-warning`, so a gap in the routing tree stays visible. Alerts with `severity: info` or `severity: none` (other than `Watchdog`) aren't sent to Slack. Resolved alerts post a follow-up notification in the same channel.
 
-Base channel names are listed in [`pipelines/bootstrap/slack/channels.hcl`](../pipelines/bootstrap/slack/channels.hcl). Each is prefixed with the environment name so the same shared Slack bot can post every environment's alerts without colliding on one channel. Channels are created per environment via the [Slack bootstrap](../pipelines/bootstrap/slack/README.md)'s `channels` pipeline.
+Base channel names are listed in [`pipelines/bootstrap/slack/channels.hcl`](../pipelines/bootstrap/slack/channels.hcl), each prefixed with the environment name so one shared Slack bot can post every environment's alerts without colliding. Channels are created per environment via the [Slack bootstrap](../pipelines/bootstrap/slack/README.md)'s `channels` pipeline.
 
 ## Dev-only Deviations
 
-- `KubeCPUOvercommit` is disabled (see [`helm-kube-prometheus-stack/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-kube-prometheus-stack/values.yaml)). The `dev` node group intentionally runs 2 nodes, and the rule can't tell EKS has no control-plane node label, so it always fails N+1 tolerance on a cluster this size. Don't carry this disable over to `staging`/`prod`, where N+1 node failure tolerance is a real concern the rule should keep catching.
+- `KubeCPUOvercommit` is disabled (see [`helm-kube-prometheus-stack/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-kube-prometheus-stack/values.yaml)). The `dev` node group intentionally runs 2 nodes, and the rule can't tell EKS has no control-plane node label, so it always fails N+1 tolerance on a cluster this size. Don't carry this disable over to `staging` or `prod`, where N+1 node failure tolerance is a real concern the rule should keep catching.

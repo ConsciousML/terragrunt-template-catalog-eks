@@ -1,6 +1,6 @@
 # Environment Variables
 
-This document describes every environment variable used across the bootstrap pipelines and EKS stack. It is the single reference for what each variable is, how to obtain it, and which workflows require it.
+The single reference for every environment variable used across the bootstrap pipelines and EKS stack: what it is, how to obtain it, and which workflows require it.
 
 ## Prerequisite
 If you haven't already, copy the example file:
@@ -75,7 +75,7 @@ export AWS_REGION=<your-region>   # e.g. us-east-1
 
 **Required by**: `live/prod/eks/terragrunt.stack.hcl` and `.github/workflows/` in the [live repository](https://github.com/ConsciousML/terragrunt-template-live-eks), not by anything in this catalog repo
 
-The ARN of the local IAM identity registered as a cluster admin so it can run operations locally against prod (e.g. `terragrunt destroy`). This catalog only provides the unit that produces it ([`units/github/secrets/eks_local_admin`](../units/github/README.md)). The live repo is what actually consumes it.
+The ARN of the local IAM identity registered as a cluster admin so it can run operations locally against prod (e.g. `terragrunt destroy`). This catalog only provides the unit that produces it ([`units/github/secrets/eks_local_admin`](../units/github/README.md)). The live repo consumes it.
 
 This variable is set automatically by the bootstrap pipeline, which captures the identity of whoever runs it and stores it as a GitHub Actions secret. No manual configuration is needed.
 

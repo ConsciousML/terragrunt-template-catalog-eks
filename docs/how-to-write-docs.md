@@ -1,12 +1,12 @@
 # How to Write Docs
 
-Guidance for AI agents working in this repository. Read before making documentation or content edits.
+Guidance for AI agents editing docs or content in this repo.
 
-If you're documenting the `argocd-app-of-apps-template` repo, also read its [`docs/how-to-write-docs.md`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/docs/how-to-write-docs.md) for rules specific to that repo.
+If documenting `argocd-app-of-apps-template`, also read its [`docs/how-to-write-docs.md`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/docs/how-to-write-docs.md) for rules specific to that repo.
 
 ## Source of Truth
 
-Before writing or editing a doc, read 2-3 *adjacent* docs of the same type and match their voice and structure (not necessarily their literal section names). Verify factual claims against the actual code (`terragrunt.hcl`, `terragrunt.stack.hcl`, workflow files, sibling repos under `../`), not against what an existing doc says, docs drift, code doesn't.
+Before writing or editing a doc, read 2-3 *adjacent* docs of the same type and match their voice and structure, not necessarily their literal section names. Verify factual claims against the actual code (`terragrunt.hcl`, `terragrunt.stack.hcl`, workflow files, sibling repos under `../`), not against what an existing doc says, docs drift, code doesn't.
 
 Doc types in this repo, with examples to read before writing one of the same kind:
 
@@ -18,8 +18,8 @@ Doc types in this repo, with examples to read before writing one of the same kin
 
 ## Content
 
-- Only document facts that are not obvious from the code 
-- Don't restate a value that can drift out of sync with the code (a pinned version, a count, an exclusivity claim like "the only" or "single"). Point at the file that holds the value instead of repeating it in prose.
+- Only document facts that aren't obvious from the code.
+- Don't restate a value that can drift out of sync with the code (a pinned version, a count, an exclusivity claim like "the only" or "single"). Point at the file that holds the value instead.
 
 ## Dependencies
 
@@ -31,6 +31,8 @@ Doc types in this repo, with examples to read before writing one of the same kin
 ## Style
 
 These rules apply to inline code comments too, not just Markdown.
+
+**The most important styler rule**: Write the fewest characters possible while keeping it readable and not losing useful information.
 
 - Never join list items with slashes (e.g. `dev`/`staging`/`prod` or `aws_eks_cluster`/`aws_eks_cluster_auth`). Use commas and "and" instead (e.g. `dev`, `staging`, and `prod`).
 - Never use `;`, `-`, or an em dash (`—`) in the middle of a sentence. Use commas, parentheses, or split into two sentences instead.

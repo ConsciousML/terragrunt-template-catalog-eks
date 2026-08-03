@@ -40,7 +40,7 @@ terragrunt init
 
 `terragrunt init -upgrade` does the same without the manual `rm`.
 
-From the repo root, run `make sync-lock-files`, verify `git diff units/<unit-path>/.terraform.lock.hcl` shows only the expected version/checksum change, commit, and push.
+From the repo root, run `make sync-lock-files`, verify `git diff units/<unit-path>/.terraform.lock.hcl` shows only the expected version and checksum change, commit, and push.
 
 ## Details
 
@@ -50,7 +50,9 @@ From the repo root, run `make sync-lock-files`, verify `git diff units/<unit-pat
 
 ### The Problem with Stacks
 
-[Vanilla Terragrunt copies `.terraform.lock.hcl`](https://docs.terragrunt.com/reference/lock-files/) from your working directory into `.terragrunt-cache` before `init`, and copies it back after. `terragrunt stack` breaks this: units are rendered into `.terragrunt-stack/<unit-path>/` first, so the copy-back lands there instead of in the unit's source directory. `.terragrunt-stack` is gitignored and fully regenerated on every `stack generate`, so any lock file Terragrunt writes there is lost the moment you regenerate. See [gruntwork-io/terragrunt#4314](https://github.com/gruntwork-io/terragrunt/issues/4314). There's no stack-aware fix for this yet.
+[Vanilla Terragrunt copies `.terraform.lock.hcl`](https://docs.terragrunt.com/reference/lock-files/) from your working directory into `.terragrunt-cache` before `init`, and copies it back after. `terragrunt stack` breaks this: units are rendered into `.terragrunt-stack/<unit-path>/` first, so the copy-back lands there instead of in the unit's source directory.
+
+`.terragrunt-stack` is gitignored and fully regenerated on every `stack generate`, so any lock file Terragrunt writes there is lost the moment you regenerate. See [gruntwork-io/terragrunt#4314](https://github.com/gruntwork-io/terragrunt/issues/4314). There's no stack-aware fix yet.
 
 ### Our Strategy
 

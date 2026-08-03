@@ -62,6 +62,7 @@
         - `environment-variables.md`: reference for every environment variable used across bootstrap pipelines and the EKS stack
         - `continuous-integration.md`: what CI validates on every pull request
         - `app-of-apps-integration.md`: catalog-side plumbing for threading Terraform values into app-of-apps
+        - `ai-assisted-workflows.md`: manual, permissive, and QRSPI-driven autonomous modes for working with Claude Code in this repo
         - `how-to-write-docs.md`: see &lt;documentation&gt;
 
         Every other README (per-unit, per-module, per-addon-group, in this repo and in `argocd-app-of-apps-template`) is reached by following links from the docs above. This map indexes entry points, not every file.

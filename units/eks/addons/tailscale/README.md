@@ -19,8 +19,9 @@ Joins the EKS cluster to a Tailnet via the Tailscale Kubernetes operator, exposi
 - **[split_dns/eks](split_dns/eks/)**: Configures Tailscale split DNS to route queries for the region's EKS private endpoint domain (`<region>.eks.amazonaws.com`) through the VPC DNS resolver, so the private EKS API endpoint resolves over the Tailnet
 - **[`helm-tailscale-operator`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-tailscale-operator)** (app-of-apps): deploys the operator Helm release itself. Not deployed by this unit
 - **[`helm-tailscale-connector`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-tailscale-connector)** (app-of-apps): deploys the `Connector` CR. Not deployed by this unit
+- **[`tailscale-secrets`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-eso-secret-sync)** (app-of-apps): an instance of the generic `helm-eso-secret-sync` chart, syncs the OAuth credentials into the operator's expected `operator-oauth` secret via an ESO `SecretStore` and `ExternalSecret`, mirroring how ArgoCD's admin password is synced
 
-The ESO `SecretStore` and `ExternalSecret` that sync the OAuth credentials into the operator's expected `operator-oauth` secret are also deployed through app-of-apps (`tailscale-secrets`, an instance of the generic [`helm-eso-secret-sync`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-eso-secret-sync) chart), mirroring how ArgoCD's admin password is synced. See the [App of Apps integration guide](../../../../docs/app-of-apps-integration.md).
+See the [App of Apps integration guide](../../../../docs/app-of-apps-integration.md) to understand how these apps are wired to Terraform-sourced values.
 
 ## Upstream Dependencies
 

@@ -15,8 +15,10 @@ Deploys ArgoCD into the cluster and wires up its admin password via AWS Secrets 
 - **[aws_secret_password](aws_secret_password/)**: Generates a random admin password and stores it in AWS Secrets Manager
 - **[helm](helm/)**: Deploys ArgoCD via Helm. Sets `global.domain` from `domains.hcl`
 - **[app_of_apps](app_of_apps/)**: Deploys the root ArgoCD `Application` CR pointing to the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template)
+- **[`argocd-secrets`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-eso-secret-sync)** (app-of-apps): an instance of the generic `helm-eso-secret-sync` chart, syncs the admin password's bcrypt hash into `argocd-secret` via an ESO `SecretStore` and `ExternalSecret`. Not deployed by this unit
+- **[`helm-argocd-ingress`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-argocd-ingress)** (app-of-apps): the ArgoCD server's `Ingress` and gRPC `Service`. Not deployed by the `helm` unit above
 
-The ESO `SecretStore` and `ExternalSecret` that sync the admin password's bcrypt hash into `argocd-secret` are deployed through app-of-apps (`argocd-secrets`, an instance of the generic [`helm-eso-secret-sync`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-eso-secret-sync) chart), not Terraform. The ArgoCD server's `Ingress` and its gRPC `Service` are also deployed through app-of-apps, as [`helm-argocd-ingress`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-argocd-ingress), not by the `helm` unit above. See the [App of Apps integration guide](../../../../docs/app-of-apps-integration.md).
+See the [App of Apps integration guide](../../../../docs/app-of-apps-integration.md) to understand how these apps are wired to Terraform-sourced values.
 
 ## Upstream Dependencies
 

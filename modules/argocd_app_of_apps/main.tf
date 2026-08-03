@@ -4,9 +4,7 @@ resource "helm_release" "this" {
   chart      = "argocd-apps"
   version    = var.helm_chart_version
   namespace  = var.namespace
-  # Uninstall can take longer than the provider's 300s default while ArgoCD cascades
-  # deletes through its own Applications and their managed resources (issue #160).
-  timeout = 600
+  timeout    = 600
 
   values = [yamlencode({
     applications = {

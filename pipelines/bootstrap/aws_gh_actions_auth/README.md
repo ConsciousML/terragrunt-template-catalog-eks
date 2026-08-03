@@ -1,11 +1,9 @@
 # GitHub Actions AWS Bootstrap
-Authenticated GitHub Actions with AWS and enables to run Terragrunt in CI/CD.
+Authenticates GitHub Actions with AWS, enabling Terragrunt to run in CI/CD.
 
 ## Purpose
 
-Run this **once** after creating a new GitHub repository from this template to authenticate GitHub Actions with AWS.
-
-This enables the CI to run properly without managing secrets and AWS credentials manually.
+Run this **once** after creating a new GitHub repository from this template, so CI can authenticate to AWS without managing secrets or credentials by hand.
 
 ## Quick Start
 
