@@ -607,7 +607,7 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "toleration-daemonset"
+    target_revision       = "vpa-use-prom-history"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
