@@ -1,0 +1,77 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "../argocd-app-of-apps-template",
+      "/tmp"
+    ],
+    "allow": [
+      "Bash(kubectl:*)",
+      "Bash(terragrunt:*)",
+      "Bash(tofu:*)",
+      "Bash(tflint:*)",
+      "Bash(trivy:*)",
+
+      "Bash(aws * describe-*)",
+      "Bash(aws * get-*)",
+      "Bash(aws * list-*)",
+      "Bash(aws * head-*)",
+      "Bash(aws sts get-caller-identity)",
+
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(git show:*)",
+      "Bash(git blame:*)",
+      "Bash(git ls-files:*)",
+
+      "Bash(gh pr view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr checks:*)",
+
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(sort:*)",
+      "Bash(echo:*)",
+      "Bash(cd:*)",
+      "Bash(jq:*)",
+      "Bash(yq:*)",
+      "Bash(wc:*)",
+      "Bash(diff:*)",
+      "Bash(cut:*)",
+      "Bash(tr:*)",
+      "Bash(uniq:*)",
+      "Bash(column:*)",
+      "Bash(stat:*)",
+      "Bash(file:*)",
+      "Bash(helm template:*)",
+      "Bash(helm lint:*)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Bash(* .env)",
+      "Bash(* .env *)",
+      "Bash(.env)",
+
+      "Read(.git/**)",
+      "Edit(.git/**)",
+      "Write(.git/**)",
+
+      "Read(../argocd-app-of-apps-template/.git/**)",
+      "Edit(../argocd-app-of-apps-template/.git/**)",
+      "Write(../argocd-app-of-apps-template/.git/**)",
+
+      "Edit(.claude/**)",
+      "Write(.claude/**)",
+
+      "Edit(../argocd-app-of-apps-template/.claude/**)",
+      "Write(../argocd-app-of-apps-template/.claude/**)"
+    ]
+  }
+}
