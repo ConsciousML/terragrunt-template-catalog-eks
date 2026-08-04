@@ -20,8 +20,10 @@ locals {
   vpc_cidrs         = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_cidrs
   vpc_cidr          = local.vpc_cidrs[local.environment]
 
-  private_subnets = [cidrsubnet(local.vpc_cidr, 8, 1), cidrsubnet(local.vpc_cidr, 8, 2)]
-  public_subnets  = [cidrsubnet(local.vpc_cidr, 8, 3), cidrsubnet(local.vpc_cidr, 8, 4)]
+  # /19 each (8,187 usable IPs), sized for prefix delegation. Indices 2 and 5 skipped,
+  # reserved for a future 3rd AZ pair.
+  private_subnets = [cidrsubnet(local.vpc_cidr, 3, 0), cidrsubnet(local.vpc_cidr, 3, 1)]
+  public_subnets  = [cidrsubnet(local.vpc_cidr, 3, 3), cidrsubnet(local.vpc_cidr, 3, 4)]
 
   # Shared by every Karpenter NodePool. Only capacity-type differs per pool.
   karpenter_node_pool_base_requirements = [
