@@ -87,11 +87,11 @@ locals {
 
   # Required onto the MNG
   mng_node_selector = {
-    "node-role.kubernetes.io/mng" = "true"
+    "node-role/mng" = "true"
   }
   mng_tolerations = [
     {
-      key      = "node-role.kubernetes.io/mng"
+      key      = "node-role/mng"
       operator = "Equal"
       value    = "true"
       effect   = "NoSchedule"
@@ -290,7 +290,7 @@ unit "cluster" {
 
         taints = {
           mng = {
-            key    = "node-role.kubernetes.io/mng"
+            key    = "node-role/mng"
             value  = "true"
             effect = "NO_SCHEDULE"
           }
