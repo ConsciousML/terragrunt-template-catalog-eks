@@ -10,6 +10,8 @@ locals {
     "prometheus-stack-warning",
     "loki-critical",
     "loki-warning",
+    "argocd-critical",
+    "argocd-warning",
     "watchdog",
     "unrouted",
   ]
