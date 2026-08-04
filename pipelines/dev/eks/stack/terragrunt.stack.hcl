@@ -20,8 +20,10 @@ locals {
   vpc_cidrs         = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_cidrs
   vpc_cidr          = local.vpc_cidrs[local.environment]
 
-  private_subnets = [cidrsubnet(local.vpc_cidr, 8, 1), cidrsubnet(local.vpc_cidr, 8, 2)]
-  public_subnets  = [cidrsubnet(local.vpc_cidr, 8, 3), cidrsubnet(local.vpc_cidr, 8, 4)]
+  # /19 each (8,187 usable IPs), sized for prefix delegation. Indices 2 and 5 skipped,
+  # reserved for a future 3rd AZ pair.
+  private_subnets = [cidrsubnet(local.vpc_cidr, 3, 0), cidrsubnet(local.vpc_cidr, 3, 1)]
+  public_subnets  = [cidrsubnet(local.vpc_cidr, 3, 3), cidrsubnet(local.vpc_cidr, 3, 4)]
 
   # Shared by every Karpenter NodePool. Only capacity-type differs per pool.
   karpenter_node_pool_base_requirements = [
@@ -87,23 +89,14 @@ locals {
 
   # Required onto the MNG
   mng_node_selector = {
-    "node-role.kubernetes.io/mng" = "true"
+    "node-role/mng" = "true"
   }
   mng_tolerations = [
     {
-      key      = "node-role.kubernetes.io/mng"
+      key      = "node-role/mng"
       operator = "Equal"
       value    = "true"
       effect   = "NoSchedule"
-    }
-  ]
-
-  # For DaemonSets that must run on every node, ready or not (they're what makes a node
-  # ready). mng_tolerations alone deadlocks: a booting node also carries the built-in
-  # not-ready taint, which these pods would then also need to tolerate.
-  bootstrap_tolerations = [
-    {
-      operator = "Exists"
     }
   ]
 }
@@ -215,7 +208,6 @@ unit "cluster" {
             requests = { cpu = "15m", memory = "100Mi" }
             limits   = { cpu = "75m", memory = "100Mi" }
           }
-          tolerations = local.bootstrap_tolerations
         })
       }
       kube-proxy = {
@@ -261,7 +253,6 @@ unit "cluster" {
               limits   = { cpu = "196m", memory = "184M" }
             }
           }
-          tolerations = local.bootstrap_tolerations
         })
       }
     }
@@ -301,7 +292,7 @@ unit "cluster" {
 
         taints = {
           mng = {
-            key    = "node-role.kubernetes.io/mng"
+            key    = "node-role/mng"
             value  = "true"
             effect = "NO_SCHEDULE"
           }
@@ -607,7 +598,7 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "toleration-daemonset"
+    target_revision       = "vpa-use-prom-history"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"

@@ -61,17 +61,13 @@
 
       "Read(.git/**)",
       "Edit(.git/**)",
-      "Write(.git/**)",
 
       "Read(../argocd-app-of-apps-template/.git/**)",
       "Edit(../argocd-app-of-apps-template/.git/**)",
-      "Write(../argocd-app-of-apps-template/.git/**)",
 
       "Edit(.claude/**)",
-      "Write(.claude/**)",
 
-      "Edit(../argocd-app-of-apps-template/.claude/**)",
-      "Write(../argocd-app-of-apps-template/.claude/**)"
+      "Edit(../argocd-app-of-apps-template/.claude/**)"
     ]
   }
 }
