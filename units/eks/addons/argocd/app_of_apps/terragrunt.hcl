@@ -300,6 +300,19 @@ inputs = {
       "goldilocks-httproute" = {
         host = local.domain_private_goldilocks
       }
+      "helm-blackbox-exporter" = {
+        "prometheus-blackbox-exporter" = {
+          serviceMonitor = {
+            targets = [
+              { name = "grafana", url = "https://${local.domain_private_grafana}" },
+              { name = "prometheus", url = "https://${local.domain_private_prometheus}" },
+              { name = "alertmanager", url = "https://${local.domain_private_alertmanager}" },
+              { name = "argocd", url = "https://${local.domain_private_argocd}" },
+              { name = "guestbook", url = "https://${local.domain_public_guestbook}" },
+            ]
+          }
+        }
+      }
     }
   }
 }

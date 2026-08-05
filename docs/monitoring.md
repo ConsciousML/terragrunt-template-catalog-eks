@@ -22,6 +22,7 @@ URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `promet
 - **[Alloy](https://grafana.com/docs/alloy/latest/)**: ships pod logs and Kubernetes cluster events to Loki
 - **[kube-state-metrics](https://github.com/kubernetes/kube-state-metrics)**: exposes cluster object state (Deployments, Pods, Nodes, ...) as metrics
 - **[node-exporter](https://github.com/prometheus/node_exporter)**: exposes host-level metrics (CPU, memory, disk, network) per node
+- **[blackbox-exporter](https://github.com/prometheus/blackbox_exporter)**: probes Grafana, Prometheus, Alertmanager, ArgoCD, and guestbook for HTTP reachability
 
 ## Accessing the UIs
 
@@ -67,10 +68,12 @@ To alert on a new metric, add a [`PrometheusRule`](https://prometheus-operator.d
 
 Alertmanager posts to Slack.
 
-Routing is by `component` (`k8s`, `prometheus-stack`, `loki`, or `argocd`), then by `severity` (`warning` or `critical`), each combination landing in its own channel. The `component` label is attached one of two ways:
+Routing is by `component` (`k8s`, `prometheus-stack`, `loki`, `argocd`, or `uptime`), then by `severity` (`warning` or `critical`), each combination landing in its own channel. The `component` label is attached one of two ways:
 
-- Chart-bundled rules (kube-prometheus-stack's own, Loki's mixin): via a Helm value, e.g. `defaultRules.additionalRuleGroupLabels` or `loki.monitoring.alerts.additionalRuleLabels` in [`helm-kube-prometheus-stack/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-kube-prometheus-stack/values.yaml) and [`helm-loki/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-loki/values.yaml)
-- Standalone `PrometheusRule` manifests (ArgoCD's): directly on each alert's `labels`, e.g. [`argocd-prometheus-rules/prometheus-rule.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/argocd-prometheus-rules/prometheus-rule.yaml) `Watchdog` gets its own channel instead, confirming the pipeline is alive.
+- Chart-bundled rules (kube-prometheus-stack's own, Loki's and blackbox-exporter's mixins): via a Helm value, e.g. `defaultRules.additionalRuleGroupLabels`, `loki.monitoring.alerts.additionalRuleLabels`, or `prometheusRule.additionalLabels` in [`helm-kube-prometheus-stack/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-kube-prometheus-stack/values.yaml), [`helm-loki/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-loki/values.yaml), and [`helm-blackbox-exporter/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-blackbox-exporter/values.yaml)
+- Standalone `PrometheusRule` manifests: directly on each alert's `labels`, see [`prometheus-rules`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/prometheus-rules)
+
+`Watchdog` gets its own channel instead, confirming the pipeline is alive.
 
 Anything matching neither a known `component` nor `Watchdog` falls into `#<environment>-unrouted` instead of mixing silently into `#<environment>-prometheus-stack-warning`, so a gap in the routing tree stays visible. Alerts with `severity: info` or `severity: none` (other than `Watchdog`) aren't sent to Slack. Resolved alerts post a follow-up notification in the same channel.
 
