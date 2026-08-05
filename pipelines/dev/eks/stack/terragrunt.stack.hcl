@@ -544,8 +544,8 @@ unit "argocd" {
       }
       server = {
         resources = {
-          requests = { cpu = "11m", memory = "94M" }
-          limits   = { cpu = "55m", memory = "94M" }
+          requests = { cpu = "11m", memory = "150M" }
+          limits   = { cpu = "55m", memory = "150M" }
         }
         nodeSelector = local.critical_node_selector
         tolerations  = local.critical_tolerations
