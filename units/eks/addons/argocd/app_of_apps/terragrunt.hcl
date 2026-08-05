@@ -272,6 +272,11 @@ inputs = {
         "kube-prometheus-stack" = {
           fullnameOverride = local.kube_prometheus_stack_release
           environment      = include.root.locals.environment
+          prometheus = {
+            prometheusSpec = {
+              externalUrl = "https://${local.domain_private_prometheus}"
+            }
+          }
           alertmanager = {
             alertmanagerSpec = {
               externalUrl = "https://${local.domain_private_alertmanager}"

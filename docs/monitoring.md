@@ -70,8 +70,8 @@ Alertmanager posts to Slack.
 
 Routing is by `component` (`k8s`, `prometheus-stack`, `loki`, `argocd`, or `uptime`), then by `severity` (`warning` or `critical`), each combination landing in its own channel. The `component` label is attached one of two ways:
 
-- Chart-bundled rules (kube-prometheus-stack's own, Loki's and blackbox-exporter's mixins): via a Helm value, e.g. `defaultRules.additionalRuleGroupLabels`, `loki.monitoring.alerts.additionalRuleLabels`, or `prometheusRule.additionalLabels` in [`helm-kube-prometheus-stack/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-kube-prometheus-stack/values.yaml), [`helm-loki/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-loki/values.yaml), and [`helm-blackbox-exporter/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-blackbox-exporter/values.yaml)
-- Standalone `PrometheusRule` manifests: directly on each alert's `labels`, see [`prometheus-rules`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/prometheus-rules)
+- Chart-bundled rules (kube-prometheus-stack's own, Loki's mixin): via a Helm value, e.g. `defaultRules.additionalRuleGroupLabels` or `loki.monitoring.alerts.additionalRuleLabels` in [`helm-kube-prometheus-stack/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-kube-prometheus-stack/values.yaml) and [`helm-loki/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-loki/values.yaml)
+- Standalone `PrometheusRule` manifests, or a chart's own `prometheusRule.rules` value (blackbox-exporter's): directly on each alert's `labels`, see [`prometheus-rules`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/prometheus-rules) and [`helm-blackbox-exporter/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-blackbox-exporter/values.yaml)
 
 `Watchdog` gets its own channel instead, confirming the pipeline is alive.
 
