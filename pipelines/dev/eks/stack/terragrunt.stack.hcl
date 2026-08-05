@@ -194,8 +194,8 @@ unit "cluster" {
         addon_version = "v1.14.2-eksbuild.4"
         configuration_values = jsonencode({
           resources = {
-            requests = { cpu = "15m", memory = "100Mi" }
-            limits   = { cpu = "75m", memory = "100Mi" }
+            requests = { cpu = "11m", memory = "24M" }
+            limits   = { cpu = "55m", memory = "24M" }
           }
           tolerations = local.mng_tolerations
         })
@@ -205,8 +205,8 @@ unit "cluster" {
         addon_version  = "v1.3.10-eksbuild.3"
         configuration_values = jsonencode({
           resources = {
-            requests = { cpu = "15m", memory = "100Mi" }
-            limits   = { cpu = "75m", memory = "100Mi" }
+            requests = { cpu = "11m", memory = "24M" }
+            limits   = { cpu = "55m", memory = "24M" }
           }
         })
       }
@@ -214,8 +214,8 @@ unit "cluster" {
         addon_version = "v1.36.0-eksbuild.7"
         configuration_values = jsonencode({
           resources = {
-            requests = { cpu = "15m", memory = "100Mi" }
-            limits   = { cpu = "75m", memory = "100Mi" }
+            requests = { cpu = "11m", memory = "37M" }
+            limits   = { cpu = "55m", memory = "37M" }
           }
           # No tolerations key: this addon's configuration schema doesn't support one, and its
           # default manifest already tolerates everything.
@@ -225,8 +225,8 @@ unit "cluster" {
         addon_version = "v0.9.0-eksbuild.2"
         configuration_values = jsonencode({
           resources = {
-            requests = { cpu = "15m", memory = "100Mi" }
-            limits   = { cpu = "75m", memory = "100Mi" }
+            requests = { cpu = "11m", memory = "37M" }
+            limits   = { cpu = "55m", memory = "37M" }
           }
           tolerations = local.mng_tolerations
         })
@@ -249,8 +249,8 @@ unit "cluster" {
           # aws-eks-nodeagent container, enabled by enableNetworkPolicy above
           nodeAgent = {
             resources = {
-              requests = { cpu = "49m", memory = "184M" }
-              limits   = { cpu = "196m", memory = "184M" }
+              requests = { cpu = "11m", memory = "164M" }
+              limits   = { cpu = "55m", memory = "164M" }
             }
           }
         })
@@ -343,8 +343,8 @@ unit "ebs_csi_driver_addon" {
       }
       node = {
         resources = {
-          requests = { cpu = "11m", memory = "35M" }
-          limits   = { cpu = "11m", memory = "35M" }
+          requests = { cpu = "11m", memory = "24M" }
+          limits   = { cpu = "11m", memory = "24M" }
         }
         tolerations = local.mng_tolerations
       }
@@ -514,8 +514,8 @@ unit "argocd" {
           }
         }
         resources = {
-          requests = { cpu = "323m", memory = "500M" }
-          limits   = { memory = "500M" }
+          requests = { cpu = "49m", memory = "717M" }
+          limits   = { memory = "717M" }
         }
         nodeSelector = local.critical_node_selector
         tolerations  = local.critical_tolerations
@@ -528,32 +528,32 @@ unit "argocd" {
           }
         }
         resources = {
-          requests = { cpu = "15m", memory = "100Mi" }
-          limits   = { cpu = "15m", memory = "100Mi" }
+          requests = { cpu = "11m", memory = "64M" }
+          limits   = { cpu = "11m", memory = "64M" }
         }
         nodeSelector = local.critical_node_selector
         tolerations  = local.critical_tolerations
       }
       applicationSet = {
         resources = {
-          requests = { cpu = "15m", memory = "100Mi" }
-          limits   = { cpu = "15m", memory = "100Mi" }
+          requests = { cpu = "11m", memory = "64M" }
+          limits   = { cpu = "11m", memory = "64M" }
         }
         nodeSelector = local.critical_node_selector
         tolerations  = local.critical_tolerations
       }
       server = {
         resources = {
-          requests = { cpu = "23m", memory = "100Mi" }
-          limits   = { cpu = "92m", memory = "100Mi" }
+          requests = { cpu = "11m", memory = "94M" }
+          limits   = { cpu = "55m", memory = "94M" }
         }
         nodeSelector = local.critical_node_selector
         tolerations  = local.critical_tolerations
       }
       redis = {
         resources = {
-          requests = { cpu = "15m", memory = "100Mi" }
-          limits   = { cpu = "75m", memory = "100Mi" }
+          requests = { cpu = "11m", memory = "35M" }
+          limits   = { cpu = "55m", memory = "35M" }
         }
         nodeSelector = local.critical_node_selector
         tolerations  = local.critical_tolerations
@@ -566,8 +566,8 @@ unit "argocd" {
       }
       dex = {
         resources = {
-          requests = { cpu = "15m", memory = "100Mi" }
-          limits   = { cpu = "75m", memory = "100Mi" }
+          requests = { cpu = "11m", memory = "64M" }
+          limits   = { cpu = "55m", memory = "64M" }
         }
         nodeSelector = local.critical_node_selector
         tolerations  = local.critical_tolerations
@@ -598,7 +598,7 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "improve-alerting"
+    target_revision       = "right-size"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
@@ -735,8 +735,8 @@ unit "karpenter_helm" {
       }
       controller = {
         resources = {
-          requests = { cpu = "49m", memory = "298M" }
-          limits   = { memory = "298M" }
+          requests = { cpu = "163m", memory = "297M" }
+          limits   = { memory = "297M" }
         }
       }
       # Requires the ServiceMonitor CRD from prometheus_operator_crds.
