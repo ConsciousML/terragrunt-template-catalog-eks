@@ -8,10 +8,10 @@ terraform {
 }
 
 locals {
-  domains_hcl             = find_in_parent_folders("domains.hcl")
-  domain_public_guestbook = read_terragrunt_config(local.domains_hcl).locals.domain_public_guestbook
+  domains_hcl           = find_in_parent_folders("domains.hcl")
+  domain_public_podinfo = read_terragrunt_config(local.domains_hcl).locals.domain_public_podinfo
 }
 
 inputs = {
-  value = local.domain_public_guestbook
+  value = local.domain_public_podinfo
 }
