@@ -5,7 +5,7 @@ include "root" {
 
 locals {
   domains_hcl = find_in_parent_folders("domains.hcl")
-  domain_name = read_terragrunt_config(local.domains_hcl).locals.domain_env
+  domain_name = read_terragrunt_config(local.domains_hcl).locals.domain_env_private
 }
 
 terraform {
