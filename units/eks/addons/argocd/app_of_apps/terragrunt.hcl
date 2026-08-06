@@ -205,9 +205,8 @@ inputs = {
           vpcId       = dependency.vpc.outputs.vpc_id
         }
       }
-      "helm-argocd-ingress" = {
-        host           = local.domain_private_argocd
-        certificateArn = dependency.acm_certificate.outputs.certificate_arn
+      "argocd-httproute" = {
+        host = local.domain_private_argocd
       }
       "helm-external-dns-private" = {
         "external-dns" = {
@@ -266,8 +265,8 @@ inputs = {
         remoteKey       = dependency.alertmanager_slack_bot_secret.outputs.secret_name
       }
       # See local.kube_prometheus_stack_release above: fullnameOverride and the 3
-      # helm-httproute backendRef names below must all agree on this same literal, and only
-      # HCL locals can compose "<release>-grafana" — Helm/YAML values files can't.
+      # helm-httproute backendRefs.default.name overrides below must all agree on this same
+      # literal. Only HCL locals can compose "<release>-grafana", plain YAML can't.
       "helm-kube-prometheus-stack" = {
         "kube-prometheus-stack" = {
           fullnameOverride = local.kube_prometheus_stack_release
@@ -286,20 +285,26 @@ inputs = {
       }
       "grafana-httproute" = {
         host = local.domain_private_grafana
-        backendRef = {
-          name = "${local.kube_prometheus_stack_release}-grafana"
+        backendRefs = {
+          default = {
+            name = "${local.kube_prometheus_stack_release}-grafana"
+          }
         }
       }
       "prometheus-httproute" = {
         host = local.domain_private_prometheus
-        backendRef = {
-          name = "${local.kube_prometheus_stack_release}-prometheus"
+        backendRefs = {
+          default = {
+            name = "${local.kube_prometheus_stack_release}-prometheus"
+          }
         }
       }
       "alertmanager-httproute" = {
         host = local.domain_private_alertmanager
-        backendRef = {
-          name = "${local.kube_prometheus_stack_release}-alertmanager"
+        backendRefs = {
+          default = {
+            name = "${local.kube_prometheus_stack_release}-alertmanager"
+          }
         }
       }
       "goldilocks-httproute" = {

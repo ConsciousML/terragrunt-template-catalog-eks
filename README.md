@@ -188,7 +188,8 @@ argocd login argocd.private.dev.<base_domain> \
   --password $(aws secretsmanager get-secret-value \
     --secret-id dev-argocd-password \
     --query SecretString \
-    --output text | jq -r .plaintext)
+    --output text | jq -r .plaintext) \
+    --grpc-web
 ```
 
 ### Disable the Public EKS Endpoint
