@@ -3,7 +3,7 @@ locals {
   vpc_cidrs = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_cidrs
 
   github_locals            = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
-  github_username_catalog  = local.github_locals.github_username_catalog
+  github_owner_catalog     = local.github_locals.github_owner_catalog
   github_repo_name_catalog = local.github_locals.github_repo_name_catalog
 
   # Tailscale tag assigned to CI runner devices joining via WIF
@@ -11,7 +11,7 @@ locals {
 }
 
 unit "acl" {
-  source = "git::git@github.com:${local.github_username_catalog}/${local.github_repo_name_catalog}.git//units/eks/addons/tailscale/acl?ref=${local.version}"
+  source = "git::git@github.com:${local.github_owner_catalog}/${local.github_repo_name_catalog}.git//units/eks/addons/tailscale/acl?ref=${local.version}"
   path   = "eks/addons/tailscale/acl"
 
   values = {

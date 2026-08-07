@@ -54,10 +54,10 @@ Here are the major components of the repository:
 
 ### Configuration
 In your forked repository, change the following Terragrunt configuration files:
-1. In `pipelines/github.hcl`, modify (by replacing `<YourGitHubUsername>`, `<the-repository-name-of-your-fork>`):
+1. In `pipelines/github.hcl`, modify (by replacing `<YourGitHubUsernameOrOrgName>`, `<the-repository-name-of-your-fork>`):
 ```hcl
 locals {
-  github_username_catalog      = "<YourGitHubUsername>"
+  github_owner_catalog      = "<YourGitHubUsernameOrOrgName>"
   github_repo_name_catalog     = "<the-repository-name-of-your-fork>"
   github_repo_name_app_of_apps = "<your-app-of-apps-repo-name>"
 }

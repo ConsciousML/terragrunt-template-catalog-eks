@@ -3,7 +3,7 @@ variable "name" {
   type        = string
 }
 
-variable "github_username" {
+variable "github_owner" {
   description = "GitHub username or organization name"
   type        = string
 }

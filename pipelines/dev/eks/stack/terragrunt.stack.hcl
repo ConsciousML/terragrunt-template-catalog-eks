@@ -118,8 +118,8 @@ unit "vpc" {
     public_subnets  = local.public_subnets
 
     enable_nat_gateway     = true
-    single_nat_gateway     = false
-    one_nat_gateway_per_az = true
+    single_nat_gateway     = true
+    one_nat_gateway_per_az = false
 
     enable_dns_hostnames = true
     enable_dns_support   = true
@@ -593,12 +593,11 @@ unit "argocd_app_of_apps" {
   path   = "eks/addons/argocd/app_of_apps"
 
   values = {
-    version   = local.version
-    name      = "app-of-apps"
-    namespace = "argocd"
-    path      = "apps"
-    #target_revision       = "main"
-    target_revision       = "improve-ha"
+    version               = local.version
+    name                  = "app-of-apps"
+    namespace             = "argocd"
+    path                  = "apps"
+    target_revision       = "main"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"

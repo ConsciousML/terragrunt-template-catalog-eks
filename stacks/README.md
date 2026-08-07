@@ -28,7 +28,7 @@ For understanding individual components, see the [units directory](../units/).
 ```hcl
 source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/<unit_path>?ref=${values.version}"
 ```
-by your forked repository (replacing `<your_github_username>` and `<your_forked_repo_name>`):
+by your forked repository (replacing `<github_owner>` and `<your_forked_repo_name>`):
 ```hcl
-source = "git::git@github.com:<your_github_username>/<your_forked_repo_name>.git//units/<unit_path>?ref=${values.version}"
+source = "git::git@github.com:<github_owner>/<your_forked_repo_name>.git//units/<unit_path>?ref=${values.version}"
 ```

@@ -3,7 +3,7 @@ data "aws_caller_identity" "current" {}
 locals {
   # For wildcard (*), use repo:org/repo:*
   # For specific branch, use repo:org/repo:ref:refs/heads/branch
-  subject_pattern = var.github_branch == "*" ? "repo:${var.github_username}/${var.github_repo_name}:*" : "repo:${var.github_username}/${var.github_repo_name}:ref:refs/heads/${var.github_branch}"
+  subject_pattern = var.github_branch == "*" ? "repo:${var.github_owner}/${var.github_repo_name}:*" : "repo:${var.github_owner}/${var.github_repo_name}:ref:refs/heads/${var.github_branch}"
 }
 
 resource "aws_iam_role" "github_actions" {
