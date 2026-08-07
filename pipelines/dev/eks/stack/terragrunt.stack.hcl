@@ -598,7 +598,7 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "right-size"
+    target_revision       = "replace-guestbook-by-podinfo"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
@@ -886,9 +886,9 @@ unit "domain_name_argocd" {
   }
 }
 
-unit "domain_name_guestbook" {
-  source = "${get_repo_root()}/units/eks/domain_name/guestbook"
-  path   = "eks/domain_name/guestbook"
+unit "domain_name_podinfo" {
+  source = "${get_repo_root()}/units/eks/domain_name/podinfo"
+  path   = "eks/domain_name/podinfo"
 
   values = {
     version = local.version

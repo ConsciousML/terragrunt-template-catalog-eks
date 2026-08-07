@@ -207,9 +207,11 @@ From this point on, `kubectl` and the AWS CLI can only reach the API server whil
 
 Grafana, Prometheus, and Alertmanager are only reachable via Tailscale, same as ArgoCD. See the [monitoring guide](docs/monitoring.md) for UI URLs, what each tool is for, and how Alertmanager routes alerts to Slack.
 
-### Access the Guestbook App
+### Access the Podinfo App
 
-Open `https://guestbook.public.dev.<base_domain>` in your browser. No login required.
+Open `https://podinfo.public.dev.<base_domain>` in your browser. No login required.
+
+`podinfo` is a sample app exercising the full wiring (DNS, Gateway API, ArgoCD, metrics) end to end, meant to be swapped for a real app in a fork.
 
 Apps are deployed using the [App of Apps](https://github.com/ConsciousML/argocd-app-of-apps-template) pattern: a single ArgoCD Application bootstraps all child apps from that repository.
 

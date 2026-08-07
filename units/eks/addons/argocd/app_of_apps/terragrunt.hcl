@@ -22,7 +22,7 @@ dependency "argocd" {
 
 locals {
   domains_hcl                 = find_in_parent_folders("domains.hcl")
-  domain_public_guestbook     = read_terragrunt_config(local.domains_hcl).locals.domain_public_guestbook
+  domain_public_podinfo       = read_terragrunt_config(local.domains_hcl).locals.domain_public_podinfo
   domain_private_argocd       = read_terragrunt_config(local.domains_hcl).locals.domain_private_argocd
   domain_private_grafana      = read_terragrunt_config(local.domains_hcl).locals.domain_private_grafana
   domain_private_prometheus   = read_terragrunt_config(local.domains_hcl).locals.domain_private_prometheus
@@ -189,8 +189,8 @@ inputs = {
       }
     }
     appParams = {
-      "guestbook-httproute" = {
-        host = local.domain_public_guestbook
+      "podinfo-httproute" = {
+        host = local.domain_public_podinfo
       }
       "gateway-public" = {
         certificateArn = dependency.acm_certificate.outputs.certificate_arn
@@ -318,7 +318,7 @@ inputs = {
               { name = "prometheus", url = "https://${local.domain_private_prometheus}" },
               { name = "alertmanager", url = "https://${local.domain_private_alertmanager}" },
               { name = "argocd", url = "https://${local.domain_private_argocd}" },
-              { name = "guestbook", url = "https://${local.domain_public_guestbook}" },
+              { name = "podinfo", url = "https://${local.domain_public_podinfo}" },
             ]
           }
         }

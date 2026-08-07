@@ -27,7 +27,7 @@ Update `pipelines/dns.hcl` with your domain:
 locals {
   base_domain            = "yourdomain.com"
   subdomain_argocd       = "argocd"
-  subdomain_guestbook    = "guestbook"
+  subdomain_podinfo      = "podinfo"
   subdomain_prometheus   = "prometheus"
   subdomain_alertmanager = "alertmanager"
   subdomain_grafana      = "grafana"

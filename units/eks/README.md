@@ -47,7 +47,7 @@ This stack is instantiated in:
 - **[`priority-classes`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/priority-classes)** (app-of-apps): `PriorityClass` for cluster-wide DaemonSets that need to land on every node
 - **[`crds-gateway-api`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/crds-gateway-api)**, **[`crds-aws-lbc-gateway-api`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/crds-aws-lbc-gateway-api)**, **[`helm-gateway-api-gateway-class`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-gateway-api-gateway-class)** (app-of-apps): Gateway API CRDs and the `GatewayClass` implemented by the AWS Load Balancer Controller, backing the `gateway-public` and `gateway-private` Gateways
 - **[`helm-vpa`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-vpa)**, **[`helm-goldilocks`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-goldilocks)** (app-of-apps): workload resource-sizing recommendations, see the [right-sizing guide](../../docs/right-sizing.md)
-- **[`guestbook`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/guestbook)** (app-of-apps): demo app used to verify an end-to-end deploy
+- **[`podinfo`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/podinfo)** (app-of-apps): sample app used to verify an end-to-end deploy, meant to be swapped for a real app in a fork
 
 ## Dependency Graph
 

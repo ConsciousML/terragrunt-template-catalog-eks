@@ -22,7 +22,7 @@ URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `promet
 - **[Alloy](https://grafana.com/docs/alloy/latest/)**: ships pod logs and Kubernetes cluster events to Loki
 - **[kube-state-metrics](https://github.com/kubernetes/kube-state-metrics)**: exposes cluster object state (Deployments, Pods, Nodes, ...) as metrics
 - **[node-exporter](https://github.com/prometheus/node_exporter)**: exposes host-level metrics (CPU, memory, disk, network) per node
-- **[blackbox-exporter](https://github.com/prometheus/blackbox_exporter)**: probes Grafana, Prometheus, Alertmanager, ArgoCD, and guestbook for HTTP reachability
+- **[blackbox-exporter](https://github.com/prometheus/blackbox_exporter)**: probes Grafana, Prometheus, Alertmanager, ArgoCD, and podinfo for HTTP reachability
 
 ## Accessing the UIs
 
