@@ -20,10 +20,9 @@ locals {
   vpc_cidrs         = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_cidrs
   vpc_cidr          = local.vpc_cidrs[local.environment]
 
-  # /19 each (8,187 usable IPs), sized for prefix delegation. Indices 2 and 5 skipped,
-  # reserved for a future 3rd AZ pair.
-  private_subnets = [cidrsubnet(local.vpc_cidr, 3, 0), cidrsubnet(local.vpc_cidr, 3, 1)]
-  public_subnets  = [cidrsubnet(local.vpc_cidr, 3, 3), cidrsubnet(local.vpc_cidr, 3, 4)]
+  # /19 each (8,187 usable IPs), sized for prefix delegation.
+  private_subnets = [cidrsubnet(local.vpc_cidr, 3, 0), cidrsubnet(local.vpc_cidr, 3, 1), cidrsubnet(local.vpc_cidr, 3, 2)]
+  public_subnets  = [cidrsubnet(local.vpc_cidr, 3, 3), cidrsubnet(local.vpc_cidr, 3, 4), cidrsubnet(local.vpc_cidr, 3, 5)]
 
   # Shared by every Karpenter NodePool. Only capacity-type differs per pool.
   karpenter_node_pool_base_requirements = [
@@ -593,11 +592,12 @@ unit "argocd_app_of_apps" {
   path   = "eks/addons/argocd/app_of_apps"
 
   values = {
-    version               = local.version
-    name                  = "app-of-apps"
-    namespace             = "argocd"
-    path                  = "apps"
-    target_revision       = "main"
+    version   = local.version
+    name      = "app-of-apps"
+    namespace = "argocd"
+    path      = "apps"
+    #target_revision       = "main"
+    target_revision       = "ha-config"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
