@@ -30,7 +30,7 @@ locals {
     {
       key      = "kubernetes.io/arch"
       operator = "In"
-      values   = ["amd64"]
+      values   = ["amd64", "arm64"]
     },
     {
       key      = "kubernetes.io/os"
@@ -598,7 +598,7 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "replace-guestbook-by-podinfo"
+    target_revision       = "improve-ha"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
@@ -754,8 +754,10 @@ unit "karpenter_ec2_node_class" {
   path   = "eks/addons/karpenter/ec2_node_class"
 
   values = {
-    version   = local.version
-    name      = "default"
+    version = local.version
+    name    = "default"
+    # DEV: @latest is fine for testing new AMIs before they reach prod. Prod should pin a
+    # tested AMI version (e.g. "al2023@v20240807") per AWS's Karpenter best practices.
     ami_alias = "al2023@latest"
     # Matches kubelet's own default (what the MNG's nodes already get). Without this, Karpenter
     # computes a lower ceiling from the plain per-ENI formula, blind to the VPC CNI addon's
