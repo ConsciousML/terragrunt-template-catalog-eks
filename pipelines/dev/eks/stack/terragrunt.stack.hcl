@@ -118,8 +118,8 @@ unit "vpc" {
     public_subnets  = local.public_subnets
 
     enable_nat_gateway     = true
-    single_nat_gateway     = false
-    one_nat_gateway_per_az = true
+    single_nat_gateway     = true
+    one_nat_gateway_per_az = false
 
     enable_dns_hostnames = true
     enable_dns_support   = true
@@ -598,7 +598,7 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "improve-ha"
+    target_revision       = "fix-psa-cascade-delete-namespaces"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
