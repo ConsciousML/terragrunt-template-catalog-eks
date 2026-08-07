@@ -12,7 +12,7 @@ The dev directory uses the same configuration pattern as the live template:
 - [`region.hcl`](../region.hcl): AWS region for all resources
 - [`dns.hcl`](../dns.hcl): Base domain and per-app subdomains (ArgoCD, podinfo, Prometheus, Alertmanager, Grafana) used for Route53 and ACM
 - [`network.hcl`](../network.hcl): VPC CIDR blocks
-- [`github.hcl`](../github.hcl): GitHub username, catalog repository name, and app-of-apps repository name for module sources
+- [`github.hcl`](../github.hcl): GitHub owner, catalog repository name, and app-of-apps repository name for module sources
 - [`version.hcl`](../version.hcl): Resolves the current git branch used as `?ref=` in all module sources
 - [`environment.hcl`](environment.hcl): Environment name (e.g., `dev`) used for resource naming and state isolation
 - [`cluster_name.hcl`](cluster_name.hcl): EKS cluster name

@@ -9,7 +9,7 @@ locals {
   environment = local.environment_vars.locals.environment
 
   github_locals                = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
-  github_username_catalog      = local.github_locals.github_username_catalog
+  github_owner_catalog         = local.github_locals.github_owner_catalog
   github_repo_name_catalog     = local.github_locals.github_repo_name_catalog
   github_repo_name_app_of_apps = local.github_locals.github_repo_name_app_of_apps
 }
@@ -46,7 +46,7 @@ EOF
 
 catalog {
   urls = [
-    "https://github.com/${local.github_username_catalog}/${local.github_repo_name_catalog}"
+    "https://github.com/${local.github_owner_catalog}/${local.github_repo_name_catalog}"
   ]
 }
 

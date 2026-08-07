@@ -12,7 +12,7 @@ include "provider_helm" {
 }
 
 terraform {
-  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/argocd_app_of_apps/?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_owner_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/argocd_app_of_apps/?ref=${values.version}"
 }
 
 dependency "argocd" {
@@ -167,7 +167,7 @@ dependency "ebs_csi_driver_addon" {
 
 inputs = {
   cluster_name          = dependency.eks_cluster.outputs.cluster_name
-  repo_url              = "https://github.com/${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_app_of_apps}"
+  repo_url              = "https://github.com/${include.root.locals.github_owner_catalog}/${include.root.locals.github_repo_name_app_of_apps}"
   name                  = values.name
   namespace             = values.namespace
   path                  = values.path

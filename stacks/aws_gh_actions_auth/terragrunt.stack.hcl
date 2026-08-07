@@ -18,7 +18,7 @@ unit "iam_role_github_actions" {
   values = {
     version          = values.version
     name             = values.iam_role_name
-    github_username  = values.github_username
+    github_owner     = values.github_owner
     github_repo_name = values.github_repo_name
     github_branch    = values.github_branch
     inline_policies  = values.inline_policies

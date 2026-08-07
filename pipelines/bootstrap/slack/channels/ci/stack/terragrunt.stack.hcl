@@ -2,7 +2,7 @@ locals {
   version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
 
   github_locals            = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
-  github_username_catalog  = local.github_locals.github_username_catalog
+  github_owner_catalog     = local.github_locals.github_owner_catalog
   github_repo_name_catalog = local.github_locals.github_repo_name_catalog
 
   environment   = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
@@ -10,7 +10,7 @@ locals {
 }
 
 stack "slack_channels" {
-  source = "github.com/${local.github_username_catalog}/${local.github_repo_name_catalog}//stacks/slack_channels?ref=${local.version}"
+  source = "github.com/${local.github_owner_catalog}/${local.github_repo_name_catalog}//stacks/slack_channels?ref=${local.version}"
   path   = "slack_channels"
 
   values = {

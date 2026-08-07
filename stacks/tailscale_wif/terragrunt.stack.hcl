@@ -5,7 +5,7 @@ unit "tailscale_wif" {
   values = {
     version = values.version
     issuer  = values.issuer
-    subject = "repo:${values.github_username}/${values.github_repo_name}:*"
+    subject = "repo:${values.github_owner}/${values.github_repo_name}:*"
     scopes  = values.scopes
     tags    = [values.ci_tag]
   }

@@ -12,12 +12,12 @@ dependency "aws_caller_identity" {
 }
 
 terraform {
-  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/github_secrets?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_owner_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/github_secrets?ref=${values.version}"
 }
 
 inputs = {
   github_token     = values.github_token
-  github_owner     = include.root.locals.github_username_catalog
+  github_owner     = include.root.locals.github_owner_catalog
   github_repo_name = values.github_repo_name
   secrets          = { EKS_LOCAL_ADMIN_ARN = dependency.aws_caller_identity.outputs.arn }
 }

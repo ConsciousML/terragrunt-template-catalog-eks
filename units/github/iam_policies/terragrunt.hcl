@@ -12,7 +12,7 @@ dependency "iam_role_github_actions" {
 }
 
 terraform {
-  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/iam_policies?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_owner_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/iam_policies?ref=${values.version}"
 }
 
 inputs = {

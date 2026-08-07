@@ -2,7 +2,7 @@ locals {
   version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
 
   github_locals            = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
-  github_username_catalog  = local.github_locals.github_username_catalog
+  github_owner_catalog     = local.github_locals.github_owner_catalog
   github_repo_name_catalog = local.github_locals.github_repo_name_catalog
 
   # Tailscale tag assigned to CI runner devices joining via WIF
@@ -11,12 +11,12 @@ locals {
 }
 
 stack "tailscale_wif" {
-  source = "github.com/${local.github_username_catalog}/${local.github_repo_name_catalog}//stacks/tailscale_wif?ref=${local.version}"
+  source = "github.com/${local.github_owner_catalog}/${local.github_repo_name_catalog}//stacks/tailscale_wif?ref=${local.version}"
   path   = "tailscale_wif"
 
   values = {
     version          = local.version
-    github_username  = local.github_username_catalog
+    github_owner     = local.github_owner_catalog
     github_repo_name = local.github_repo_name_catalog
     github_token     = get_env("GITHUB_TOKEN")
     issuer           = "https://token.actions.githubusercontent.com"

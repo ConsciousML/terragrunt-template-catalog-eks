@@ -2,18 +2,18 @@ locals {
   version = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
 
   github_locals            = read_terragrunt_config(find_in_parent_folders("github.hcl")).locals
-  github_username_catalog  = local.github_locals.github_username_catalog
+  github_owner_catalog     = local.github_locals.github_owner_catalog
   github_repo_name_catalog = local.github_locals.github_repo_name_catalog
 
   github_token = get_env("GITHUB_TOKEN")
 }
 
 stack "aws_gh_actions_auth" {
-  source = "github.com/${local.github_username_catalog}/${local.github_repo_name_catalog}//stacks/aws_gh_actions_auth?ref=${local.version}"
+  source = "github.com/${local.github_owner_catalog}/${local.github_repo_name_catalog}//stacks/aws_gh_actions_auth?ref=${local.version}"
   path   = "github_actions_bootstrap"
   values = {
     version          = local.version
-    github_username  = local.github_username_catalog
+    github_owner     = local.github_owner_catalog
     github_repo_name = local.github_repo_name_catalog
     github_token     = local.github_token
     iam_role_name    = "gh-terragrunt-role-catalog"
@@ -90,7 +90,7 @@ stack "aws_gh_actions_auth" {
 }
 
 unit "deploy_key_terraform_docs" {
-  source = "git::git@github.com:${local.github_username_catalog}/${local.github_repo_name_catalog}.git//units/github/deploy_key/?ref=${local.version}"
+  source = "git::git@github.com:${local.github_owner_catalog}/${local.github_repo_name_catalog}.git//units/github/deploy_key/?ref=${local.version}"
   path   = "github/deploy_key"
 
   values = {

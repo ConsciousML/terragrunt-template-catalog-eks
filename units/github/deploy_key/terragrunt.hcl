@@ -4,12 +4,12 @@ include "root" {
 }
 
 terraform {
-  source = "git::git@github.com:${include.root.locals.github_username_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/deploy_key/?ref=${values.version}"
+  source = "git::git@github.com:${include.root.locals.github_owner_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/deploy_key/?ref=${values.version}"
 }
 
 inputs = {
   github_token       = values.github_token
-  github_owner       = include.root.locals.github_username_catalog
+  github_owner       = include.root.locals.github_owner_catalog
   repositories       = values.repositories
   secret_names       = values.secret_names
   current_repository = values.current_repository
