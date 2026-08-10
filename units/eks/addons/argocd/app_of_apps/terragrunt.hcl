@@ -32,9 +32,9 @@ locals {
   region_hcl = find_in_parent_folders("region.hcl")
   region     = read_terragrunt_config(local.region_hcl).locals.region
 
-  # Shared by helm-kube-prometheus-stack's fullnameOverride and the 3 helm-httproute
+  # Shared by kube-prometheus-stack's fullnameOverride and the 3 httproute
   # backendRef names below. Only HCL can compose "<release>-grafana", so it lives here.
-  # Must also match tool.helm.releaseName for helm-kube-prometheus-stack in apps/values.yaml
+  # Must also match tool.helm.releaseName for kube-prometheus-stack in apps/values.yaml
   # (argocd-app-of-apps-template repo), which appParams has no path to set.
   kube_prometheus_stack_release = "kube-prometheus-stack"
 }
@@ -198,7 +198,7 @@ inputs = {
       "gateway-private" = {
         certificateArn = dependency.acm_certificate.outputs.certificate_arn
       }
-      "helm-aws-lbc" = {
+      "aws-lbc" = {
         "aws-load-balancer-controller" = {
           clusterName = dependency.eks_cluster.outputs.cluster_name
           region      = local.region
@@ -208,7 +208,7 @@ inputs = {
       "argocd-httproute" = {
         host = local.domain_private_argocd
       }
-      "helm-external-dns-private" = {
+      "external-dns-private" = {
         "external-dns" = {
           txtOwnerId = dependency.eks_cluster.outputs.cluster_name
           # The %%% is for escaping Terragrunt templates
@@ -216,7 +216,7 @@ inputs = {
           domainFilters = [dependency.route53_hosted_zone_private.outputs.domain_name]
         }
       }
-      "helm-external-dns-public" = {
+      "external-dns-public" = {
         "external-dns" = {
           txtOwnerId = dependency.eks_cluster.outputs.cluster_name
           # The %%% is for escaping Terragrunt templates
@@ -224,7 +224,7 @@ inputs = {
           domainFilters = [dependency.route53_hosted_zone_public.outputs.domain_name]
         }
       }
-      "helm-loki" = {
+      "loki" = {
         loki = {
           loki = {
             storage = {
@@ -249,7 +249,7 @@ inputs = {
         awsRegion       = include.root.locals.aws_region
         remoteKey       = dependency.tailscale_oauth_client_secret.outputs.secret_name
       }
-      "helm-tailscale-connector" = {
+      "tailscale-connector" = {
         name            = "${dependency.eks_cluster.outputs.cluster_name}-connector"
         hostnamePrefix  = dependency.eks_cluster.outputs.cluster_name
         advertiseRoutes = [dependency.vpc.outputs.vpc_cidr_block]
@@ -265,9 +265,9 @@ inputs = {
         remoteKey       = dependency.alertmanager_slack_bot_secret.outputs.secret_name
       }
       # See local.kube_prometheus_stack_release above: fullnameOverride and the 3
-      # helm-httproute backendRefs.default.name overrides below must all agree on this same
+      # httproute backendRefs.default.name overrides below must all agree on this same
       # literal. Only HCL locals can compose "<release>-grafana", plain YAML can't.
-      "helm-kube-prometheus-stack" = {
+      "kube-prometheus-stack" = {
         "kube-prometheus-stack" = {
           fullnameOverride = local.kube_prometheus_stack_release
           environment      = include.root.locals.environment
@@ -310,7 +310,7 @@ inputs = {
       "goldilocks-httproute" = {
         host = local.domain_private_goldilocks
       }
-      "helm-blackbox-exporter" = {
+      "blackbox-exporter" = {
         "prometheus-blackbox-exporter" = {
           serviceMonitor = {
             targets = [

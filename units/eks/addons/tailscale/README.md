@@ -17,9 +17,9 @@ Joins the EKS cluster to a Tailnet via the Tailscale Kubernetes operator, exposi
 - **[oauth_client_secret](oauth_client_secret/)**: Stores `oauth_client_tailscale_operator`'s credentials in AWS Secrets Manager
 - **[split_dns/default](split_dns/default/)**: Configures Tailscale split DNS to route queries for `domain_env_private` (e.g. `private.dev.axelmendoza.com`) through the VPC DNS resolver, so private hostnames resolve over the Tailnet without intercepting public endpoints. Reads `domain_env_private` from `domains.hcl`
 - **[split_dns/eks](split_dns/eks/)**: Configures Tailscale split DNS to route queries for the region's EKS private endpoint domain (`<region>.eks.amazonaws.com`) through the VPC DNS resolver, so the private EKS API endpoint resolves over the Tailnet
-- **[`helm-tailscale-operator`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-tailscale-operator)** (app-of-apps): deploys the operator Helm release itself. Not deployed by this unit
-- **[`helm-tailscale-connector`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-tailscale-connector)** (app-of-apps): deploys the `Connector` CR. Not deployed by this unit
-- **[`tailscale-secrets`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-eso-secret-sync)** (app-of-apps): an instance of the generic `helm-eso-secret-sync` chart, syncs the OAuth credentials into the operator's expected `operator-oauth` secret via an ESO `SecretStore` and `ExternalSecret`, mirroring how ArgoCD's admin password is synced
+- **[`tailscale-operator`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/charts/tailscale/operator)** (app-of-apps): deploys the operator Helm release itself. Not deployed by this unit
+- **[`tailscale-connector`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/charts/tailscale/connector)** (app-of-apps): deploys the `Connector` CR. Not deployed by this unit
+- **[`tailscale-secrets`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/charts/external-secrets-operator/secret-sync)** (app-of-apps): an instance of the generic `secret-sync` chart, syncs the OAuth credentials into the operator's expected `operator-oauth` secret via an ESO `SecretStore` and `ExternalSecret`, mirroring how ArgoCD's admin password is synced
 
 See the [App of Apps integration guide](../../../../docs/app-of-apps-integration.md) to understand how these apps are wired to Terraform-sourced values.
 

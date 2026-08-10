@@ -10,7 +10,7 @@ terraform {
 inputs = {
   name = "${include.root.locals.environment}-alertmanager-slack-bot"
   # Key here (bot_token) must match the remoteProperty value in
-  # helm-eso-secret-sync/alertmanager-secrets-values.yaml (argocd-app-of-apps-template repo),
+  # charts/external-secrets-operator/secret-sync/alertmanager-secrets-values.yaml (argocd-app-of-apps-template repo),
   # which pulls it into the alertmanager-slack-bot Secret Alertmanager mounts.
   secret_data = {
     bot_token = values.bot_token
