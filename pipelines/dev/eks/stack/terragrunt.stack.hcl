@@ -10,7 +10,7 @@ locals {
   version_karpenter_iam  = "21.24.0"
   version_karpenter_helm = "1.14.0"
   # Keep in sync with the appVersion the kube-prometheus-stack chart dependency pins in the
-  # app-of-apps repo's helm-kube-prometheus-stack/Chart.yaml, both track the same
+  # app-of-apps repo's charts/monitoring/kube-prometheus-stack/Chart.yaml, both track the same
   # prometheus-operator CRD version.
   version_prometheus_operator_crds = "30.0.1"
   version_s3                       = "5.15.1"
@@ -597,7 +597,7 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "ha-config"
+    target_revision       = "refactor-directory-tree"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"

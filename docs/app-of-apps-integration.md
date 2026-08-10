@@ -19,7 +19,7 @@ The key in `appParams` must match the app's `name` in `apps/values.yaml`, not it
 
 ### Decide if the App Needs Any Terraform-Sourced Values at All
 
-Some apps need nothing dynamic (e.g. `helm-external-secrets-operator` has no `appParams` entry: its `values.yaml` defaults suffice). If so, skip straight to the app-of-apps repo's "Adding an App" steps.
+Some apps need nothing dynamic (e.g. `external-secrets-operator` has no `appParams` entry: its `values.yaml` defaults suffice). If so, skip straight to the app-of-apps repo's "Adding an App" steps.
 
 ### Add Any AWS-Side Terraform the App Needs
 
@@ -51,11 +51,11 @@ In the [app of apps unit](../units/eks/addons/argocd/app_of_apps/terragrunt.hcl)
 }
 ```
 
-Only inject values that trace back to a `dependency` block or a genuine Terraform-owned fact (region, cluster name, ARNs, hostnames, secret names). Anything static or chart-known (`targetSecretName`, `targetCreationPolicy`, `data`, annotations, ports, and so on) belongs as a default in the app-of-apps repo, typically via a dedicated `extraValueFiles` entry (see `helm-eso-secret-sync/argocd-secrets-values.yaml` in that repo for this exact app).
+Only inject values that trace back to a `dependency` block or a genuine Terraform-owned fact (region, cluster name, ARNs, hostnames, secret names). Anything static or chart-known (`targetSecretName`, `targetCreationPolicy`, `data`, annotations, ports, and so on) belongs as a default in the app-of-apps repo, typically via a dedicated `extraValueFiles` entry (see `charts/external-secrets-operator/secret-sync/argocd-secrets-values.yaml` in that repo for this exact app).
 
 The one exception is when composing a value requires string interpolation shared across multiple appParams entries (Helm and YAML values files can't do that, only HCL locals can). See `local.kube_prometheus_stack_release` in the same `terragrunt.hcl` for an example.
 
-If the app wraps an upstream Helm chart with a subchart alias (e.g. `helm-aws-lbc` depending on the `aws-load-balancer-controller` chart), nest the values one level under that subchart's name, same as the existing `helm-aws-lbc` and `helm-external-dns-*` entries.
+If the app wraps an upstream Helm chart with a subchart alias (e.g. `aws-lbc` depending on the `aws-load-balancer-controller` chart), nest the values one level under that subchart's name, same as the existing `aws-lbc` and `external-dns-*` entries.
 
 ### Reuse a Generic Chart or Author a New One
 

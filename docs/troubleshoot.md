@@ -215,7 +215,7 @@ uninstall: Failed to purge the release: get: failed to get
 dial tcp <vpc-ip>:443: i/o timeout
 ```
 
-`helm-tailscale-connector` advertises the whole VPC CIDR as a subnet route (`advertiseRoutes` in `units/eks/addons/argocd/app_of_apps/terragrunt.hcl`), so with `tailscale up` active, API server traffic routes through it even against the public endpoint. The connector is part of the same release being uninstalled, so its pod gets deleted mid-uninstall, the route disappears, and whichever API call is in flight times out. Disconnect first:
+`tailscale-connector` advertises the whole VPC CIDR as a subnet route (`advertiseRoutes` in `units/eks/addons/argocd/app_of_apps/terragrunt.hcl`), so with `tailscale up` active, API server traffic routes through it even against the public endpoint. The connector is part of the same release being uninstalled, so its pod gets deleted mid-uninstall, the route disappears, and whichever API call is in flight times out. Disconnect first:
 
 ```bash
 tailscale down

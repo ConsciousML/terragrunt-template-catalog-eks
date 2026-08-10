@@ -11,7 +11,7 @@ Provisions the AWS-side IAM/Pod Identity resources for two [ExternalDNS](https:/
 
 - **[private/iam_role](private/iam_role/)**: Creates an IAM role bound to the `external-dns-private` service account via Pod Identity, with Route53 write access scoped to the private hosted zone
 - **[public/iam_role](public/iam_role/)**: Creates an IAM role bound to the `external-dns-public` service account via Pod Identity, with Route53 write access scoped to the public hosted zone
-- **[`helm-external-dns`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/helm-external-dns)** (app-of-apps): the shared chart that deploys both instances. Not deployed by this unit
+- **[`external-dns`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/charts/external-dns)** (app-of-apps): the shared chart that deploys both instances. Not deployed by this unit
 
 ## Upstream Dependencies
 

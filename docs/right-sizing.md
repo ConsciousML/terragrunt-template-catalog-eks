@@ -2,7 +2,7 @@
 
 Guide to right-sizing a workload's CPU and memory requests using the VPA recommender and Goldilocks.
 
-The Helm releases are configured in the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template)'s [`helm-vpa/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-vpa/values.yaml) and [`helm-goldilocks/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-goldilocks/values.yaml). Implementation details below link there.
+The Helm releases are configured in the [App of Apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template)'s [`charts/right-sizing/vpa/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/charts/right-sizing/vpa/values.yaml) and [`charts/right-sizing/goldilocks/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/charts/right-sizing/goldilocks/values.yaml). Implementation details below link there.
 
 ## Prerequisites
 
@@ -105,14 +105,14 @@ After the change rolls out, watch the workload in [Grafana](monitoring.md) for C
 
 The recommender exposes two independent controls per resource:
 
-- **Percentile target**: how far into the usage distribution the recommendation reaches, set per resource via `recommender.extraArgs` in [`helm-vpa/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-vpa/values.yaml)
+- **Percentile target**: how far into the usage distribution the recommendation reaches, set per resource via `recommender.extraArgs` in [`charts/right-sizing/vpa/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/charts/right-sizing/vpa/values.yaml)
 - **Safety margin**: a percentage added on top of the percentile target, applied uniformly to both CPU and memory (upstream VPA has no per-resource margin flag), set via `recommendation-margin-fraction` in the same file
 
 Memory is tuned to a higher percentile than CPU. An undersized memory request ends in an OOM kill, a hard failure, so memory recommendations stack a higher percentile on top of the safety margin. An undersized CPU request only causes throttling, a soft, recoverable failure, so CPU is left at the chart's default percentile rather than stacking a second hedge on top of the same margin.
 
 ## Adding a New Workload
 
-Goldilocks runs in `on-by-default` mode (`controller.flags.on-by-default` in [`helm-goldilocks/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/helm-goldilocks/values.yaml)), so a new workload controller gets a `VerticalPodAutoscaler` and shows up on the dashboard without any per-namespace labeling.
+Goldilocks runs in `on-by-default` mode (`controller.flags.on-by-default` in [`charts/right-sizing/goldilocks/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/charts/right-sizing/goldilocks/values.yaml)), so a new workload controller gets a `VerticalPodAutoscaler` and shows up on the dashboard without any per-namespace labeling.
 
 ## Sources
 - [One Up Time](https://oneuptime.com/blog/post/2026-01-06-kubernetes-right-size-resources/view)

@@ -35,8 +35,8 @@ inputs = {
   cluster_name    = dependency.eks_cluster.outputs.cluster_name
   iam_policy_name = "${include.root.locals.environment}-loki-policy"
   iam_role_name   = "${include.root.locals.environment}-loki"
-  namespace       = "loki" # must match the app-of-apps repo's helm-loki destination namespace
-  service_account = "loki" # must match the app-of-apps repo's helm-loki tool.helm.releaseName
+  namespace       = "loki" # must match the app-of-apps repo's loki destination namespace
+  service_account = "loki" # must match the app-of-apps repo's loki tool.helm.releaseName
 
   iam_policy_json = jsonencode({
     Version = "2012-10-17"
