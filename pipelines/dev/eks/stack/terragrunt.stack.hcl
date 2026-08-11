@@ -248,8 +248,8 @@ unit "cluster" {
           # aws-eks-nodeagent container, enabled by enableNetworkPolicy above
           nodeAgent = {
             resources = {
-              requests = { cpu = "11m", memory = "164M" }
-              limits   = { cpu = "55m", memory = "164M" }
+              requests = { cpu = "11m", memory = "184M" }
+              limits   = { cpu = "55m", memory = "184M" }
             }
           }
         })
