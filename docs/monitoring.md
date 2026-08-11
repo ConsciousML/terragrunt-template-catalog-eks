@@ -22,7 +22,7 @@ URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `promet
 - **[Alloy](https://grafana.com/docs/alloy/latest/)**: ships pod logs and Kubernetes cluster events to Loki
 - **[kube-state-metrics](https://github.com/kubernetes/kube-state-metrics)**: exposes cluster object state (Deployments, Pods, Nodes, ...) as metrics
 - **[node-exporter](https://github.com/prometheus/node_exporter)**: exposes host-level metrics (CPU, memory, disk, network) per node
-- **[blackbox-exporter](https://github.com/prometheus/blackbox_exporter)**: probes Grafana, Prometheus, Alertmanager, ArgoCD, and podinfo for HTTP reachability
+- **[blackbox-exporter](https://github.com/prometheus/blackbox_exporter)**: probes every private and public tool endpoint for HTTP reachability
 
 ## Accessing the UIs
 
@@ -31,6 +31,7 @@ URLs below use `<environment>` and `<base_domain>` as placeholders, e.g. `promet
 | Grafana | `https://grafana.private.<environment>.<base_domain>` | Dashboards over node, pod, and addon metrics |
 | Prometheus | `https://prometheus.private.<environment>.<base_domain>` | Ad-hoc PromQL queries, checking target/scrape health |
 | Alertmanager | `https://alertmanager.private.<environment>.<base_domain>` | Viewing and silencing firing alerts |
+| Hubble UI | `https://hubble.private.<environment>.<base_domain>` | Visualizing live and historical pod-to-pod network flows |
 | Slack | Your Slack workspace, [base channel names listed here](../pipelines/bootstrap/slack/channels.hcl), each prefixed with the environment (e.g. `#dev-k8s-critical`) | Receiving alert notifications |
 
 ### Grafana Login
@@ -43,11 +44,20 @@ aws secretsmanager get-secret-value \
   --output text | jq -r .plaintext
 ```
 
+## Network Observability (Hubble)
+
+[Cilium](https://cilium.io/) runs in [CNI chaining mode](https://docs.cilium.io/en/stable/installation/cni-chaining/) alongside the `vpc-cni` EKS addon, purely for flow visibility. It doesn't alter `vpc-cni`'s existing behavior. Configuration lives in the App of Apps repo's [`charts/cilium/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/charts/cilium/values.yaml).
+
+[Hubble](https://docs.cilium.io/en/stable/observability/hubble/) shows, per flow, who talked to whom, over what protocol, and whether it was allowed or dropped, useful for auditing traffic without guessing at a `NetworkPolicy`. No login, access is restricted via Tailscale like every other private UI here.
+
+Cilium, Hubble, and their Grafana dashboards are provisioned the same way as every other addon (see [Monitoring a New Component](#monitoring-a-new-component) below), no extra wiring needed to see them in Grafana.
+
 ## Which Tool to Reach For
 
 - **Control plane health** (API server, scheduler, controller manager, etcd): [EKS Observability dashboard](https://docs.aws.amazon.com/eks/latest/userguide/eks-observe.html) in the AWS Console
 - **Raw control plane metrics**, to query one directly: [`metrics.eks.amazonaws.com`](https://docs.aws.amazon.com/eks/latest/userguide/view-raw-metrics.html)
 - **Node, pod, workload, and addon-level metrics** (ArgoCD, ExternalDNS, ESO, Karpenter): Grafana
+- **Pod-to-pod network flows** (who talked to whom, allowed or denied, by protocol): Hubble UI
 - **Pod logs and Kubernetes cluster events**: Grafana Explore, Loki datasource
 - **Viewing and silencing firing alerts**: Alertmanager
 - **Alert notifications**: Slack
