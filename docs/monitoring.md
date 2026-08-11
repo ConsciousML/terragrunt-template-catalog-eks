@@ -52,6 +52,39 @@ aws secretsmanager get-secret-value \
 
 Cilium, Hubble, and their Grafana dashboards are provisioned the same way as every other addon (see [Monitoring a New Component](#monitoring-a-new-component) below), no extra wiring needed to see them in Grafana.
 
+### Restoring Full Flow Visibility
+
+Cilium only manages pods created after `cilium-agent` is already running on their node, so every pod predating it (the entire EKS bootstrap) has no `CiliumEndpoint` and stays invisible to Hubble.
+
+Once the whole stack is bootstrapped, spot which components are missing one:
+
+```bash
+for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do
+  ceps=$(kubectl -n "$ns" get ciliumendpoints.cilium.io -o jsonpath='{.items[*].metadata.name}' | tr ' ' '\n' | sort)
+  pods=$(kubectl -n "$ns" get pod -o custom-columns=NAME:.metadata.name,HOST:.spec.hostNetwork --no-headers \
+    | awk '$2 == "<none>" || $2 == "false" {print $1}' | sort)
+  comm -23 <(echo "$pods") <(echo "$ceps") | while read -r pod; do
+    [ -z "$pod" ] && continue
+    kind=$(kubectl -n "$ns" get pod "$pod" -o jsonpath='{.metadata.ownerReferences[0].kind}')
+    name=$(kubectl -n "$ns" get pod "$pod" -o jsonpath='{.metadata.ownerReferences[0].name}')
+    if [ "$kind" = "ReplicaSet" ]; then
+      kind=$(kubectl -n "$ns" get replicaset "$name" -o jsonpath='{.metadata.ownerReferences[0].kind}')
+      name=$(kubectl -n "$ns" get replicaset "$name" -o jsonpath='{.metadata.ownerReferences[0].name}')
+    fi
+    echo "${ns}/${kind}/${name:-$pod}"
+  done
+done | sort -u
+```
+
+Restart each one to get functional network observability, see [Cilium's restart-existing-pods guidance](https://docs.cilium.io/en/stable/installation/cni-chaining-aws-cni/#restart-existing-pods).
+
+**Warning**: restarting deletes and recreates pods. Run only during a maintenance window:
+```bash
+kubectl -n <namespace> rollout restart <kind>/<name>
+```
+
+To avoid this altogether, install Cilium in [ENI mode](https://cilium.io/blog/2025/06/19/eks-eni-install/) instead of chained: a bigger change (it replaces `vpc-cni` instead of sitting alongside it), but kubelet then waits on Cilium's own CNI config, closing the gap.
+
 ## Which Tool to Reach For
 
 - **Control plane health** (API server, scheduler, controller manager, etcd): [EKS Observability dashboard](https://docs.aws.amazon.com/eks/latest/userguide/eks-observe.html) in the AWS Console

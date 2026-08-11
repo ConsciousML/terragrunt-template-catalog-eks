@@ -269,6 +269,10 @@ kubectl patch application <name> -n argocd --type=merge -p '{"metadata":{"finali
 
 This skips ArgoCD's own cascade-prune, so check for orphaned resources it was still managing afterward.
 
+## No Data in Hubble UI
+
+Hubble UI resolves but shows no flows. See [Restoring Full Flow Visibility](monitoring.md#restoring-full-flow-visibility).
+
 ## Node Group Stuck in Deleting State
 
 Deleting:
