@@ -495,8 +495,8 @@ unit "argocd" {
           }
         }
         resources = {
-          requests = { cpu = "1388m", memory = "1471M" }
-          limits   = { memory = "1471M" }
+          requests = { cpu = "1388m", memory = "1645M" }
+          limits   = { memory = "1645M" }
         }
         # Outranks the DaemonSets' daemonset-critical (argocd-app-of-apps-template's
         # priority-classes/), so it can no longer be preempted to make room for one of them
