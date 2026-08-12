@@ -20,7 +20,8 @@ locals {
 dependency "eks_cluster" {
   config_path = "${dirname(find_in_parent_folders("addons"))}/cluster"
   mock_outputs = {
-    cluster_name = "mock-cluster"
+    cluster_name     = "mock-cluster"
+    cluster_endpoint = "https://mock.eks.amazonaws.com"
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }

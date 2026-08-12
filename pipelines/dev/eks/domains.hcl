@@ -12,4 +12,5 @@ locals {
   domain_private_alertmanager = "${local.dns.subdomain_alertmanager}.${local.domain_env_private}"
   domain_private_grafana      = "${local.dns.subdomain_grafana}.${local.domain_env_private}"
   domain_private_goldilocks   = "${local.dns.subdomain_goldilocks}.${local.domain_env_private}"
+  domain_private_hubble       = "${local.dns.subdomain_hubble}.${local.domain_env_private}"
 }

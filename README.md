@@ -11,12 +11,15 @@ Comes with a production-grade [EKS Cluster](units/eks/README.md), deployable acr
 
 - Persistent storage via EBS-backed `PersistentVolumeClaim`s
 - Cluster and workload metrics via Prometheus, Alertmanager, and Grafana
+- Workload resource-sizing recommendations via the VPA recommender and Goldilocks
+- Log aggregation via Loki
 - Public and private traffic routing via ALB and Gateway API
 - Automated DNS and TLS termination
 - Secrets synced from AWS Secrets Manager
 - GitOps via ArgoCD and the App of Apps pattern
 - VPN access via Tailscale
 - Node autoscaling via Karpenter
+- Pod-to-pod network flow visibility via Cilium and Hubble
 
 ## Catalog vs Live Infrastructure
 

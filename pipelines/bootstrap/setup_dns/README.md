@@ -31,6 +31,8 @@ locals {
   subdomain_prometheus   = "prometheus"
   subdomain_alertmanager = "alertmanager"
   subdomain_grafana      = "grafana"
+  subdomain_goldilocks   = "goldilocks"
+  subdomain_hubble       = "hubble"
 }
 ```
 

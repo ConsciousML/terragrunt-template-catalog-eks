@@ -28,6 +28,7 @@ locals {
   domain_private_prometheus   = read_terragrunt_config(local.domains_hcl).locals.domain_private_prometheus
   domain_private_alertmanager = read_terragrunt_config(local.domains_hcl).locals.domain_private_alertmanager
   domain_private_goldilocks   = read_terragrunt_config(local.domains_hcl).locals.domain_private_goldilocks
+  domain_private_hubble       = read_terragrunt_config(local.domains_hcl).locals.domain_private_hubble
 
   region_hcl = find_in_parent_folders("region.hcl")
   region     = read_terragrunt_config(local.region_hcl).locals.region
@@ -208,6 +209,15 @@ inputs = {
       "argocd-httproute" = {
         host = local.domain_private_argocd
       }
+      "cilium" = {
+        cilium = {
+          # Bare API server host as KUBERNETES_SERVICE_HOST, cluster_endpoint's https://
+          # scheme stripped. Cilium can't rely on kubernetes.default.svc before its own
+          # service load-balancing is up.
+          k8sServiceHost = trimprefix(dependency.eks_cluster.outputs.cluster_endpoint, "https://")
+          k8sServicePort = "443"
+        }
+      }
       "external-dns-private" = {
         "external-dns" = {
           txtOwnerId = dependency.eks_cluster.outputs.cluster_name
@@ -310,6 +320,9 @@ inputs = {
       "goldilocks-httproute" = {
         host = local.domain_private_goldilocks
       }
+      "hubble-ui-httproute" = {
+        host = local.domain_private_hubble
+      }
       "blackbox-exporter" = {
         "prometheus-blackbox-exporter" = {
           serviceMonitor = {
@@ -319,6 +332,7 @@ inputs = {
               { name = "alertmanager", url = "https://${local.domain_private_alertmanager}" },
               { name = "argocd", url = "https://${local.domain_private_argocd}" },
               { name = "podinfo", url = "https://${local.domain_public_podinfo}" },
+              { name = "hubble", url = "https://${local.domain_private_hubble}" },
             ]
           }
         }

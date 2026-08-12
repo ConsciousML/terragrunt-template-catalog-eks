@@ -50,7 +50,7 @@ locals {
     # Exclude oversized instances so Karpenter never bin-packs onto an expensive
     # instance. nano, micro, and small are too small to be useful: every node runs the same
     # fixed floor of DaemonSets (aws-node, kube-proxy, ebs-csi-node, eks-pod-identity-agent,
-    # alloy, loki-canary) regardless of size, so provisioning more.
+    # alloy, loki-canary, cilium-agent) regardless of size, so provisioning more.
     # The instance-cpu and instance-memory requirements below raise the real
     # floor further: size labels are family-relative (a "medium" can be 1 vCPU in one family,
     # 2 in another).
@@ -248,8 +248,8 @@ unit "cluster" {
           # aws-eks-nodeagent container, enabled by enableNetworkPolicy above
           nodeAgent = {
             resources = {
-              requests = { cpu = "11m", memory = "164M" }
-              limits   = { cpu = "55m", memory = "164M" }
+              requests = { cpu = "11m", memory = "184M" }
+              limits   = { cpu = "55m", memory = "184M" }
             }
           }
         })
@@ -495,8 +495,8 @@ unit "argocd" {
           }
         }
         resources = {
-          requests = { cpu = "1388m", memory = "1471M" }
-          limits   = { memory = "1471M" }
+          requests = { cpu = "1388m", memory = "1645M" }
+          limits   = { memory = "1645M" }
         }
         # Outranks the DaemonSets' daemonset-critical (argocd-app-of-apps-template's
         # priority-classes/), so it can no longer be preempted to make room for one of them
@@ -597,7 +597,7 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "refactor-directory-tree"
+    target_revision       = "cilium-hubble"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
@@ -926,6 +926,15 @@ unit "domain_name_grafana" {
 unit "domain_name_goldilocks" {
   source = "${get_repo_root()}/units/eks/domain_name/goldilocks"
   path   = "eks/domain_name/goldilocks"
+
+  values = {
+    version = local.version
+  }
+}
+
+unit "domain_name_hubble" {
+  source = "${get_repo_root()}/units/eks/domain_name/hubble"
+  path   = "eks/domain_name/hubble"
 
   values = {
     version = local.version
