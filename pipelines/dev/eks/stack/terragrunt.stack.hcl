@@ -749,8 +749,8 @@ unit "karpenter_helm" {
       }
       controller = {
         resources = {
-          requests = { cpu = "163m", memory = "297M" }
-          limits   = { memory = "297M" }
+          requests = { cpu = "163m", memory = "512M" }
+          limits   = { memory = "512M" }
         }
       }
       # Requires the ServiceMonitor CRD from prometheus_operator_crds.
