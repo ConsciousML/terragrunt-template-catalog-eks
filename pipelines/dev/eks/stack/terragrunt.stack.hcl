@@ -466,7 +466,7 @@ unit "argocd" {
           "server.insecure" = true
           # Caps concurrent GenerateManifest calls so a resync burst can't starve the
           # repo-server's own healthz handler behind a backlog of manifest renders.
-          "reposerver.parallelism.limit" = 30
+          "reposerver.parallelism.limit" = 20
         }
         cm = {
           # Restores the Application CRD health check ArgoCD removed by default in v1.8+.
@@ -522,8 +522,11 @@ unit "argocd" {
         # healthz?full=true does real dependency checks that can exceed 1s on cold start.
         readinessProbe = { timeoutSeconds = 5 }
         livenessProbe  = { timeoutSeconds = 5 }
-        nodeSelector   = local.critical_node_selector
-        tolerations    = local.critical_tolerations
+        env = [
+          { name = "ARGOCD_EXEC_TIMEOUT", value = "180s" }
+        ]
+        nodeSelector = local.critical_node_selector
+        tolerations  = local.critical_tolerations
       }
       notifications = {
         metrics = {
