@@ -464,6 +464,9 @@ unit "argocd" {
       configs = {
         params = {
           "server.insecure" = true
+          # Caps concurrent GenerateManifest calls so a resync burst can't starve the
+          # repo-server's own healthz handler behind a backlog of manifest renders.
+          "reposerver.parallelism.limit" = 30
         }
         cm = {
           # Restores the Application CRD health check ArgoCD removed by default in v1.8+.
@@ -597,7 +600,8 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "cilium-hubble"
+    # Fully qualified git ref: resolves directly instead of scanning all branches/tags.
+    target_revision       = "refs/heads/network-policies"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
