@@ -519,8 +519,11 @@ unit "argocd" {
           requests = { cpu = "49m", memory = "717M" }
           limits   = { memory = "717M" }
         }
-        nodeSelector = local.critical_node_selector
-        tolerations  = local.critical_tolerations
+        # healthz?full=true does real dependency checks that can exceed 1s on cold start.
+        readinessProbe = { timeoutSeconds = 5 }
+        livenessProbe  = { timeoutSeconds = 5 }
+        nodeSelector   = local.critical_node_selector
+        tolerations    = local.critical_tolerations
       }
       notifications = {
         metrics = {
