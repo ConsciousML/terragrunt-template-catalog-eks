@@ -212,9 +212,11 @@ unit "cluster" {
       kube-proxy = {
         addon_version = "v1.36.0-eksbuild.7"
         configuration_values = jsonencode({
+          # No CPU limit: kube-proxy programs node-level service routing, throttling it
+          # breaks Service traffic for every pod on the node.
           resources = {
             requests = { cpu = "11m", memory = "37M" }
-            limits   = { cpu = "55m", memory = "37M" }
+            limits   = { memory = "37M" }
           }
           # No tolerations key: this addon's configuration schema doesn't support one, and its
           # default manifest already tolerates everything.
@@ -240,16 +242,19 @@ unit "cluster" {
           }
           # Enables enforcement of NetworkPolicy resources, without this they are accepted but ignored
           enableNetworkPolicy = "true"
-          # aws-node container
+          # aws-node container. No CPU limit: it programs the node's CNI config, throttling it
+          # breaks pod sandbox create/delete for every pod scheduled on the node.
           resources = {
             requests = { cpu = "11m", memory = "64M" }
-            limits   = { cpu = "55m", memory = "64M" }
+            limits   = { memory = "64M" }
           }
-          # aws-eks-nodeagent container, enabled by enableNetworkPolicy above
+          # aws-eks-nodeagent container, enabled by enableNetworkPolicy above. No CPU limit for
+          # the same reason: aws-cni calls out to it over gRPC within a 5s deadline to program
+          # network policy, throttling causes that call to time out and sandbox creation to fail.
           nodeAgent = {
             resources = {
               requests = { cpu = "11m", memory = "184M" }
-              limits   = { cpu = "55m", memory = "184M" }
+              limits   = { memory = "184M" }
             }
           }
         })
