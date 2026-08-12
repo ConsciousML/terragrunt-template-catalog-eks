@@ -14,6 +14,7 @@ The cluster supports:
 - GitOps via ArgoCD and the App of Apps pattern
 - VPN access via Tailscale
 - Node autoscaling via Karpenter
+- Pod-to-pod network flow visibility via Cilium and Hubble
 
 ## How to Use
 

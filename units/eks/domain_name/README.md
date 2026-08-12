@@ -10,3 +10,4 @@ Each unit is a [`modules/identity`](../../../modules/identity/) passthrough arou
 - **[podinfo](podinfo/)**: public domain for the podinfo sample app
 - **[prometheus](prometheus/)**, **[alertmanager](alertmanager/)**, **[grafana](grafana/)**: private domains for the `kube-prometheus-stack` UIs
 - **[goldilocks](goldilocks/)**: private domain for the Goldilocks dashboard
+- **[hubble](hubble/)**: private domain for the Hubble UI
