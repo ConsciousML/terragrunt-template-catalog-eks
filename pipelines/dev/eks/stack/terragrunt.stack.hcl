@@ -236,9 +236,13 @@ unit "cluster" {
         before_compute = true
         addon_version  = "v1.23.0-eksbuild.1"
         configuration_values = jsonencode({
-          # Prefix delegation: nodes need more IPs than one-per-ENI allows
           env = {
+            # Prefix delegation: nodes need more IPs than one-per-ENI allows
             ENABLE_PREFIX_DELEGATION = "true"
+            # standard mode allows all traffic for the first seconds of a spawned pod's
+            # life, before its policy is programmed. Serious security hole for anything
+            # short-lived (Jobs, autoscaled pods). https://github.com/aws/aws-network-policy-agent/issues/271
+            NETWORK_POLICY_ENFORCING_MODE = "strict"
           }
           # Enables enforcement of NetworkPolicy resources, without this they are accepted but ignored
           enableNetworkPolicy = "true"
@@ -252,7 +256,7 @@ unit "cluster" {
           # the same reason: aws-cni calls out to it over gRPC within a 5s deadline to program
           # network policy, throttling causes that call to time out and sandbox creation to fail.
           nodeAgent = {
-            # TEMP DEBUG: diagnosing why admin-deny-imds-egress isn't enforced. Do not ship to main.
+            # Useful for debugging NetworkPolicy decisions: https://docs.aws.amazon.com/eks/latest/userguide/network-policies-troubleshooting.html
             enablePolicyEventLogs = "true"
             resources = {
               requests = { cpu = "11m", memory = "184M" }
