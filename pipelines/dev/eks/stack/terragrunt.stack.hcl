@@ -242,7 +242,8 @@ unit "cluster" {
             # standard mode allows all traffic for the first seconds of a spawned pod's
             # life, before its policy is programmed. Serious security hole for anything
             # short-lived (Jobs, autoscaled pods). https://github.com/aws/aws-network-policy-agent/issues/271
-            NETWORK_POLICY_ENFORCING_MODE = "strict"
+            # strict doesn't allow addons to spawn, reverting to standard for now
+            NETWORK_POLICY_ENFORCING_MODE = "standard"
           }
           # Enables enforcement of NetworkPolicy resources, without this they are accepted but ignored
           enableNetworkPolicy = "true"
