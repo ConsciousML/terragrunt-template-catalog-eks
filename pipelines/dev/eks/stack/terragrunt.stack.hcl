@@ -252,6 +252,8 @@ unit "cluster" {
           # the same reason: aws-cni calls out to it over gRPC within a 5s deadline to program
           # network policy, throttling causes that call to time out and sandbox creation to fail.
           nodeAgent = {
+            # TEMP DEBUG: diagnosing why admin-deny-imds-egress isn't enforced. Do not ship to main.
+            enablePolicyEventLogs = "true"
             resources = {
               requests = { cpu = "11m", memory = "184M" }
               limits   = { memory = "184M" }
@@ -517,6 +519,7 @@ unit "argocd" {
         tolerations       = local.critical_tolerations
       }
       repoServer = {
+        replicas = 2
         metrics = {
           enabled = true
           serviceMonitor = {
@@ -532,6 +535,15 @@ unit "argocd" {
         livenessProbe  = { timeoutSeconds = 5 }
         env = [
           { name = "ARGOCD_EXEC_TIMEOUT", value = "180s" }
+        ]
+        # Spreads the 2 replicas across AZs so a single node's CPU contention (or loss)
+        # can't stall manifest generation for every Application at once.
+        topologySpreadConstraints = [
+          {
+            maxSkew           = 1
+            topologyKey       = "topology.kubernetes.io/zone"
+            whenUnsatisfiable = "DoNotSchedule"
+          }
         ]
         nodeSelector = local.critical_node_selector
         tolerations  = local.critical_tolerations
