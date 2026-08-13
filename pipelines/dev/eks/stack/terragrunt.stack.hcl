@@ -234,7 +234,7 @@ unit "cluster" {
       }
       vpc-cni = {
         before_compute = true
-        addon_version  = "v1.21.2-eksbuild.2"
+        addon_version  = "v1.23.0-eksbuild.1"
         configuration_values = jsonencode({
           # Prefix delegation: nodes need more IPs than one-per-ENI allows
           env = {
