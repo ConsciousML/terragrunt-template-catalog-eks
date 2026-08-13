@@ -114,6 +114,8 @@ For more information on how to use mise, read their [getting started guide](http
 - [jq](https://jqlang.org/download/)
 - [ArgoCD CLI](https://argo-cd.readthedocs.io/en/stable/cli_installation/)
 - [Slack CLI](https://docs.slack.dev/tools/slack-cli/)
+- [Cilium CLI](https://github.com/cilium/cilium-cli#installation)
+- [Hubble CLI](https://github.com/cilium/hubble#installation)
 
 See [mise.toml](./mise.toml) and [mise.local.toml](./mise.local.toml) for specific versions.
 

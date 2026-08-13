@@ -52,6 +52,20 @@ aws secretsmanager get-secret-value \
 
 Cilium, Hubble, and their Grafana dashboards are provisioned the same way as every other addon (see [Monitoring a New Component](#monitoring-a-new-component) below), no extra wiring needed to see them in Grafana.
 
+### Hubble CLI
+
+To query flows from a terminal instead of the UI, observe at the namespace level:
+```bash
+hubble observe --namespace external-dns -P
+```
+
+Or at the pod level:
+```bash
+hubble observe --pod external-dns-private-7cb844c9d5-q8tns --namespace external-dns -P
+```
+
+See the [Hubble CLI docs](https://docs.cilium.io/en/latest/observability/hubble/hubble-cli/) for more.
+
 ### Restoring Full Flow Visibility
 
 Cilium only manages pods created after `cilium-agent` is already running on their node, so every pod predating it (the entire EKS bootstrap) has no `CiliumEndpoint` and stays invisible to Hubble.

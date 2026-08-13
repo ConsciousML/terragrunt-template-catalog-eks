@@ -472,6 +472,9 @@ unit "argocd" {
           # Caps concurrent GenerateManifest calls so a resync burst can't starve the
           # repo-server's own healthz handler behind a backlog of manifest renders.
           "reposerver.parallelism.limit" = 20
+          # Matches ARGOCD_EXEC_TIMEOUT below: the controller's own deadline for the
+          # GenerateManifest RPC is a separate 60s default that isn't covered by it.
+          "controller.repo.server.timeout.seconds" = "180"
         }
         cm = {
           # Restores the Application CRD health check ArgoCD removed by default in v1.8+.
