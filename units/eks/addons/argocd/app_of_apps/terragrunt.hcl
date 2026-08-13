@@ -218,6 +218,11 @@ inputs = {
           k8sServicePort = "443"
         }
       }
+      "network-policies-cluster-wide" = {
+        # kubernetes.default gets the first usable IP in the service CIDR; the CIDR
+        # itself is too broad to allow (whole ClusterIP range, not just the API server).
+        apiServerCidr = "${cidrhost(dependency.eks_cluster.outputs.cluster_service_cidr, 1)}/32"
+      }
       "external-dns-private" = {
         "external-dns" = {
           txtOwnerId = dependency.eks_cluster.outputs.cluster_name
