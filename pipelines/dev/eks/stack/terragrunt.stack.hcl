@@ -239,30 +239,15 @@ unit "cluster" {
           env = {
             # Prefix delegation: nodes need more IPs than one-per-ENI allows
             ENABLE_PREFIX_DELEGATION = "true"
-            # standard mode allows all traffic for the first seconds of a spawned pod's
-            # life, before its policy is programmed. Serious security hole for anything
-            # short-lived (Jobs, autoscaled pods). https://github.com/aws/aws-network-policy-agent/issues/271
-            # strict doesn't allow addons to spawn, reverting to standard for now
-            NETWORK_POLICY_ENFORCING_MODE = "standard"
           }
-          # Enables enforcement of NetworkPolicy resources, without this they are accepted but ignored
-          enableNetworkPolicy = "true"
+          # Policy enforcement moved to Cilium (chaining mode), see charts/cilium in
+          # argocd-app-of-apps-template.
+          enableNetworkPolicy = "false"
           # aws-node container. No CPU limit: it programs the node's CNI config, throttling it
           # breaks pod sandbox create/delete for every pod scheduled on the node.
           resources = {
             requests = { cpu = "11m", memory = "64M" }
             limits   = { memory = "64M" }
-          }
-          # aws-eks-nodeagent container, enabled by enableNetworkPolicy above. No CPU limit for
-          # the same reason: aws-cni calls out to it over gRPC within a 5s deadline to program
-          # network policy, throttling causes that call to time out and sandbox creation to fail.
-          nodeAgent = {
-            # Useful for debugging NetworkPolicy decisions: https://docs.aws.amazon.com/eks/latest/userguide/network-policies-troubleshooting.html
-            enablePolicyEventLogs = "true"
-            resources = {
-              requests = { cpu = "11m", memory = "184M" }
-              limits   = { memory = "184M" }
-            }
           }
         })
       }
