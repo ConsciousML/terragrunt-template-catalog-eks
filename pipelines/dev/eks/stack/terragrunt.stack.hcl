@@ -212,9 +212,11 @@ unit "cluster" {
       kube-proxy = {
         addon_version = "v1.36.0-eksbuild.7"
         configuration_values = jsonencode({
+          # No CPU limit: kube-proxy programs node-level service routing, throttling it
+          # breaks Service traffic for every pod on the node.
           resources = {
             requests = { cpu = "11m", memory = "37M" }
-            limits   = { cpu = "55m", memory = "37M" }
+            limits   = { memory = "37M" }
           }
           # No tolerations key: this addon's configuration schema doesn't support one, and its
           # default manifest already tolerates everything.
@@ -232,25 +234,20 @@ unit "cluster" {
       }
       vpc-cni = {
         before_compute = true
-        addon_version  = "v1.21.2-eksbuild.2"
+        addon_version  = "v1.23.0-eksbuild.1"
         configuration_values = jsonencode({
-          # Prefix delegation: nodes need more IPs than one-per-ENI allows
           env = {
+            # Prefix delegation: nodes need more IPs than one-per-ENI allows
             ENABLE_PREFIX_DELEGATION = "true"
           }
-          # Enables enforcement of NetworkPolicy resources, without this they are accepted but ignored
-          enableNetworkPolicy = "true"
-          # aws-node container
+          # Policy enforcement moved to Cilium (chaining mode), see charts/cilium in
+          # argocd-app-of-apps-template.
+          enableNetworkPolicy = "false"
+          # aws-node container. No CPU limit: it programs the node's CNI config, throttling it
+          # breaks pod sandbox create/delete for every pod scheduled on the node.
           resources = {
             requests = { cpu = "11m", memory = "64M" }
-            limits   = { cpu = "55m", memory = "64M" }
-          }
-          # aws-eks-nodeagent container, enabled by enableNetworkPolicy above
-          nodeAgent = {
-            resources = {
-              requests = { cpu = "11m", memory = "184M" }
-              limits   = { cpu = "55m", memory = "184M" }
-            }
+            limits   = { memory = "64M" }
           }
         })
       }
@@ -464,6 +461,12 @@ unit "argocd" {
       configs = {
         params = {
           "server.insecure" = true
+          # Caps concurrent GenerateManifest calls so a resync burst can't starve the
+          # repo-server's own healthz handler behind a backlog of manifest renders.
+          "reposerver.parallelism.limit" = 20
+          # Matches ARGOCD_EXEC_TIMEOUT below: the controller's own deadline for the
+          # GenerateManifest RPC is a separate 60s default that isn't covered by it.
+          "controller.repo.server.timeout.seconds" = "180"
         }
         cm = {
           # Restores the Application CRD health check ArgoCD removed by default in v1.8+.
@@ -506,6 +509,7 @@ unit "argocd" {
         tolerations       = local.critical_tolerations
       }
       repoServer = {
+        replicas = 2
         metrics = {
           enabled = true
           serviceMonitor = {
@@ -516,6 +520,21 @@ unit "argocd" {
           requests = { cpu = "49m", memory = "717M" }
           limits   = { memory = "717M" }
         }
+        # healthz?full=true does real dependency checks that can exceed 1s on cold start.
+        readinessProbe = { timeoutSeconds = 5 }
+        livenessProbe  = { timeoutSeconds = 5 }
+        env = [
+          { name = "ARGOCD_EXEC_TIMEOUT", value = "180s" }
+        ]
+        # Spreads the 2 replicas across AZs so a single node's CPU contention (or loss)
+        # can't stall manifest generation for every Application at once.
+        topologySpreadConstraints = [
+          {
+            maxSkew           = 1
+            topologyKey       = "topology.kubernetes.io/zone"
+            whenUnsatisfiable = "DoNotSchedule"
+          }
+        ]
         nodeSelector = local.critical_node_selector
         tolerations  = local.critical_tolerations
       }
@@ -597,7 +616,8 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     #target_revision       = "main"
-    target_revision       = "cilium-hubble"
+    # Fully qualified git ref: resolves directly instead of scanning all branches/tags.
+    target_revision       = "refs/heads/network-policies"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"
@@ -734,8 +754,8 @@ unit "karpenter_helm" {
       }
       controller = {
         resources = {
-          requests = { cpu = "163m", memory = "297M" }
-          limits   = { memory = "297M" }
+          requests = { cpu = "163m", memory = "512M" }
+          limits   = { memory = "512M" }
         }
       }
       # Requires the ServiceMonitor CRD from prometheus_operator_crds.

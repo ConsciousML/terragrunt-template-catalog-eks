@@ -52,11 +52,25 @@ aws secretsmanager get-secret-value \
 
 Cilium, Hubble, and their Grafana dashboards are provisioned the same way as every other addon (see [Monitoring a New Component](#monitoring-a-new-component) below), no extra wiring needed to see them in Grafana.
 
+### Hubble CLI
+
+To query flows from a terminal instead of the UI, observe at the namespace level:
+```bash
+hubble observe --namespace external-dns -P
+```
+
+Or at the pod level:
+```bash
+hubble observe --pod external-dns-private-7cb844c9d5-q8tns --namespace external-dns -P
+```
+
+See the [Hubble CLI docs](https://docs.cilium.io/en/latest/observability/hubble/hubble-cli/) for more.
+
 ### Restoring Full Flow Visibility
 
 Cilium only manages pods created after `cilium-agent` is already running on their node, so every pod predating it (the entire EKS bootstrap) has no `CiliumEndpoint` and stays invisible to Hubble.
 
-Once the whole stack is bootstrapped, spot which components are missing one:
+Once the whole stack is bootstrapped, spot which components are missing one and save the list:
 
 ```bash
 for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do
@@ -73,14 +87,16 @@ for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do
     fi
     echo "${ns}/${kind}/${name:-$pod}"
   done
-done | sort -u
+done | sort -u | tee /tmp/missing-ceps.txt
 ```
 
-Restart each one to get functional network observability, see [Cilium's restart-existing-pods guidance](https://docs.cilium.io/en/stable/installation/cni-chaining-aws-cni/#restart-existing-pods).
+Review `/tmp/missing-ceps.txt`, then restart everything on it to get functional network observability, see [Cilium's restart-existing-pods guidance](https://docs.cilium.io/en/stable/installation/cni-chaining-aws-cni/#restart-existing-pods).
 
 **Warning**: restarting deletes and recreates pods. Run only during a maintenance window:
 ```bash
-kubectl -n <namespace> rollout restart <kind>/<name>
+while IFS=/ read -r ns kind name; do
+  kubectl -n "$ns" rollout restart "$kind/$name"
+done < /tmp/missing-ceps.txt
 ```
 
 To avoid this altogether, install Cilium in [ENI mode](https://cilium.io/blog/2025/06/19/eks-eni-install/) instead of chained: a bigger change (it replaces `vpc-cni` instead of sitting alongside it), but kubelet then waits on Cilium's own CNI config, closing the gap.
