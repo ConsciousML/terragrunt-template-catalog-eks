@@ -38,16 +38,10 @@ Cross-check against the workload's spec: ports, probes, whether it's reached via
 
 **Turn deny-on.** Add `<namespace>` back to `default-deny.yaml`, commit, push, `argocd app sync`, restart the workload.
 
-**Re-verify.** `hubble observe -n <namespace> --verdict DROPPED -P` should now return anything, and the feature should still work end to end, see [Verify](#verify). Iterate the capture and write steps for anything still broken.
+**Re-verify.** `hubble observe -n <namespace> --verdict DROPPED -P` should now return anything, and the feature should still work end to end. Iterate the capture and write steps for anything still broken.
 
 ## Writing a Workload Policy
 
 Scope `endpointSelector` to the component-level labels a chart's pods carry (`app.kubernetes.io/component`, not just `name`), so a multi-deployment chart gets independently scoped rules.
 
 Only add an `ingress` or `egress` block for a direction the workload needs. The namespace's actual default-deny comes from `default-deny.yaml` (policies on one endpoint combine, default-deny wins if any requests it), so a workload policy only needs to add allows on top.
-
-Comment each rule with why the flow exists, not what the YAML says. See `charts/right-sizing/vpa/templates/network-policy.yaml` and `manifests/podinfo/podinfo-network-policy.yaml` for the shape.
-
-## Verify
-
-`hubble observe -n <namespace> --verdict DROPPED -P` stays clean (no `Policy denied`, only IPv6 noise) across a normal traffic cycle, not just the first few seconds after restart. The feature itself still works end to end, a clean Hubble window only proves the network layer.
