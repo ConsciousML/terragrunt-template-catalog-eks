@@ -38,7 +38,7 @@ Cross-check against the workload's spec: ports, probes, whether it's reached via
 
 **Turn deny-on.** Add `<namespace>` back to `default-deny.yaml`, commit, push, `argocd app sync`, restart the workload.
 
-**Re-verify.** `hubble observe -n <namespace> --verdict DROPPED -P` should now return anything, and the feature should still work end to end. Iterate the capture and write steps for anything still broken.
+**Re-verify.** `hubble observe -n <namespace> --verdict DROPPED -P` should return nothing except `Unsupported L3 protocol DROPPED (ICMPv6 RouterSolicitation)` (IPv4-only Cilium drops these regardless of policy), and the feature should still work end to end. Iterate the capture and write steps for anything still broken.
 
 ## Writing a Workload Policy
 
