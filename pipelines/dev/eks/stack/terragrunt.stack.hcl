@@ -615,9 +615,8 @@ unit "argocd_app_of_apps" {
     name      = "app-of-apps"
     namespace = "argocd"
     path      = "apps"
-    #target_revision       = "main"
     # Fully qualified git ref: resolves directly instead of scanning all branches/tags.
-    target_revision       = "refs/heads/network-policies"
+    target_revision       = "refs/heads/main"
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"

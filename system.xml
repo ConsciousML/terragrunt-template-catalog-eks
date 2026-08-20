@@ -58,6 +58,7 @@
         - `troubleshoot.md`: recovering from broken or stuck Terragrunt state
         - `reproducibility.md`: provider lock file management
         - `monitoring.md`: operating the deployed kube-prometheus-stack
+        - `network-policies.md`: taking a namespace from unrestricted to default-deny with explicit CiliumNetworkPolicy rules
         - `new-environment.md`: adding a new environment, including bootstrap and DNS/ACM prerequisites
         - `environment-variables.md`: reference for every environment variable used across bootstrap pipelines and the EKS stack
         - `continuous-integration.md`: what CI validates on every pull request

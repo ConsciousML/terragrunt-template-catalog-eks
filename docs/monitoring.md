@@ -46,9 +46,11 @@ aws secretsmanager get-secret-value \
 
 ## Network Observability (Hubble)
 
-[Cilium](https://cilium.io/) runs in [CNI chaining mode](https://docs.cilium.io/en/stable/installation/cni-chaining/) alongside the `vpc-cni` EKS addon, purely for flow visibility. It doesn't alter `vpc-cni`'s existing behavior. Configuration lives in the App of Apps repo's [`charts/cilium/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/charts/cilium/values.yaml).
+[Cilium](https://cilium.io/) runs in [CNI chaining mode](https://docs.cilium.io/en/stable/installation/cni-chaining/) alongside the `vpc-cni` EKS addon, for flow visibility and `NetworkPolicy` enforcement. Configuration lives in the App of Apps repo's [`charts/cilium/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/charts/cilium/values.yaml).
 
 [Hubble](https://docs.cilium.io/en/stable/observability/hubble/) shows, per flow, who talked to whom, over what protocol, and whether it was allowed or dropped, useful for auditing traffic without guessing at a `NetworkPolicy`. No login, access is restricted via Tailscale like every other private UI here.
+
+See [Network Policies](network-policies.md) for how to use Hubble to write and harden a `CiliumNetworkPolicy`.
 
 Cilium, Hubble, and their Grafana dashboards are provisioned the same way as every other addon (see [Monitoring a New Component](#monitoring-a-new-component) below), no extra wiring needed to see them in Grafana.
 
