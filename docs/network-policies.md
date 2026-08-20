@@ -45,3 +45,9 @@ Cross-check against the workload's spec: ports, probes, whether it's reached via
 Scope `endpointSelector` to the component-level labels a chart's pods carry (`app.kubernetes.io/component`, not just `name`), so a multi-deployment chart gets independently scoped rules.
 
 Only add an `ingress` or `egress` block for a direction the workload needs. The namespace's actual default-deny comes from `default-deny.yaml` (policies on one endpoint combine, default-deny wins if any requests it), so a workload policy only needs to add allows on top.
+
+## Identities in This Cluster
+
+See Cilium's [entities-based identities](https://docs.cilium.io/en/stable/security/policy/layer3/#entities-based) for what `world`, `host`, `remote-node`, `kube-apiserver`, and `cluster` mean. Gateway API `HTTPRoute` traffic reaches the pod IP directly, bypassing Service-aware routing, so it arrives as `world`.
+
+`hostNetwork: true` pods (`aws-node`, `kube-proxy`, `cilium`, `cilium-operator`, `eks-pod-identity-agent`) get no Cilium endpoint of their own. Without Cilium's [host firewall](https://docs.cilium.io/en/stable/security/host-firewall/) enabled (not the case in this cluster), they all collapse into the single per-node `host` identity, indistinguishable from kubelet or containerd. A `CiliumNetworkPolicy` can't select them individually, and `default-deny.yaml`'s namespace-scoped selector can't reach `host` either, so their own traffic is unaffected by any namespace's default-deny.
