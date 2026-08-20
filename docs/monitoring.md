@@ -72,34 +72,16 @@ See the [Hubble CLI docs](https://docs.cilium.io/en/latest/observability/hubble/
 
 Cilium only manages pods created after `cilium-agent` is already running on their node, so every pod predating it (the entire EKS bootstrap) has no `CiliumEndpoint` and stays invisible to Hubble.
 
-Once the whole stack is bootstrapped, spot which components are missing one and save the list:
+By default this is handled automatically: `argocd-app-of-apps-template`'s [`manifests/cilium-restart-job`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/manifests/cilium-restart-job) runs a one-shot `Job` right after Cilium syncs, restarting every bootstrap-time pod.
 
-```bash
-for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do
-  ceps=$(kubectl -n "$ns" get ciliumendpoints.cilium.io -o jsonpath='{.items[*].metadata.name}' | tr ' ' '\n' | sort)
-  pods=$(kubectl -n "$ns" get pod -o custom-columns=NAME:.metadata.name,HOST:.spec.hostNetwork --no-headers \
-    | awk '$2 == "<none>" || $2 == "false" {print $1}' | sort)
-  comm -23 <(echo "$pods") <(echo "$ceps") | while read -r pod; do
-    [ -z "$pod" ] && continue
-    kind=$(kubectl -n "$ns" get pod "$pod" -o jsonpath='{.metadata.ownerReferences[0].kind}')
-    name=$(kubectl -n "$ns" get pod "$pod" -o jsonpath='{.metadata.ownerReferences[0].name}')
-    if [ "$kind" = "ReplicaSet" ]; then
-      kind=$(kubectl -n "$ns" get replicaset "$name" -o jsonpath='{.metadata.ownerReferences[0].kind}')
-      name=$(kubectl -n "$ns" get replicaset "$name" -o jsonpath='{.metadata.ownerReferences[0].name}')
-    fi
-    echo "${ns}/${kind}/${name:-$pod}"
-  done
-done | sort -u | tee /tmp/missing-ceps.txt
-```
-
-Review `/tmp/missing-ceps.txt`, then restart everything on it to get functional network observability, see [Cilium's restart-existing-pods guidance](https://docs.cilium.io/en/stable/installation/cni-chaining-aws-cni/#restart-existing-pods).
+If a pod is still missing one afterward, fix it with [`scripts/restart-missing-cilium-endpoints.sh`](../scripts/restart-missing-cilium-endpoints.sh), see [Cilium's restart-existing-pods guidance](https://docs.cilium.io/en/stable/installation/cni-chaining-aws-cni/#restart-existing-pods). It logs what it finds missing before restarting it, waits for each rollout, then re-scans and fails if anything is still missing.
 
 **Warning**: restarting deletes and recreates pods. Run only during a maintenance window:
 ```bash
-while IFS=/ read -r ns kind name; do
-  kubectl -n "$ns" rollout restart "$kind/$name"
-done < /tmp/missing-ceps.txt
+scripts/restart-missing-cilium-endpoints.sh
 ```
+
+Same script as the one baked into the Job's `ConfigMap`, kept in sync manually.
 
 To avoid this altogether, install Cilium in [ENI mode](https://cilium.io/blog/2025/06/19/eks-eni-install/) instead of chained: a bigger change (it replaces `vpc-cni` instead of sitting alongside it), but kubelet then waits on Cilium's own CNI config, closing the gap.
 
