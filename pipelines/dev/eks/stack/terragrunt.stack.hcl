@@ -517,12 +517,12 @@ unit "argocd" {
           }
         }
         resources = {
-          requests = { cpu = "49m", memory = "717M" }
+          requests = { cpu = "100m", memory = "717M" }
           limits   = { memory = "717M" }
         }
         # healthz?full=true does real dependency checks that can exceed 1s on cold start.
-        readinessProbe = { timeoutSeconds = 5 }
-        livenessProbe  = { timeoutSeconds = 5 }
+        readinessProbe = { timeoutSeconds = 10 }
+        livenessProbe  = { timeoutSeconds = 10 }
         env = [
           { name = "ARGOCD_EXEC_TIMEOUT", value = "180s" }
         ]
