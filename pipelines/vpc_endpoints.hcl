@@ -15,6 +15,7 @@ locals {
     elasticloadbalancing = 16
     sqs                  = 17
     iam                  = 18
+    tagging              = 19
   }
 
   # Consumer-side keys matching the vpcEndpointCidrs shape each CiliumNetworkPolicy
@@ -26,5 +27,6 @@ locals {
     elasticloadbalancing = "elasticloadbalancing"
     sqs                  = "sqs"
     iam                  = "iam"
+    tagging              = "tagging"
   }
 }
