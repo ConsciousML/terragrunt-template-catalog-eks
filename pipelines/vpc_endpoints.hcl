@@ -1,8 +1,10 @@
 locals {
   # Offset within each private subnet CIDR for each interface endpoint's pinned ENI IP.
-  # ecr.dkr is provisioned for NAT cost savings only. No CiliumNetworkPolicy consumes it
-  # (node image pulls go through kubelet, not a pod's Cilium endpoint). It has no
-  # app_param_key_map entry below.
+  # ecr.api and ecr.dkr are provisioned for NAT cost savings only. No CiliumNetworkPolicy
+  # consumes them (node image pulls, including registry auth, go through kubelet, not a
+  # pod's Cilium endpoint). Neither has an app_param_key_map entry below. sts has no
+  # current CNP consumer either (Karpenter's world rule only covers EC2 Fleet + SQS), add
+  # it to app_param_key_map if a future consumer needs it.
   endpoint_host_offsets = {
     secretsmanager       = 10
     route53              = 11
@@ -19,9 +21,7 @@ locals {
   app_param_key_map = {
     secretsmanager       = "secretsmanager"
     route53              = "route53"
-    "ecr.api"            = "ecrApi"
     ec2                  = "ec2"
-    sts                  = "sts"
     elasticloadbalancing = "elasticloadbalancing"
     sqs                  = "sqs"
   }

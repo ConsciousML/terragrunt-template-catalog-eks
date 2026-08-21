@@ -50,7 +50,7 @@ This stack is instantiated in:
 - **[`vpa`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/charts/right-sizing/vpa)**, **[`goldilocks`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/charts/right-sizing/goldilocks)** (app-of-apps): workload resource-sizing recommendations, see the [right-sizing guide](../../docs/right-sizing.md)
 - **[`podinfo`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/manifests/podinfo)** (app-of-apps): sample app used to verify an end-to-end deploy, meant to be swapped for a real app in a fork
 - **[`cilium`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/charts/cilium)**, **[`hubble-ui-httproute`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/charts/gateway-api/httproute)** (app-of-apps): Cilium in CNI chaining mode alongside `vpc-cni` (no change to existing networking behavior), providing Hubble network flow visibility for audits
-- **[`network-policies-aws-endpoints`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/manifests/network-policies)** (app-of-apps): `CiliumNetworkPolicy` egress rules scoped to pinned VPC endpoint IPs from [`vpc/endpoint_cidrs`](../vpc/endpoint_cidrs/README.md) instead of `toEntities: world`
+- **[`network-policies-kube-system`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/charts/network-policies/kube-system)**, plus in-place `CiliumNetworkPolicy` updates in **`aws-lbc`**, **`external-dns`**, and **`external-secrets-operator`** (app-of-apps): egress rules scoped to pinned VPC endpoint IPs from [`vpc/endpoint_cidrs`](../vpc/endpoint_cidrs/README.md) instead of `toEntities: world`
 
 ## Dependency Graph
 
