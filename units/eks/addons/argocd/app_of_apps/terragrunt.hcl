@@ -167,6 +167,11 @@ dependency "ebs_csi_driver_addon" {
   skip_outputs = true
 }
 
+dependency "vpc_endpoints" {
+  config_path  = "../../../../vpc/endpoints"
+  skip_outputs = true
+}
+
 dependency "vpc_endpoint_cidrs" {
   config_path = "../../../../vpc/endpoint_cidrs"
   mock_outputs = {
