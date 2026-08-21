@@ -32,6 +32,7 @@ dependency "vpc" {
   config_path = "../vpc"
   mock_outputs = {
     vpc_id                  = "mock-vpc-id"
+    vpc_cidr_block          = "10.2.0.0/16"
     private_subnets         = ["mock-subnet-1", "mock-subnet-2", "mock-subnet-3"]
     private_route_table_ids = ["mock-rt-1", "mock-rt-2", "mock-rt-3"]
   }
@@ -55,6 +56,19 @@ dependency "endpoint_cidrs" {
 inputs = {
   vpc_id = dependency.vpc.outputs.vpc_id
   region = local.region
+
+  # Interface endpoints need a security group allowing 443 from the VPC, or every
+  # endpoint attaches to the VPC's default security group instead of one pods can
+  # actually be scoped to.
+  create_security_group      = true
+  security_group_name_prefix = "${local.environment}-vpc-endpoints-"
+  security_group_description = "Allow HTTPS from the VPC to interface VPC endpoints"
+  security_group_rules = {
+    ingress_https = {
+      description = "HTTPS from VPC"
+      cidr_blocks = [dependency.vpc.outputs.vpc_cidr_block]
+    }
+  }
 
   endpoints = merge(
     {
