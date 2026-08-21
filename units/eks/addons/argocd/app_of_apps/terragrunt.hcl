@@ -217,14 +217,14 @@ inputs = {
         certificateArn = dependency.acm_certificate.outputs.certificate_arn
       }
       "aws-lbc" = {
+        vpcEndpointCidrs = {
+          ec2                  = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.ec2
+          elasticloadbalancing = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.elasticloadbalancing
+        }
         "aws-load-balancer-controller" = {
           clusterName = dependency.eks_cluster.outputs.cluster_name
           region      = local.region
           vpcId       = dependency.vpc.outputs.vpc_id
-          vpcEndpointCidrs = {
-            ec2                  = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.ec2
-            elasticloadbalancing = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.elasticloadbalancing
-          }
         }
       }
       "argocd-httproute" = {
@@ -240,25 +240,25 @@ inputs = {
         }
       }
       "external-dns-private" = {
+        vpcEndpointCidrs = {
+          route53 = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.route53
+        }
         "external-dns" = {
           txtOwnerId = dependency.eks_cluster.outputs.cluster_name
           # The %%% is for escaping Terragrunt templates
           txtPrefix     = "%%%{record_type}-external-dns-private-${dependency.eks_cluster.outputs.cluster_name}."
           domainFilters = [dependency.route53_hosted_zone_private.outputs.domain_name]
-          vpcEndpointCidrs = {
-            route53 = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.route53
-          }
         }
       }
       "external-dns-public" = {
+        vpcEndpointCidrs = {
+          route53 = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.route53
+        }
         "external-dns" = {
           txtOwnerId = dependency.eks_cluster.outputs.cluster_name
           # The %%% is for escaping Terragrunt templates
           txtPrefix     = "%%%{record_type}-external-dns-public-${dependency.eks_cluster.outputs.cluster_name}."
           domainFilters = [dependency.route53_hosted_zone_public.outputs.domain_name]
-          vpcEndpointCidrs = {
-            route53 = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.route53
-          }
         }
       }
       "external-secrets-operator" = {
