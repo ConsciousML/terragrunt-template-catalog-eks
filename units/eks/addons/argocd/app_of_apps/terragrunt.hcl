@@ -38,6 +38,12 @@ locals {
   # Must also match tool.helm.releaseName for kube-prometheus-stack in apps/values.yaml
   # (argocd-app-of-apps-template repo), which appParams has no path to set.
   kube_prometheus_stack_release = "kube-prometheus-stack"
+
+  # Same offsets and consumer-side keys the vpc_endpoints unit uses to pin each
+  # interface endpoint's ENI IP, see units/vpc_endpoints/README.md.
+  vpc_endpoints_hcl     = find_in_parent_folders("vpc_endpoints.hcl")
+  endpoint_host_offsets = read_terragrunt_config(local.vpc_endpoints_hcl).locals.endpoint_host_offsets
+  app_param_key_map     = read_terragrunt_config(local.vpc_endpoints_hcl).locals.app_param_key_map
 }
 
 dependency "route53_hosted_zone_public" {
@@ -167,19 +173,8 @@ dependency "ebs_csi_driver_addon" {
 }
 
 dependency "vpc_endpoints" {
-  config_path = "../../../../vpc_endpoints"
-  mock_outputs = {
-    aws_endpoint_cidrs = {
-      secretsmanager       = "10.2.0.10"
-      route53              = "10.2.0.11"
-      ecrApi               = "10.2.0.12"
-      ec2                  = "10.2.0.14"
-      sts                  = "10.2.0.15"
-      elasticloadbalancing = "10.2.0.16"
-      sqs                  = "10.2.0.17"
-    }
-  }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+  config_path  = "../../../../vpc_endpoints"
+  skip_outputs = true
 }
 
 inputs = {
