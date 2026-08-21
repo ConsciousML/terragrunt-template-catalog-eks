@@ -5,9 +5,23 @@ include "root" {
 
 locals {
   environment = include.root.locals.environment
+  region      = include.root.locals.aws_region
 
   vpc_endpoints_hcl     = find_in_parent_folders("vpc_endpoints.hcl")
   endpoint_host_offsets = read_terragrunt_config(local.vpc_endpoints_hcl).locals.endpoint_host_offsets
+
+  # route53's VPC endpoint service is published as the global "com.amazonaws.route53"
+  # (no region segment), unlike every other service here. The module requires
+  # service_endpoint to be set explicitly whenever region is (per its own variable
+  # description), so compute it ourselves for every service instead of relying on its
+  # data source lookup.
+  service_endpoints = merge(
+    {
+      for svc in keys(local.endpoint_host_offsets) : svc =>
+      svc == "route53" ? "com.amazonaws.route53" : "com.amazonaws.${local.region}.${svc}"
+    },
+    { s3 = "com.amazonaws.${local.region}.s3" }
+  )
 }
 
 terraform {
@@ -40,27 +54,25 @@ dependency "endpoint_cidrs" {
 
 inputs = {
   vpc_id = dependency.vpc.outputs.vpc_id
-
-  # root.hcl injects region into every unit's inputs by default. This module also
-  # declares its own "region" variable, but for cross-region endpoint overrides: a
-  # non-null value disables its service-name data source lookup entirely, breaking
-  # service_name resolution for every endpoint here. Override the global default back
-  # to null.
-  region = null
+  region = local.region
 
   endpoints = merge(
     {
       for svc, offset in local.endpoint_host_offsets : svc => {
-        service               = svc
+        service_endpoint      = local.service_endpoints[svc]
+        private_dns_enabled   = true
         subnet_ids            = dependency.vpc.outputs.private_subnets
         subnet_configurations = dependency.endpoint_cidrs.outputs.endpoint_ips[svc]
       }
     },
     {
-      # Gateway endpoint, route table prefix-list entry, no ENI, no IP to pin.
+      # Gateway endpoint, route table prefix-list entry, no ENI, no IP to pin. AWS also
+      # offers an Interface variant of s3, so service_type must be explicit or the
+      # module defaults to Interface.
       s3 = {
-        service         = "s3"
-        route_table_ids = dependency.vpc.outputs.private_route_table_ids
+        service_endpoint = local.service_endpoints.s3
+        service_type     = "Gateway"
+        route_table_ids  = dependency.vpc.outputs.private_route_table_ids
       }
     }
   )
