@@ -16,6 +16,8 @@ locals {
     sqs                  = 17
     iam                  = 18
     tagging              = 19
+    shield               = 20
+    acm                  = 21
   }
 
   # Consumer-side keys matching the vpcEndpointCidrs shape each CiliumNetworkPolicy
@@ -28,5 +30,7 @@ locals {
     sqs                  = "sqs"
     iam                  = "iam"
     tagging              = "tagging"
+    shield               = "shield"
+    acm                  = "acm"
   }
 }

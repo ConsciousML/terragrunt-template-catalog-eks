@@ -180,6 +180,8 @@ dependency "vpc_endpoint_cidrs" {
       sqs                  = ["10.2.0.17", "10.2.32.17", "10.2.64.17"]
       iam                  = ["10.2.0.18", "10.2.32.18", "10.2.64.18"]
       tagging              = ["10.2.0.19", "10.2.32.19", "10.2.64.19"]
+      shield               = ["10.2.0.20", "10.2.32.20", "10.2.64.20"]
+      acm                  = ["10.2.0.21", "10.2.32.21", "10.2.64.21"]
     }
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
@@ -223,6 +225,8 @@ inputs = {
           ec2                  = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.ec2
           elasticloadbalancing = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.elasticloadbalancing
           tagging              = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.tagging
+          shield               = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.shield
+          acm                  = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.acm
         }
         "aws-load-balancer-controller" = {
           clusterName = dependency.eks_cluster.outputs.cluster_name
