@@ -22,7 +22,7 @@ Otherwise, ask the user to authenticate. Don't run [Authenticate with AWS](../..
 3. Commit and push. Match the existing style, a single-line `type(scope): summary` subject, no body.
 4. If `prek`'s hook fails for a reason unrelated to the change (missing local tooling, not a real lint or validation failure), commit with `-n` and tell the user about the gap.
 5. Apply, picking the branch that matches the goal:
-   - **Testing a specific unit**: from the stack directory, `terragrunt stack generate`, then apply that unit's dependencies first (in dependency-graph order, upstream to downstream), and only then `cd` into its `.terragrunt-stack/<unit>` directory and run `terragrunt apply`. A unit applied on its own without its dependencies already applied fails or plans against stale/mock state.
+   - **Testing a specific unit**: from the stack directory, `terragrunt stack generate`, then apply that unit's dependencies first (in dependency-graph order, upstream to downstream), and only then `cd` into its `.terragrunt-stack/<unit>` directory and run `terragrunt apply -auto-approve`. A unit applied on its own without its dependencies already applied fails or plans against stale/mock state.
    - **End-to-end goal**: follow the documented flow instead, from the stack directory: `terragrunt stack generate` then `terragrunt run --all apply --non-interactive --no-stack-generate` (see [Deploy a Dev EKS Cluster](../../README.md#deploy-a-dev-eks-cluster)). Terragrunt sequences the whole graph itself.
 6. Verify against the live AWS state (`aws ... describe`/`get`, or the console), not against the plan output.
 7. If verification fails, fix the source file and repeat from step 1.
@@ -35,5 +35,5 @@ Otherwise, ask the user to authenticate. Don't run [Authenticate with AWS](../..
 
 Only destroy when the user asks for it.
 
-- **Testing a specific unit**: `cd` into its `.terragrunt-stack/<unit>` directory and run `terragrunt destroy`. Destroy in reverse dependency order if you're tearing down more than one unit, downstream before upstream, or a downstream unit will fail against a dependency that's already gone.
+- **Testing a specific unit**: `cd` into its `.terragrunt-stack/<unit>` directory and run `terragrunt destroy -auto-approve`. Destroy in reverse dependency order if you're tearing down more than one unit, downstream before upstream, or a downstream unit will fail against a dependency that's already gone.
 - **End-to-end goal**: follow the documented flow instead, from the stack directory: read the caution notes in [Destroy the Infrastructure](../../README.md#destroy-the-infrastructure) first (public endpoint and Tailscale ordering matter there), then `terragrunt run --all destroy --non-interactive --no-stack-generate`.
