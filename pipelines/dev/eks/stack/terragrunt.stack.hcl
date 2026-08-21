@@ -833,7 +833,7 @@ unit "karpenter_node_pool_critical" {
         }
       ]
     }
-    limits_cpu = "16"
+    limits_cpu = "32"
     # Long enough for Loki/Prometheus/ArgoCD to shut down cleanly, short enough to bound how
     # long a blocking PDB can delay a drift-driven AMI/CVE patch.
     termination_grace_period = "30m"
