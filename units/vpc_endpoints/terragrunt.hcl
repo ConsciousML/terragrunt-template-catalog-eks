@@ -11,7 +11,7 @@ locals {
 }
 
 terraform {
-  source = "tfr:///terraform-aws-modules/vpc//modules/vpc-endpoints?version=${values.version}"
+  source = "tfr:///terraform-aws-modules/vpc/aws//modules/vpc-endpoints?version=${values.version}"
 }
 
 dependency "vpc" {
