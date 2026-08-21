@@ -266,6 +266,12 @@ inputs = {
           secretsmanager = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.secretsmanager
         }
       }
+      "network-policies-kube-system" = {
+        vpcEndpointCidrs = {
+          ec2 = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.ec2
+          sqs = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.sqs
+        }
+      }
       "loki" = {
         loki = {
           loki = {

@@ -86,6 +86,7 @@
       "Bash(source .env)"
     ],
     "ask": [
+      "Bash(rm -rf *)",
       "Bash(aws * create-*)",
       "Bash(aws * delete-*)",
       "Bash(aws * put-*)",
