@@ -55,7 +55,7 @@ Only inject values that trace back to a `dependency` block or a genuine Terrafor
 
 The one exception is when composing a value requires string interpolation shared across multiple appParams entries (Helm and YAML values files can't do that, only HCL locals can). See `local.kube_prometheus_stack_release` in the same `terragrunt.hcl` for an example.
 
-If the app wraps an upstream Helm chart with a subchart alias (e.g. `aws-lbc` depending on the `aws-load-balancer-controller` chart), nest the values one level under that subchart's name, same as the existing `aws-lbc` and `external-dns-*` entries.
+If the app wraps an upstream Helm chart with a subchart alias (e.g. `aws-lbc` depending on the `aws-load-balancer-controller` chart), nest the values one level under that subchart's name, same as the existing `aws-lbc` and `external-dns-*` entries. A value the chart's own `values.yaml` reads directly (not a subchart's), like `vpcEndpointCidrs` on `aws-lbc`, stays unnested at the top of that app's `appParams` entry instead.
 
 ### Reuse a Generic Chart or Author a New One
 
