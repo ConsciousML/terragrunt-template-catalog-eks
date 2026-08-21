@@ -178,6 +178,7 @@ dependency "vpc_endpoint_cidrs" {
       sts                  = ["10.2.0.15", "10.2.32.15", "10.2.64.15"]
       elasticloadbalancing = ["10.2.0.16", "10.2.32.16", "10.2.64.16"]
       sqs                  = ["10.2.0.17", "10.2.32.17", "10.2.64.17"]
+      iam                  = ["10.2.0.18", "10.2.32.18", "10.2.64.18"]
     }
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
@@ -270,6 +271,7 @@ inputs = {
         vpcEndpointCidrs = {
           ec2 = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.ec2
           sqs = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.sqs
+          iam = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.iam
         }
       }
       "loki" = {

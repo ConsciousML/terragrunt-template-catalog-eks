@@ -14,6 +14,7 @@ locals {
     sts                  = 15
     elasticloadbalancing = 16
     sqs                  = 17
+    iam                  = 18
   }
 
   # Consumer-side keys matching the vpcEndpointCidrs shape each CiliumNetworkPolicy
@@ -24,5 +25,6 @@ locals {
     ec2                  = "ec2"
     elasticloadbalancing = "elasticloadbalancing"
     sqs                  = "sqs"
+    iam                  = "iam"
   }
 }
