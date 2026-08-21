@@ -17,10 +17,23 @@ terraform {
 dependency "vpc" {
   config_path = "../vpc"
   mock_outputs = {
-    vpc_id                      = "mock-vpc-id"
-    private_subnets             = ["mock-subnet-1", "mock-subnet-2", "mock-subnet-3"]
-    private_subnets_cidr_blocks = ["10.2.0.0/19", "10.2.32.0/19", "10.2.64.0/19"]
-    private_route_table_ids     = ["mock-rt-1", "mock-rt-2", "mock-rt-3"]
+    vpc_id                  = "mock-vpc-id"
+    private_subnets         = ["mock-subnet-1", "mock-subnet-2", "mock-subnet-3"]
+    private_route_table_ids = ["mock-rt-1", "mock-rt-2", "mock-rt-3"]
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
+dependency "endpoint_cidrs" {
+  config_path = "../endpoint_cidrs"
+  mock_outputs = {
+    endpoint_ips = {
+      for svc in keys(local.endpoint_host_offsets) : svc => [
+        { subnet_id = "mock-subnet-1", ipv4 = "10.2.0.10" },
+        { subnet_id = "mock-subnet-2", ipv4 = "10.2.32.10" },
+        { subnet_id = "mock-subnet-3", ipv4 = "10.2.64.10" },
+      ]
+    }
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
@@ -31,14 +44,9 @@ inputs = {
   endpoints = merge(
     {
       for svc, offset in local.endpoint_host_offsets : svc => {
-        service    = svc
-        subnet_ids = dependency.vpc.outputs.private_subnets
-        subnet_configurations = [
-          for i, cidr in dependency.vpc.outputs.private_subnets_cidr_blocks : {
-            ipv4      = cidrhost(cidr, offset)
-            subnet_id = dependency.vpc.outputs.private_subnets[i]
-          }
-        ]
+        service               = svc
+        subnet_ids            = dependency.vpc.outputs.private_subnets
+        subnet_configurations = dependency.endpoint_cidrs.outputs.endpoint_ips[svc]
       }
     },
     {

@@ -14,8 +14,8 @@ locals {
     sqs                  = 17
   }
 
-  # Consumer-side keys matching the awsEndpointCidrs shape expected by the
-  # network-policies-aws-endpoints app in argocd-app-of-apps-template.
+  # Consumer-side keys matching the vpcEndpointCidrs shape each CiliumNetworkPolicy
+  # consumer expects in argocd-app-of-apps-template.
   app_param_key_map = {
     secretsmanager       = "secretsmanager"
     route53              = "route53"

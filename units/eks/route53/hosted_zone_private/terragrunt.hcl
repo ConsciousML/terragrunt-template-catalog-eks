@@ -13,7 +13,7 @@ terraform {
 }
 
 dependency "vpc" {
-  config_path = "../../../vpc"
+  config_path = "../../../vpc/vpc"
   mock_outputs = {
     vpc_id = "mock-vpc-id"
   }

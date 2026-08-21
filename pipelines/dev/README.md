@@ -27,7 +27,7 @@ Stacks in `pipelines/dev/` reference the catalog using relative paths:
 
 ```hcl
 unit "vpc" {
-  source = "${get_repo_root()}/units/vpc"
+  source = "${get_repo_root()}/units/vpc/vpc"
   ...
 }
 ```

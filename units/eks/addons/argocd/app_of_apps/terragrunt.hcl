@@ -39,11 +39,6 @@ locals {
   # (argocd-app-of-apps-template repo), which appParams has no path to set.
   kube_prometheus_stack_release = "kube-prometheus-stack"
 
-  # Same offsets and consumer-side keys the vpc_endpoints unit uses to pin each
-  # interface endpoint's ENI IP, see units/vpc_endpoints/README.md.
-  vpc_endpoints_hcl     = find_in_parent_folders("vpc_endpoints.hcl")
-  endpoint_host_offsets = read_terragrunt_config(local.vpc_endpoints_hcl).locals.endpoint_host_offsets
-  app_param_key_map     = read_terragrunt_config(local.vpc_endpoints_hcl).locals.app_param_key_map
 }
 
 dependency "route53_hosted_zone_public" {
@@ -71,7 +66,7 @@ dependency "acm_certificate" {
 }
 
 dependency "vpc" {
-  config_path = "../../../../vpc"
+  config_path = "../../../../vpc/vpc"
   mock_outputs = {
     vpc_id         = "mock-vpc-id"
     vpc_cidr_block = "10.0.0.0/16"
@@ -172,9 +167,20 @@ dependency "ebs_csi_driver_addon" {
   skip_outputs = true
 }
 
-dependency "vpc_endpoints" {
-  config_path  = "../../../../vpc_endpoints"
-  skip_outputs = true
+dependency "vpc_endpoint_cidrs" {
+  config_path = "../../../../vpc/endpoint_cidrs"
+  mock_outputs = {
+    vpc_endpoint_cidrs = {
+      secretsmanager       = ["10.2.0.10", "10.2.32.10", "10.2.64.10"]
+      route53              = ["10.2.0.11", "10.2.32.11", "10.2.64.11"]
+      ecrApi               = ["10.2.0.12", "10.2.32.12", "10.2.64.12"]
+      ec2                  = ["10.2.0.14", "10.2.32.14", "10.2.64.14"]
+      sts                  = ["10.2.0.15", "10.2.32.15", "10.2.64.15"]
+      elasticloadbalancing = ["10.2.0.16", "10.2.32.16", "10.2.64.16"]
+      sqs                  = ["10.2.0.17", "10.2.32.17", "10.2.64.17"]
+    }
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
 inputs = {
@@ -215,6 +221,10 @@ inputs = {
           clusterName = dependency.eks_cluster.outputs.cluster_name
           region      = local.region
           vpcId       = dependency.vpc.outputs.vpc_id
+          vpcEndpointCidrs = {
+            ec2                  = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.ec2
+            elasticloadbalancing = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.elasticloadbalancing
+          }
         }
       }
       "argocd-httproute" = {
@@ -235,6 +245,9 @@ inputs = {
           # The %%% is for escaping Terragrunt templates
           txtPrefix     = "%%%{record_type}-external-dns-private-${dependency.eks_cluster.outputs.cluster_name}."
           domainFilters = [dependency.route53_hosted_zone_private.outputs.domain_name]
+          vpcEndpointCidrs = {
+            route53 = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.route53
+          }
         }
       }
       "external-dns-public" = {
@@ -243,6 +256,14 @@ inputs = {
           # The %%% is for escaping Terragrunt templates
           txtPrefix     = "%%%{record_type}-external-dns-public-${dependency.eks_cluster.outputs.cluster_name}."
           domainFilters = [dependency.route53_hosted_zone_public.outputs.domain_name]
+          vpcEndpointCidrs = {
+            route53 = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.route53
+          }
+        }
+      }
+      "external-secrets-operator" = {
+        vpcEndpointCidrs = {
+          secretsmanager = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.secretsmanager
         }
       }
       "loki" = {
@@ -333,9 +354,6 @@ inputs = {
       }
       "hubble-ui-httproute" = {
         host = local.domain_private_hubble
-      }
-      "network-policies-aws-endpoints" = {
-        awsEndpointCidrs = dependency.vpc_endpoints.outputs.aws_endpoint_cidrs
       }
       "blackbox-exporter" = {
         "prometheus-blackbox-exporter" = {

@@ -103,8 +103,8 @@ locals {
 # --- VPC + EKS cluster ---
 
 unit "vpc" {
-  source = "${get_repo_root()}/units/vpc"
-  path   = "vpc"
+  source = "${get_repo_root()}/units/vpc/vpc"
+  path   = "vpc/vpc"
 
   values = {
     create_vpc = true
@@ -148,9 +148,14 @@ unit "vpc" {
   }
 }
 
+unit "vpc_endpoint_cidrs" {
+  source = "${get_repo_root()}/units/vpc/endpoint_cidrs"
+  path   = "vpc/endpoint_cidrs"
+}
+
 unit "vpc_endpoints" {
-  source = "${get_repo_root()}/units/vpc_endpoints"
-  path   = "vpc_endpoints"
+  source = "${get_repo_root()}/units/vpc/endpoints"
+  path   = "vpc/endpoints"
 
   values = {
     # Same source repo as the vpc unit (terraform-aws-modules/vpc), reuse its version pin.

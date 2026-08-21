@@ -30,7 +30,7 @@ See the [App of Apps integration guide](../../../../docs/app-of-apps-integration
 
 ### [App of Apps Unit](app_of_apps/)
 
-- **[`units/vpc`](../../../vpc/)**: reads `vpc_id` and `vpc_cidr_block` to configure `aws-lbc` and `tailscale-connector`
+- **[`units/vpc`](../../../vpc/vpc/)**: reads `vpc_id` and `vpc_cidr_block` to configure `aws-lbc` and `tailscale-connector`
 - **[`units/eks/addons/prometheus_stack`](../prometheus_stack/)**: reads the `grafana/aws_secret_password` and `alertmanager/aws_secret_slack_bot` secret names to configure `grafana-secrets` and `alertmanager-secrets`
 - **[`units/eks/addons/external_secrets_operator`](../external_secrets_operator/)**: depends on its IAM role so the ESO controller can read the admin password secret once deployed through app-of-apps
 - **[`units/eks/addons/aws_load_balancer_controller`](../aws_load_balancer_controller/)**: depends on its IAM role so the Pod Identity association exists before ArgoCD deploys the controller

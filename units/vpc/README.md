@@ -1,13 +1,9 @@
 # VPC
 
-Wraps the [terraform-aws-modules/vpc/aws](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) module to provision the VPC that hosts the EKS cluster. For the full list of AWS networking requirements see the [EKS VPC and subnet requirements](https://docs.aws.amazon.com/eks/latest/userguide/network-reqs.html).
+Provisions the VPC that hosts the EKS cluster and the AWS-service reachability that keeps cluster traffic off the NAT gateway.
 
-## Constraints
+## What's Inside
 
-The following inputs are required by EKS and must not be removed:
-
-- `enable_dns_hostnames` and `enable_dns_support` must be `true`. EKS node registration fails without them
-- Public subnets must carry `kubernetes.io/role/elb = 1` and private subnets `kubernetes.io/role/internal-elb = 1`. The AWS Load Balancer Controller uses these tags to discover subnets. Missing tags cause load balancer provisioning to fail silently
-- A NAT gateway on private subnets is required so nodes can reach ECR and other AWS services to pull images. Without it, node bootstrap stalls
-- Subnets must span at least two Availability Zones and each have at least 16 available IP addresses
-- The VPC CIDR must not overlap with other VPCs connected via Transit Gateway or VPC peering. CIDR conflicts cause unpredictable routing failures
+- **[vpc](vpc/)**: Wraps [terraform-aws-modules/vpc/aws](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) to create the VPC, subnets, and NAT gateway
+- **[endpoint_cidrs](endpoint_cidrs/)**: Pure computation, no AWS resources. Pins each interface VPC endpoint's ENI IP from a private subnet CIDR and a per-service host offset, single source of truth for both `endpoints` and consumers in `argocd-app-of-apps-template`
+- **[endpoints](endpoints/)**: Wraps [terraform-aws-modules/vpc//modules/vpc-endpoints](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest/submodules/vpc-endpoints) to provision the actual VPC endpoints, using the pinned IPs from `endpoint_cidrs`
