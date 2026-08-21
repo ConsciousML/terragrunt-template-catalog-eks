@@ -166,6 +166,22 @@ dependency "ebs_csi_driver_addon" {
   skip_outputs = true
 }
 
+dependency "vpc_endpoints" {
+  config_path = "../../../../vpc_endpoints"
+  mock_outputs = {
+    aws_endpoint_cidrs = {
+      secretsmanager       = "10.2.0.10"
+      route53              = "10.2.0.11"
+      ecrApi               = "10.2.0.12"
+      ec2                  = "10.2.0.14"
+      sts                  = "10.2.0.15"
+      elasticloadbalancing = "10.2.0.16"
+      sqs                  = "10.2.0.17"
+    }
+  }
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
 inputs = {
   cluster_name          = dependency.eks_cluster.outputs.cluster_name
   repo_url              = "https://github.com/${include.root.locals.github_owner_catalog}/${include.root.locals.github_repo_name_app_of_apps}"
@@ -322,6 +338,9 @@ inputs = {
       }
       "hubble-ui-httproute" = {
         host = local.domain_private_hubble
+      }
+      "network-policies-aws-endpoints" = {
+        awsEndpointCidrs = dependency.vpc_endpoints.outputs.aws_endpoint_cidrs
       }
       "blackbox-exporter" = {
         "prometheus-blackbox-exporter" = {
