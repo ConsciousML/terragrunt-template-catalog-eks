@@ -10,15 +10,17 @@ locals {
   vpc_endpoints_hcl     = find_in_parent_folders("vpc_endpoints.hcl")
   endpoint_host_offsets = read_terragrunt_config(local.vpc_endpoints_hcl).locals.endpoint_host_offsets
 
-  # route53's VPC endpoint service is published as the global "com.amazonaws.route53"
-  # (no region segment), unlike every other service here. The module requires
-  # service_endpoint to be set explicitly whenever region is (per its own variable
+  # route53 and iam's VPC endpoint services are published as global names ("com.amazonaws.route53",
+  # "com.amazonaws.iam", no region segment), unlike every other service here. The module
+  # requires service_endpoint to be set explicitly whenever region is (per its own variable
   # description), so compute it ourselves for every service instead of relying on its
   # data source lookup.
+  global_services = ["route53", "iam"]
+
   service_endpoints = merge(
     {
       for svc in keys(local.endpoint_host_offsets) : svc =>
-      svc == "route53" ? "com.amazonaws.route53" : "com.amazonaws.${local.region}.${svc}"
+      contains(local.global_services, svc) ? "com.amazonaws.${svc}" : "com.amazonaws.${local.region}.${svc}"
     },
     { s3 = "com.amazonaws.${local.region}.s3" }
   )
