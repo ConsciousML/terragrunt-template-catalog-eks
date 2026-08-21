@@ -41,6 +41,13 @@ dependency "endpoint_cidrs" {
 inputs = {
   vpc_id = dependency.vpc.outputs.vpc_id
 
+  # root.hcl injects region into every unit's inputs by default. This module also
+  # declares its own "region" variable, but for cross-region endpoint overrides: a
+  # non-null value disables its service-name data source lookup entirely, breaking
+  # service_name resolution for every endpoint here. Override the global default back
+  # to null.
+  region = null
+
   endpoints = merge(
     {
       for svc, offset in local.endpoint_host_offsets : svc => {
