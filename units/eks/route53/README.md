@@ -16,4 +16,4 @@ Provisions the DNS infrastructure and TLS certificate for the EKS cluster: a pub
 ## Upstream Dependencies
 
 - **[`pipelines/bootstrap/setup_dns`](../../../pipelines/bootstrap/setup_dns/)**: creates the public hosted zone once and outputs NS records to delegate at the registrar. Must run before the EKS stack
-- **[`units/vpc`](../../vpc/)**: `hosted_zone_private` depends on the VPC ID to associate the private zone with the VPC
+- **[`units/vpc`](../../vpc/vpc/)**: `hosted_zone_private` depends on the VPC ID to associate the private zone with the VPC

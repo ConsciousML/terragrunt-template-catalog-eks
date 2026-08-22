@@ -8,7 +8,7 @@ terraform {
 }
 
 dependency "vpc" {
-  config_path = "../../../../../vpc"
+  config_path = "../../../../../vpc/vpc"
   mock_outputs = {
     vpc_cidr_block = "10.0.0.0/16"
   }

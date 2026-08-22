@@ -103,8 +103,8 @@ locals {
 # --- VPC + EKS cluster ---
 
 unit "vpc" {
-  source = "${get_repo_root()}/units/vpc"
-  path   = "vpc"
+  source = "${get_repo_root()}/units/vpc/vpc"
+  path   = "vpc/vpc"
 
   values = {
     create_vpc = true
@@ -145,6 +145,21 @@ unit "vpc" {
       # Tag for Karpenter to discover the private subnet
       "karpenter.sh/discovery" = local.cluster_name_full
     }
+  }
+}
+
+unit "vpc_endpoint_cidrs" {
+  source = "${get_repo_root()}/units/vpc/endpoint_cidrs"
+  path   = "vpc/endpoint_cidrs"
+}
+
+unit "vpc_endpoints" {
+  source = "${get_repo_root()}/units/vpc/endpoints"
+  path   = "vpc/endpoints"
+
+  values = {
+    # Same source repo as the vpc unit (terraform-aws-modules/vpc), reuse its version pin.
+    version = local.version_vpc
   }
 }
 
@@ -818,7 +833,7 @@ unit "karpenter_node_pool_critical" {
         }
       ]
     }
-    limits_cpu = "16"
+    limits_cpu = "32"
     # Long enough for Loki/Prometheus/ArgoCD to shut down cleanly, short enough to bound how
     # long a blocking PDB can delay a drift-driven AMI/CVE patch.
     termination_grace_period = "30m"
