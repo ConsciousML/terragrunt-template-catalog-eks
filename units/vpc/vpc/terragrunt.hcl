@@ -30,8 +30,8 @@ inputs = {
   public_subnets  = values.public_subnets
 
   enable_nat_gateway     = values.enable_nat_gateway
-  single_nat_gateway     = values.single_nat_gateway
-  one_nat_gateway_per_az = values.one_nat_gateway_per_az
+  single_nat_gateway     = try(values.single_nat_gateway, false)
+  one_nat_gateway_per_az = try(values.one_nat_gateway_per_az, false)
 
   enable_dns_hostnames = values.enable_dns_hostnames
   enable_dns_support   = values.enable_dns_support
