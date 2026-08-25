@@ -13,8 +13,8 @@ terraform {
   source = "tfr:///terraform-aws-modules/eks/aws?version=${values.version}"
 }
 
-# If your stack uses fck-nat, add an ordering-only `dependency "fck_nat"` via `autoinclude` on
-# this unit. Example: pipelines/dev/eks/stack/terragrunt.stack.hcl.
+# DEV: if your stack uses fck-nat, add an ordering-only `dependency "fck_nat"` via `autoinclude`
+# on this unit. Example: pipelines/dev/eks/stack/terragrunt.stack.hcl.
 
 dependency "vpc" {
   config_path = "../../vpc/vpc"
