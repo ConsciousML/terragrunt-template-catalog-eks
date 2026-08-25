@@ -11,8 +11,7 @@ The dev directory uses the same configuration pattern as the live template:
 - [`root.hcl`](../root.hcl): S3 backend and AWS provider inherited by all units
 - [`region.hcl`](../region.hcl): AWS region for all resources
 - [`dns.hcl`](../dns.hcl): Base domain and per-app subdomains for private and public applications, used for Route53 and ACM
-- [`network.hcl`](../network.hcl): VPC CIDR blocks
-- [`vpc_endpoints.hcl`](../vpc_endpoints.hcl): per-service host offsets for pinned VPC interface endpoint IPs, and the app-param key each maps to for `CiliumNetworkPolicy` consumers
+- [`network.hcl`](../network.hcl): VPC name and CIDR blocks, per-service host offsets for pinned VPC interface endpoint IPs, and the app-param key each maps to for `CiliumNetworkPolicy` consumers
 - [`github.hcl`](../github.hcl): GitHub owner, catalog repository name, and app-of-apps repository name for module sources
 - [`version.hcl`](../version.hcl): Resolves the current git branch used as `?ref=` in all module sources
 - [`environment.hcl`](environment.hcl): Environment name (e.g., `dev`) used for resource naming and state isolation

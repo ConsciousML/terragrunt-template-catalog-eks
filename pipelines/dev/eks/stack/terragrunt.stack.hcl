@@ -115,8 +115,6 @@ unit "vpc" {
     create_vpc = true
     version    = local.version_vpc
 
-    name = "vpc-eks"
-
     # For production, use at least 2 subnets
     private_subnets = local.private_subnets
     public_subnets  = local.public_subnets

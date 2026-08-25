@@ -5,6 +5,25 @@ include "root" {
 
 locals {
   environment = include.root.locals.environment
+
+  vpc_full_name = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_full_name
+
+  # The fck-nat module's data "aws_vpc" "main" does a real AWS lookup on var.vpc_id, unlike
+  # most units it can't tolerate a mocked dependency. Skip plan/validate until the VPC unit
+  # has actually been applied, same pattern as provider_k8s_base.hcl's cluster_exists check.
+  vpc_exists = run_cmd("--terragrunt-quiet", "sh", "-c", <<-EOT
+    output=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=${local.vpc_full_name}" --query 'Vpcs[0].VpcId' --output text 2>&1)
+    aws_exit_code=$?
+    if [ $aws_exit_code -ne 0 ]; then
+      echo "$output" >&2
+      exit 1
+    elif [ "$output" = "None" ]; then
+      echo false
+    else
+      echo true
+    fi
+  EOT
+  )
 }
 
 terraform {
@@ -19,6 +38,11 @@ dependency "vpc" {
     private_route_table_ids = ["mock-rt-1", "mock-rt-2", "mock-rt-3"]
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
+exclude {
+  if      = !local.vpc_exists
+  actions = ["init", "validate", "plan", "destroy"]
 }
 
 inputs = {

@@ -7,8 +7,8 @@ locals {
   environment = include.root.locals.environment
   region      = include.root.locals.aws_region
 
-  vpc_endpoints_hcl     = find_in_parent_folders("vpc_endpoints.hcl")
-  endpoint_host_offsets = read_terragrunt_config(local.vpc_endpoints_hcl).locals.endpoint_host_offsets
+  network_hcl           = find_in_parent_folders("network.hcl")
+  endpoint_host_offsets = read_terragrunt_config(local.network_hcl).locals.endpoint_host_offsets
 
   # route53 and iam's VPC endpoint services are published as global names ("com.amazonaws.route53",
   # "com.amazonaws.iam", no region segment), unlike every other service here. The module

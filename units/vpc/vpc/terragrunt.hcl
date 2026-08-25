@@ -11,7 +11,10 @@ locals {
   region        = local.region_locals.region
   azs           = local.region_locals.azs
 
-  vpc_cidr = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_cidrs[local.environment]
+  network_hcl    = find_in_parent_folders("network.hcl")
+  network_locals = read_terragrunt_config(local.network_hcl).locals
+  vpc_cidr       = local.network_locals.vpc_cidrs[local.environment]
+  vpc_full_name  = local.network_locals.vpc_full_name
 }
 
 terraform {
@@ -21,7 +24,7 @@ terraform {
 inputs = {
   create_vpc = values.create_vpc
 
-  name = "${values.name}-${local.environment}"
+  name = local.vpc_full_name
 
   cidr = local.vpc_cidr
   azs  = local.azs
