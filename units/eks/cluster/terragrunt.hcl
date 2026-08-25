@@ -13,21 +13,15 @@ terraform {
   source = "tfr:///terraform-aws-modules/eks/aws?version=${values.version}"
 }
 
+# DEV: if your stack uses fck-nat, add an ordering-only `dependency "fck_nat"` via `autoinclude`
+# on this unit. Example: pipelines/dev/eks/stack/terragrunt.stack.hcl.
+
 dependency "vpc" {
   config_path = "../../vpc/vpc"
   mock_outputs = {
     vpc_id          = "mock_vpc_id"
     private_subnets = ["mock_subnet_id_1", "mock_subnet_id_2"]
   }
-  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
-}
-
-# Ordering-only dependency: the cluster needs fck-nat's route-table updates in place before
-# nodes/pods that require internet egress come up, and fck-nat must not be destroyed while
-# the cluster is still relying on it.
-dependency "fck_nat" {
-  config_path                             = "../fck_nat"
-  mock_outputs                            = {}
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 

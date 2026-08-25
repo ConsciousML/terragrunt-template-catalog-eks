@@ -181,6 +181,16 @@ unit "cluster" {
   source = "${get_repo_root()}/units/eks/cluster"
   path   = "eks/cluster"
 
+  # DEV: ordering-only, cluster needs fck-nat's route table before nodes/pods need egress, and
+  # fck-nat mustn't be destroyed while the cluster depends on it. Stack-scoped, staging/prod
+  # don't provision fck_nat.
+  autoinclude {
+    dependency "fck_nat" {
+      config_path  = unit.fck_nat.path
+      skip_outputs = true
+    }
+  }
+
   values = {
     version = local.version_cluster
 
