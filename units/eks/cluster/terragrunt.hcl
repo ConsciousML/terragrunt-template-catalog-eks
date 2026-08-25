@@ -22,6 +22,15 @@ dependency "vpc" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
+# Ordering-only dependency: the cluster needs fck-nat's route-table updates in place before
+# nodes/pods that require internet egress come up, and fck-nat must not be destroyed while
+# the cluster is still relying on it.
+dependency "fck_nat" {
+  config_path                             = "../../vpc/fck_nat"
+  mock_outputs                            = {}
+  mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
+}
+
 inputs = {
   name = local.cluster_name_full
 
