@@ -1,9 +1,4 @@
 locals {
-  environment = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
-
-  vpc_name      = "vpc-eks"
-  vpc_full_name = "${local.vpc_name}-${local.environment}"
-
   vpc_cidrs = {
     prod           = "10.0.0.0/16"
     staging        = "10.1.0.0/16"

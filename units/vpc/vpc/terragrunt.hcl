@@ -11,10 +11,11 @@ locals {
   region        = local.region_locals.region
   azs           = local.region_locals.azs
 
-  network_hcl    = find_in_parent_folders("network.hcl")
-  network_locals = read_terragrunt_config(local.network_hcl).locals
-  vpc_cidr       = local.network_locals.vpc_cidrs[local.environment]
-  vpc_full_name  = local.network_locals.vpc_full_name
+  network_hcl = find_in_parent_folders("network.hcl")
+  vpc_cidr    = read_terragrunt_config(local.network_hcl).locals.vpc_cidrs[local.environment]
+
+  vpc_hcl       = find_in_parent_folders("vpc.hcl")
+  vpc_full_name = read_terragrunt_config(local.vpc_hcl).locals.vpc_full_name
 }
 
 terraform {

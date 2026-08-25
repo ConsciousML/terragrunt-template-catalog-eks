@@ -6,7 +6,7 @@ include "root" {
 locals {
   environment = include.root.locals.environment
 
-  vpc_full_name = read_terragrunt_config(find_in_parent_folders("network.hcl")).locals.vpc_full_name
+  vpc_full_name = read_terragrunt_config(find_in_parent_folders("vpc.hcl")).locals.vpc_full_name
 
   # The fck-nat module's data "aws_vpc" "main" does a real AWS lookup on var.vpc_id, unlike
   # most units it can't tolerate a mocked dependency. Skip plan/validate until the VPC unit
