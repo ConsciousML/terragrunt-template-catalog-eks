@@ -33,6 +33,7 @@ This stack is instantiated in:
 ## What's Inside
 
 - **[cluster](cluster/)**: EKS control plane and managed node groups
+- **[fck_nat](fck_nat/)**: Wraps [RaJiska/fck-nat/aws](https://registry.terraform.io/modules/RaJiska/fck-nat/aws/latest) to provide outbound NAT for the private subnets, a cheaper self-managed alternative to an AWS NAT Gateway
 - **[route53](route53/README.md)**: public and private hosted zones and wildcard ACM certificate
 - **[addons/ebs_csi_driver](addons/ebs_csi_driver/README.md)**: EKS managed addon providing `PersistentVolumeClaim` provisioning backed by EBS volumes
 - **[addons/prometheus_stack](addons/prometheus_stack/README.md)**: cluster and workload metrics via Prometheus, Alertmanager, and Grafana

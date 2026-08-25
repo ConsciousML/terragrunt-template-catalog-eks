@@ -26,7 +26,7 @@ dependency "vpc" {
 # nodes/pods that require internet egress come up, and fck-nat must not be destroyed while
 # the cluster is still relying on it.
 dependency "fck_nat" {
-  config_path                             = "../../vpc/fck_nat"
+  config_path                             = "../fck_nat"
   mock_outputs                            = {}
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }

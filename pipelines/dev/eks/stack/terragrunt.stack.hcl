@@ -156,8 +156,8 @@ unit "vpc" {
 # DEV: fck-nat, a self-managed NAT instance, is much cheaper than an AWS NAT Gateway but
 # lacks its managed HA, prod should use the AWS NAT Gateway instead of this unit.
 unit "fck_nat" {
-  source = "${get_repo_root()}/units/vpc/fck_nat"
-  path   = "vpc/fck_nat"
+  source = "${get_repo_root()}/units/eks/fck_nat"
+  path   = "eks/fck_nat"
 
   values = {
     version = local.version_fck_nat
