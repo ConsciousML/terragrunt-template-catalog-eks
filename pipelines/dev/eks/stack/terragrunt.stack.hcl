@@ -5,7 +5,9 @@ locals {
   version_cluster = "21.15.1"
 
   # Point to your dev branch of app-of-apps when developing
-  app_of_apps_target_revision = "refs/heads/main"
+  #app_of_apps_target_revision = "refs/heads/main"
+  # TEMP:
+  app_of_apps_target_revision = "refs/heads/hpa-podinfo"
 
   # Keep in sync with the aws-load-balancer-controller chart dependency version pinned in
   # the app-of-apps repo's aws-load-balancer-controller/Chart.yaml
