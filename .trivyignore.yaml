@@ -22,3 +22,12 @@ misconfigurations:
       terraform-aws-modules/eks default: worker nodes need broad outbound access to reach
       ECR, the EKS/AWS APIs, and container registries. Restricting it would require VPC
       endpoints for every external destination nodes talk to.
+
+  - id: AWS-0104
+    paths:
+      - "main.tf"
+    statement: >
+      RaJiska/fck-nat/aws default: this is egress, not ingress. The security group's ingress
+      is already scoped to the VPC CIDR only, no SSH. A NAT instance proxies outbound traffic
+      for every host in the private subnets to whatever destination they reach, so
+      unrestricted egress is required by design.

@@ -1,7 +1,12 @@
 locals {
   version         = read_terragrunt_config(find_in_parent_folders("version.hcl")).locals.version
   version_vpc     = "6.6.0"
+  version_fck_nat = "1.6.1"
   version_cluster = "21.15.1"
+
+  # Point to your dev branch of app-of-apps when developing
+  app_of_apps_target_revision = "refs/heads/main"
+
   # Keep in sync with the aws-load-balancer-controller chart dependency version pinned in
   # the app-of-apps repo's aws-load-balancer-controller/Chart.yaml
   version_aws_lbc        = "3.2.1"
@@ -110,15 +115,13 @@ unit "vpc" {
     create_vpc = true
     version    = local.version_vpc
 
-    name = "vpc-eks"
-
     # For production, use at least 2 subnets
     private_subnets = local.private_subnets
     public_subnets  = local.public_subnets
 
-    enable_nat_gateway     = true
-    single_nat_gateway     = true
-    one_nat_gateway_per_az = false
+    # DEV: fck-nat replaces the AWS NAT Gateway below, cheaper but single-instance,
+    # prod should keep enable_nat_gateway = true.
+    enable_nat_gateway = false
 
     enable_dns_hostnames = true
     enable_dns_support   = true
@@ -145,6 +148,17 @@ unit "vpc" {
       # Tag for Karpenter to discover the private subnet
       "karpenter.sh/discovery" = local.cluster_name_full
     }
+  }
+}
+
+# DEV: fck-nat, a self-managed NAT instance, is much cheaper than an AWS NAT Gateway but
+# lacks its managed HA, prod should use the AWS NAT Gateway instead of this unit.
+unit "fck_nat" {
+  source = "${get_repo_root()}/units/eks/fck_nat"
+  path   = "eks/fck_nat"
+
+  values = {
+    version = local.version_fck_nat
   }
 }
 
@@ -631,7 +645,7 @@ unit "argocd_app_of_apps" {
     namespace = "argocd"
     path      = "apps"
     # Fully qualified git ref: resolves directly instead of scanning all branches/tags.
-    target_revision       = "refs/heads/main"
+    target_revision       = local.app_of_apps_target_revision
     project               = "default"
     destination_namespace = "argocd"
     destination_server    = "https://kubernetes.default.svc"

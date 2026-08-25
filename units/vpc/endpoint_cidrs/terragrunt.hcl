@@ -4,9 +4,10 @@ include "root" {
 }
 
 locals {
-  vpc_endpoints_hcl     = find_in_parent_folders("vpc_endpoints.hcl")
-  endpoint_host_offsets = read_terragrunt_config(local.vpc_endpoints_hcl).locals.endpoint_host_offsets
-  app_param_key_map     = read_terragrunt_config(local.vpc_endpoints_hcl).locals.app_param_key_map
+  network_hcl           = find_in_parent_folders("network.hcl")
+  network_locals        = read_terragrunt_config(local.network_hcl).locals
+  endpoint_host_offsets = local.network_locals.endpoint_host_offsets
+  app_param_key_map     = local.network_locals.app_param_key_map
 }
 
 terraform {
