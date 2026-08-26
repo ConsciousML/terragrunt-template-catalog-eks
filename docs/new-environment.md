@@ -62,9 +62,12 @@ Update `pipelines/dev-2/environment.hcl`:
 
 ```hcl
 locals {
-  environment = get_env("TG_ENVIRONMENT", "dev-2")
+  environment       = get_env("TG_ENVIRONMENT", "dev-2")
+  environment_alias = get_env("TG_ENVIRONMENT_ALIAS", "dev-2")
 }
 ```
+
+If `dev-2` should reuse `dev`'s Helm value overlays instead of getting its own, set `environment_alias`'s default to `"dev"`.
 
 ### Deploy the EKS Stack
 
