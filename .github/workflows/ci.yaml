@@ -15,8 +15,10 @@ permissions:
 env:
   # The relative path of the directory containing the Terragrunt Stack to test during code quality checks
   TG_STACK_PATH: pipelines/dev/eks/stack
-  # Isolates CI state from local runs — uses a dedicated S3 bucket (tofu-state-{account_id}-catalog-eks-ci)
+  # Isolates CI state from local runs, uses a dedicated S3 bucket (tofu-state-{account_id}-catalog-eks-ci)
   TG_ENVIRONMENT: catalog-eks-ci
+  # Aliases CI onto dev's Helm value overlays (global.environment), CI has no overlays of its own
+  TG_ENVIRONMENT_ALIAS: dev
 
 
 jobs:
