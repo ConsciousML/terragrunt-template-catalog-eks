@@ -21,7 +21,7 @@ For work you can hand off unattended once a specific test proves the goal is met
 - Run [`/goal`](https://code.claude.com/docs/en/goal.md) and define a specific, checkable test as the completion condition, for example a command exiting 0 or a resource reaching a given state.
 - Run [`/loop`](https://code.claude.com/docs/en/scheduled-tasks.md) with specific instructions on how to reach the goal.
 
-**Note:** if the goal requires changing the live EKS cluster, feed `/loop` the GitOps loop in [`working_against_live_cluster.md`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/docs/agents/working_against_live_cluster.md) (`argocd-app-of-apps-template`) as its starting instructions. It covers editing, committing, syncing the affected ArgoCD app, and verifying against live cluster state instead of a rendered manifest.
+**Note:** if the goal requires changing the live EKS cluster, feed `/loop` the [`working-against-live-cluster`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/.claude/skills/working-against-live-cluster/SKILL.md) skill (`argocd-app-of-apps-template`) as its starting instructions. It covers editing, committing, syncing the affected ArgoCD app, and verifying against live cluster state instead of a rendered manifest.
 
 **Use when:** the desired end state is easy to check mechanically but tedious to babysit step by step.
 

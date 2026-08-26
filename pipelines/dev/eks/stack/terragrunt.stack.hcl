@@ -9,7 +9,8 @@ locals {
 
   # Keep in sync with the aws-load-balancer-controller chart dependency version pinned in
   # the app-of-apps repo's aws-load-balancer-controller/Chart.yaml
-  version_aws_lbc        = "3.2.1"
+  version_aws_lbc = "3.2.1"
+
   version_argocd         = "9.5.0"
   version_argocd_apps    = "2.0.5"
   version_karpenter_iam  = "21.24.0"
