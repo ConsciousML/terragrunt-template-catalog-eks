@@ -234,10 +234,9 @@ inputs = {
           acm                  = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.acm
         }
         "aws-load-balancer-controller" = {
-          # TEMP: nested-field typo to test app of apps contract
-          clusterNam = dependency.eks_cluster.outputs.cluster_name
-          region     = local.region
-          vpcId      = dependency.vpc.outputs.vpc_id
+          clusterName = dependency.eks_cluster.outputs.cluster_name
+          region      = local.region
+          vpcId       = dependency.vpc.outputs.vpc_id
         }
       }
       "argocd-httproute" = {
