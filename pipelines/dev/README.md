@@ -14,7 +14,7 @@ The dev directory uses the same configuration pattern as the live template:
 - [`network.hcl`](../network.hcl): VPC CIDR blocks, per-service host offsets for pinned VPC interface endpoint IPs, and the app-param key each maps to for `CiliumNetworkPolicy` consumers
 - [`github.hcl`](../github.hcl): GitHub owner, catalog repository name, and app-of-apps repository name for module sources
 - [`version.hcl`](../version.hcl): Resolves the current git branch used as `?ref=` in all module sources
-- [`environment.hcl`](environment.hcl): Environment name (e.g., `dev`) used for resource naming and state isolation
+- [`environment.hcl`](environment.hcl): Environment name (e.g., `dev`) used for resource naming and state isolation, and the alias exposed to Helm as `global.environment`
 - [`cluster_name.hcl`](cluster_name.hcl): EKS cluster name
 - [`provider_k8s_base.hcl`](provider_k8s_base.hcl): `aws_eks_cluster` and `aws_eks_cluster_auth` data sources shared by other providers, and skips units when the cluster doesn't exist yet
 - [`provider_helm.hcl`](provider_helm.hcl): Helm provider configuration sourced from the EKS cluster output

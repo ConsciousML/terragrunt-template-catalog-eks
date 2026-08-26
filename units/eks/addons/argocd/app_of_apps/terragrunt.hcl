@@ -215,6 +215,11 @@ inputs = {
         }
       }
     }
+    # Injects the environment name so applications.yaml can pick up each app's
+    # values-{environment}.yaml overlay when one exists.
+    global = {
+      environment = include.root.locals.environment_alias
+    }
     appParams = {
       "podinfo-httproute" = {
         host = local.domain_public_podinfo

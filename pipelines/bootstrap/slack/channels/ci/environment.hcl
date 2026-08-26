@@ -1,3 +1,4 @@
 locals {
-  environment = "catalog-eks-ci"
+  environment       = "catalog-eks-ci"
+  environment_alias = "dev"
 }
