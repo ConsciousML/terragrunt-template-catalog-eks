@@ -98,7 +98,7 @@
 
       "Bash(source .env)",
 
-      "Write(~/.claude/plans/**)"
+      "Edit(~/.claude/plans/**)"
     ],
     "ask": [
       "Bash(rm -rf *)",
