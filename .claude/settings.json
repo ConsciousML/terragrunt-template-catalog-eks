@@ -195,22 +195,14 @@
       "Read(../argocd-app-of-apps-template/.git/**)",
       "Edit(../argocd-app-of-apps-template/.git/**)",
 
-
       "Edit(../argocd-app-of-apps-template/.claude/**)",
       "Edit(CLAUDE.md)",
-      "Write(CLAUDE.md)",
       "Edit(.claude/settings.json)",
       "Edit(.claude/settings.local.json)",
-      "Write(.claude/settings.json)",
-      "Write(.claude/settings.local.json)",
       "Edit(~/.claude/settings.json)",
       "Edit(~/.claude/settings.local.json)",
-      "Write(~/.claude/settings.json)",
-      "Write(~/.claude/settings.local.json)",
       "Edit(~/.claude/CLAUDE.md)",
-      "Write(~/.claude/CLAUDE.md)",
-      "Edit(~/.claude/hooks/**)",
-      "Write(~/.claude/hooks/**)"
+      "Edit(~/.claude/hooks/**)"
     ]
   }
 }
