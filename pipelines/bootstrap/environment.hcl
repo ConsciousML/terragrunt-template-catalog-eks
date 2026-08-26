@@ -3,5 +3,5 @@
 # as well as some resource variables to avoid collision
 locals {
   environment       = "bootstrap-catalog-eks"
-  environment_alias = local.environment
+  environment_alias = "dev"
 }
