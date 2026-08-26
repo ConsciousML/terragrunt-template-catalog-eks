@@ -216,7 +216,9 @@ inputs = {
       }
     }
     appParams = {
-      "podinfo-httproute" = {
+      # TEMP: introducing a typo to test app of apps contract
+      #"podinfo-httproute" = {
+      "podinfo-httproute-aas" = {
         host = local.domain_public_podinfo
       }
       "gateway-public" = {
