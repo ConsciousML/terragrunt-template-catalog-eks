@@ -80,20 +80,11 @@
         - `app-of-apps-integration.md`: threading Terraform values into app-of-apps
         - `ai-assisted-workflows.md`: manual, permissive, and QRSPI-driven autonomous modes for
           Claude Code in this repo
-        - `how-to-write-docs.md`: see &lt;documentation&gt;
-        - `agents/working_against_live_infra.md`: loop for changes that must take effect on
-          live AWS infra
 
         Every other README (per-unit, per-module, per-addon-group, here and in
         `argocd-app-of-apps-template`) is reached via links from the docs above. This map
         indexes entry points, not every file.
     </documentation_map>
-
-    <documentation>
-        Read `docs/how-to-write-docs.md` before writing or editing any doc or inline comments
-        Most important rule: Write the fewest characters possible while keeping it readable
-        and not losing useful information.
-    </documentation>
 
     <instructions>
         Read the files the user points to first, then judge if you have enough context to act.
