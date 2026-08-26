@@ -2,5 +2,6 @@
 # The env name will prefix the GCS bucket name storing the tfstates
 # as well as some resource variables to avoid collision
 locals {
-  environment = "bootstrap-catalog-eks"
+  environment       = "bootstrap-catalog-eks"
+  environment_alias = local.environment
 }
