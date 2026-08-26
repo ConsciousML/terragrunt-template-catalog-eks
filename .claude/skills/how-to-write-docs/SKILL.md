@@ -4,7 +4,7 @@ description: Rules for writing or editing Markdown docs or inline code comments 
 ---
 
 If documenting `argocd-app-of-apps-template`, also read its
-[`docs/how-to-write-docs.md`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/docs/how-to-write-docs.md)
+[`how-to-write-docs` skill](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/.claude/skills/how-to-write-docs/SKILL.md)
 for rules specific to that repo.
 
 ## Source of Truth
