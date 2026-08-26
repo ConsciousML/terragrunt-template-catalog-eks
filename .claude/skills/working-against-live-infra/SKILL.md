@@ -23,22 +23,19 @@ any SSO login are interactive and may touch credentials you shouldn't handle.
 
 1. Run `source .env` from the repo root. Stack generation reads required vars (e.g.
    `SLACK_BOT_TOKEN`) via `get_env`, and fails without them.
-2. Edit the source file(s) under `units/` or `pipelines/`. Never edit, copy over, or otherwise
-   hand-patch a file under `.terragrunt-stack/`, that directory is generated output, not a place
-   to fix things by hand even as a shortcut. `terragrunt stack generate` is the only way to
-   refresh it from source, run it, don't work around it.
-   Prefer plain `terragrunt stack generate` over `terragrunt stack clean`. `stack generate` alone
-   picks up source changes and is usually enough, check its output confirms the unit as up to
-   date before reaching for `clean`. `clean` also wipes `.terragrunt-cache`, so the next apply
-   re-downloads and re-inits every module in the stack, slow across the whole infra. Reach for it
-   only when `generate` isn't picking up a change, not as a first move. Same rule against
-   hand-editing applies here too, `rm -rf` on the cache yourself instead of `clean` is still
-   working around Terragrunt.
+2. Edit the source file(s) under `units/` or `pipelines/`. `.terragrunt-stack/` is generated
+   output, treat it as read-only, step 5 regenerates it from source.
 3. Commit and push. Match the existing style, a single-line `type(scope): summary` subject, no
    body.
 4. If `prek`'s hook fails for a reason unrelated to the change (missing local tooling, not a real
    lint or validation failure), commit with `-n` and tell the user about the gap.
-5. Apply, picking the branch that matches the goal:
+5. Regenerate and apply, picking the branch that matches the goal.
+   Prefer plain `terragrunt stack generate` over `terragrunt stack clean`. `stack generate` alone
+   picks up source changes and is usually enough, check its output confirms the unit as up to
+   date before reaching for `clean`. `clean` also wipes `.terragrunt-cache`, so the next apply
+   re-downloads and re-inits every module in the stack, slow across the whole infra. Reach for it
+   only when `generate` isn't picking up a change, not as a first move. `rm -rf` on the cache
+   yourself instead of `clean` is still working around Terragrunt, use `clean` for that case.
    - **Testing a specific unit**: from the stack directory, `terragrunt stack generate`, then
      apply that unit's dependencies first (in dependency-graph order, upstream to downstream), and
      only then `cd` into its `.terragrunt-stack/<unit>` directory and run
