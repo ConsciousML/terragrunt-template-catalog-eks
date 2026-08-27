@@ -73,9 +73,9 @@ export AWS_REGION=<your-region>   # e.g. us-east-1
 
 ## `EKS_LOCAL_ADMIN_ARN`
 
-**Required by**: `live/prod/eks/terragrunt.stack.hcl` and `.github/workflows/` in the [live repository](https://github.com/ConsciousML/terragrunt-template-live-eks), not by anything in this catalog repo
+**Required by**: `live/staging/eks/terragrunt.stack.hcl`, `live/prod/eks/terragrunt.stack.hcl`, and `.github/workflows/` in the [live repository](https://github.com/ConsciousML/terragrunt-template-live-eks), not by anything in this catalog repo
 
-The ARN of the local IAM identity registered as a cluster admin so it can run operations locally against prod (e.g. `terragrunt destroy`). This catalog only provides the unit that produces it ([`units/github/secrets/eks_local_admin`](../units/github/README.md)). The live repo consumes it.
+The ARN of the local IAM identity registered as a cluster admin so it can run operations locally against staging or prod (e.g. `terragrunt destroy`) when CI deployed the cluster and can't finish tearing it down itself. This catalog only provides the unit that produces it ([`units/github/secrets/eks_local_admin`](../units/github/README.md)). The live repo consumes it.
 
 This variable is set automatically by the bootstrap pipeline, which captures the identity of whoever runs it and stores it as a GitHub Actions secret. No manual configuration is needed.
 
