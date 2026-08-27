@@ -166,6 +166,10 @@ unit "fck_nat" {
 unit "vpc_endpoint_cidrs" {
   source = "${get_repo_root()}/units/vpc/endpoint_cidrs"
   path   = "vpc/endpoint_cidrs"
+
+  values = {
+    version = local.version
+  }
 }
 
 unit "vpc_endpoints" {
