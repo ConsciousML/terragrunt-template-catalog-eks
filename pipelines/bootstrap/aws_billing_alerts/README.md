@@ -9,6 +9,8 @@ Deploys the [`billing_budgets`](../../../stacks/billing_budgets/) and [`billing_
 
 Run this **once per AWS account** to get visibility into unexpected spend before it grows into a large bill.
 
+**Warning**: only instantiate this in the catalog repo, not in a live repo. It's scoped to the AWS account, not to a repo or environment.
+
 ### Prerequisite
 Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate with AWS` (included), then set `BILLING_ANOMALY_MONITOR_ARN` in `.env` (see [environment-variables.md](../../../docs/environment-variables.md#billing_anomaly_monitor_arn)).
 

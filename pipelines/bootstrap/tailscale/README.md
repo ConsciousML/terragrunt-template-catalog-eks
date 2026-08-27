@@ -10,6 +10,8 @@ Sets up Tailscale as a VPN and configures the access control policy, workload id
 
 Run this **once** before deploying the Tailscale operator into any EKS cluster. The ACL policy and WIF credential must exist in Tailscale before the per-cluster units can create subnet routers and configure split DNS.
 
+**Warning**: only instantiate the `acl` unit in the catalog repo, not in a live repo. It's a single tailnet-wide policy, not scoped to a repo or environment.
+
 ## Quick Start
 
 ### Prerequisites
