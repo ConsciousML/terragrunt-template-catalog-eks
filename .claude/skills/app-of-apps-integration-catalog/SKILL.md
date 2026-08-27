@@ -1,5 +1,5 @@
 ---
-name: app-of-apps-integration
+name: app-of-apps-integration-catalog
 description: Thread a Terraform-sourced value (IAM, Pod Identity, Secrets Manager, ACM, ...) into an app-of-apps Helm value, or add a new app to app-of-apps. Use when an app in argocd-app-of-apps-template needs a value only this repo's Terraform can produce.
 ---
 

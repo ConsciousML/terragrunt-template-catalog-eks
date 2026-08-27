@@ -1,5 +1,5 @@
 ---
-name: reproducibility
+name: reproducibility-catalog
 description: Regenerate provider lock files after adding a unit or changing a provider version/constraint under units/. Use before considering such a change done.
 ---
 

@@ -1,10 +1,10 @@
 ---
-name: how-to-write-docs
+name: how-to-write-docs-catalog
 description: Rules for writing or editing Markdown docs or inline code comments in this repo (README.md, docs/, unit/module docs, comments). Use before writing or editing any doc or comment.
 ---
 
 If documenting `argocd-app-of-apps-template`, also read its
-[`how-to-write-docs` skill](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/.claude/skills/how-to-write-docs/SKILL.md)
+[`how-to-write-docs-app-of-apps` skill](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/.claude/skills/how-to-write-docs-app-of-apps/SKILL.md)
 for rules specific to that repo.
 
 ## Source of Truth
