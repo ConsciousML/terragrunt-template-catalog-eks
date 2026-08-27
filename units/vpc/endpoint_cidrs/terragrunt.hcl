@@ -11,7 +11,7 @@ locals {
 }
 
 terraform {
-  source = "${get_repo_root()}/modules/vpc_endpoint_cidrs"
+  source = "git::git@github.com:${include.root.locals.github_owner_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/vpc_endpoint_cidrs?ref=${values.version}"
 }
 
 dependency "vpc" {
