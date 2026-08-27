@@ -1,4 +1,6 @@
 locals {
+  # Must stay in sync with vpc_cidrs in the live repo's live/network.hcl:
+  # https://github.com/ConsciousML/terragrunt-template-live-eks/blob/main/live/network.hcl
   vpc_cidrs = {
     prod           = "10.0.0.0/16"
     staging        = "10.1.0.0/16"
