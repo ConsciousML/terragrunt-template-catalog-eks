@@ -18,6 +18,12 @@ variable "github_branch" {
   type        = string
 }
 
+variable "max_session_duration" {
+  description = "Maximum session duration (in seconds) for the IAM role"
+  type        = number
+  default     = 3600
+}
+
 variable "tags" {
   description = "A map of tags to assign to the IAM role"
   type        = map(string)

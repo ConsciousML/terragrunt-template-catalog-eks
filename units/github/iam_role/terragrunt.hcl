@@ -12,11 +12,12 @@ terraform {
 }
 
 inputs = {
-  name             = "${local.environment}-${values.name}"
-  github_owner     = values.github_owner
-  github_repo_name = values.github_repo_name
-  github_branch    = values.github_branch
-  inline_policies  = values.inline_policies
+  name                 = "${local.environment}-${values.name}"
+  github_owner         = values.github_owner
+  github_repo_name     = values.github_repo_name
+  github_branch        = values.github_branch
+  inline_policies      = values.inline_policies
+  max_session_duration = try(values.max_session_duration, 3600)
   tags = {
     environment = "${local.environment}"
   }
