@@ -32,6 +32,7 @@ Creates an IAM role with a trust policy scoped to a GitHub repository and branch
 | <a name="input_github_owner"></a> [github\_owner](#input\_github\_owner) | GitHub username or organization name | `string` | n/a | yes |
 | <a name="input_github_repo_name"></a> [github\_repo\_name](#input\_github\_repo\_name) | GitHub repository name | `string` | n/a | yes |
 | <a name="input_inline_policies"></a> [inline\_policies](#input\_inline\_policies) | List of inline policies to attach to the IAM role | <pre>list(object({<br/>    name   = string<br/>    policy = string<br/>  }))</pre> | `[]` | no |
+| <a name="input_max_session_duration"></a> [max\_session\_duration](#input\_max\_session\_duration) | Maximum session duration (in seconds) for the IAM role | `number` | `3600` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the IAM role | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to assign to the IAM role | `map(string)` | `{}` | no |
 
