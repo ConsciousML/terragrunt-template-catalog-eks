@@ -16,12 +16,13 @@ unit "iam_role_github_actions" {
   path   = "github/iam_role"
 
   values = {
-    version          = values.version
-    name             = values.iam_role_name
-    github_owner     = values.github_owner
-    github_repo_name = values.github_repo_name
-    github_branch    = values.github_branch
-    inline_policies  = values.inline_policies
+    version              = values.version
+    name                 = values.iam_role_name
+    github_owner         = values.github_owner
+    github_repo_name     = values.github_repo_name
+    github_branch        = values.github_branch
+    inline_policies      = values.inline_policies
+    max_session_duration = try(values.max_session_duration, 3600)
   }
 }
 
