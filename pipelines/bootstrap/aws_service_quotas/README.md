@@ -51,5 +51,4 @@ terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
-Quota increase requests are asynchronous. Small increases often auto-approve within minutes, but AWS gives no SLA, and larger or new-account requests can take days. `terragrunt apply` returns once the request is submitted, not once it's approved. Check status with the same `aws service-quotas get-service-quota` commands above.
-
+Some quota increase requests are validated manually by AWS. Check status in the [Service Quotas request history console](https://us-east-1.console.aws.amazon.com/servicequotas/home/requests).
