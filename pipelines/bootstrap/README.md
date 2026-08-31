@@ -4,6 +4,7 @@ Run each of these pipelines **once** after forking this repository, before deplo
 
 - **[AWS Billing Alerts](aws_billing_alerts/README.md)**: creates AWS Budgets and a Cost Anomaly Detection monitor that email a notification when spend crosses a configured threshold
 - **[AWS GitHub Actions Auth](aws_gh_actions_auth/README.md)**: authenticates GitHub Actions with AWS via OIDC
+- **[AWS Service Quotas](aws_service_quotas/README.md)**: requests EC2 vCPU Service Quota increases so the EKS stack can allocate enough instances
 - **[Setup DNS](setup_dns/README.md)**: creates a public Route53 hosted zone per environment for ACM certificate validation
 - **[Slack](slack/README.md)**: registers the Slack bot token as a GitHub Actions secret so CI-deployed Alertmanager instances can send notifications to Slack
 - **[Tailscale](tailscale/README.md)**: sets up the ACL policy and OAuth client for the Tailscale Kubernetes operator
