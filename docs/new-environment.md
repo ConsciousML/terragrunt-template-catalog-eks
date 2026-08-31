@@ -52,6 +52,10 @@ locals {
 
 Then apply it and delegate the NS records at your registrar. See the [DNS bootstrap README](../pipelines/bootstrap/setup_dns/README.md) for the full deploy and delegation steps.
 
+### Revisit EC2 Quotas
+
+The new environment's node groups add to the account's total vCPU usage. Check whether the [`aws_service_quotas` bootstrap](../pipelines/bootstrap/aws_service_quotas/README.md) still covers it before deploying.
+
 ### Create the Environment Directory
 
 ```bash
