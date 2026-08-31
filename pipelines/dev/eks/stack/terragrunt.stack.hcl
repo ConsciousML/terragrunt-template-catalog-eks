@@ -297,6 +297,7 @@ unit "cluster" {
       }
     }
 
+    # Sizing here counts against the account's EC2 Service Quotas, see pipelines/bootstrap/aws_service_quotas.
     eks_managed_node_groups = {
       "${local.environment}_ng" = {
         # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
@@ -828,6 +829,7 @@ unit "karpenter_ec2_node_class" {
   }
 }
 
+# Sizing here counts against the account's EC2 Service Quotas, see pipelines/bootstrap/aws_service_quotas.
 unit "karpenter_node_pool_critical" {
   source = "${get_repo_root()}/units/eks/addons/karpenter/node_pool/critical"
   path   = "eks/addons/karpenter/node_pool/critical"
@@ -870,6 +872,7 @@ unit "karpenter_node_pool_critical" {
   }
 }
 
+# Sizing here counts against the account's EC2 Service Quotas, see pipelines/bootstrap/aws_service_quotas.
 unit "karpenter_node_pool_elastic" {
   source = "${get_repo_root()}/units/eks/addons/karpenter/node_pool/elastic"
   path   = "eks/addons/karpenter/node_pool/elastic"
