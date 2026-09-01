@@ -43,6 +43,9 @@ inputs = {
   chart            = "../../charts/karpenter-ec2-node-class"
   namespace        = "kube-system"
   create_namespace = false
+  # Karpenter's own uninstall waits for it to deprovision all nodes owned by this class first;
+  # the module's 300s default is too short under load, so we raise it here.
+  timeout = try(values.timeout, 600)
   helm_values = {
     name           = values.name
     nodeRole       = dependency.karpenter_iam.outputs.node_iam_role_name

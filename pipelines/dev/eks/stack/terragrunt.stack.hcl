@@ -826,6 +826,9 @@ unit "karpenter_ec2_node_class" {
     # computes a lower ceiling from the plain per-ENI formula, blind to the VPC CNI addon's
     # ENABLE_PREFIX_DELEGATION setting, which starves small instance types of pod slots.
     kubelet_max_pods = 110
+    # Karpenter's own uninstall waits for it to deprovision all nodes owned by this class first;
+    # the helm_release module's 300s default is too short under load.
+    timeout = 600
   }
 }
 
