@@ -3,7 +3,7 @@
 ## Authenticate with the AWS CLI
 You'll need to authenticate with the AWS CLI to deploy cloud resources with [Terraform](https://developer.hashicorp.com/terraform) (TF).
 The EKS stack provisions resources across many AWS services, so `AdministratorAccess` is the convenient choice here.
-You can scope down to a narrower policy later by reviewing the [units](../units/README.md) this catalog uses.
+You can scope down to a narrower policy later by reviewing the [units](../units/) this catalog uses.
 
 ### Fast Track (admin)
 If you're a root user or admin:
