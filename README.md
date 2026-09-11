@@ -74,50 +74,7 @@ locals {
 4. Karpenter NodePools cap total vCPUs via `spec.limits.cpu`, set in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](pipelines/dev/eks/stack/terragrunt.stack.hcl). Raise a limit or switch a pool's `karpenter.sh/capacity-type` requirement to `on-demand` for production stability.
 
 ### Installation
-
-**Option 1: Use mise (recommended)**
-
-First, `cd` at the root of this repository. 
-
-Next, install mise:
-```bash
-curl https://mise.run | MISE_VERSION=v2026.4.0 sh
-```
-
-Then, install all the tools in the `mise.toml` file:
-```bash
-mise trust
-mise install
-```
-
-Finally, run the following to automatically activate mise when starting a shell:
-- For zsh: 
-```bash
-echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc && source ~/.zshrc
-```
-- For bash:
-```bash
-echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc && source ~/.bashrc
-```
-
-For more information on how to use mise, read their [getting started guide](https://mise.jdx.dev/getting-started.html).
-
-
-**Option 2: Install Tools Manually**
-- [OpenTofu](https://opentofu.org/docs/intro/install/) (or [Terraform](https://developer.hashicorp.com/terraform/install))
-- [Terragrunt](https://terragrunt.gruntwork.io/docs/getting-started/install/)
-- [tflint](https://github.com/terraform-linters/tflint)
-- [prek](https://github.com/j178/prek#installation)
-- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-- [GitHub CLI](https://github.com/cli/cli#installation)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
-- [jq](https://jqlang.org/download/)
-- [ArgoCD CLI](https://argo-cd.readthedocs.io/en/stable/cli_installation/)
-- [Slack CLI](https://docs.slack.dev/tools/slack-cli/)
-- [Cilium CLI](https://github.com/cilium/cilium-cli#installation)
-- [Hubble CLI](https://github.com/cilium/hubble#installation)
-
-See [mise.toml](./mise.toml) and [mise.local.toml](./mise.local.toml) for specific versions.
+See the [installation documentation](docs/installation.md).
 
 ### Authenticate with AWS
 Authenticate to the AWS CLI:
