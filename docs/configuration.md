@@ -39,8 +39,8 @@ Where:
 - `<the-repository-name-of-your-fork>` should be the name you chose when [you forked the catalog](../../quickstart/installation#fork-the-eks-forge-catalog)
 - `<github_owner_catalog>` is the GitHub username or organization name where your fork lives 
 
-This change sets all the `terraform { source = <url>}` to your forked catalog url.
-In other words, you'll be able to modify the modules and units in the future as your fork is now the sole proprietary of them.
+This change points all the `terraform { source = <url>}` to your fork instead of the official EKS Forge catalog.
+In other words, you'll be able to modify the modules and units yourself going forward.
 
 2. Change `pipelines/region.hcl` to match your desired AWS region and Availability Zones (AZs):
 ```hcl
