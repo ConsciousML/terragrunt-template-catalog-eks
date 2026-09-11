@@ -45,44 +45,8 @@ Here are the major components of the repository:
 - **[CI](docs/continuous-integration.md)**: Automated configuration validation and documentation (`terraform-docs`).
 - **[Bootstrap](pipelines/bootstrap/README.md)**: Contains pipelines that need to be run once per repository fork
 
-## Getting Started
-### Prerequisites
-- AWS account with billing enabled
-- GitHub account
-- `AdministratorAccess` AWS IAM Policy
-
-### Fork the Repository
-1. Click on the `Use this template` > `Create a new repository` button.
-2. Under `Repository Name`, choose a name for your repository.
-
-### Configuration
-In your forked repository, change the following Terragrunt configuration files:
-1. In `pipelines/github.hcl`, modify (by replacing `<YourGitHubUsernameOrOrgName>`, `<the-repository-name-of-your-fork>`):
-```hcl
-locals {
-  github_owner_catalog      = "<YourGitHubUsernameOrOrgName>"
-  github_repo_name_catalog     = "<the-repository-name-of-your-fork>"
-  github_repo_name_app_of_apps = "<your-app-of-apps-repo-name>"
-}
-```
-`<the-repository-name-of-your-fork>` should be the same name you chose in the previous section. `<your-app-of-apps-repo-name>` should match your fork of [argocd-app-of-apps-template](https://github.com/ConsciousML/argocd-app-of-apps-template).
-
-2. Change `pipelines/region.hcl` to match your desired AWS region
-
-3. Set `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET` in your `.env` (see the [environment variables guide](docs/environment-variables.md))
-
-4. Karpenter NodePools cap total vCPUs via `spec.limits.cpu`, set in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](pipelines/dev/eks/stack/terragrunt.stack.hcl). Raise a limit or switch a pool's `karpenter.sh/capacity-type` requirement to `on-demand` for production stability.
-
-### Installation
-See the [installation documentation](docs/installation.md).
-
-### Authenticate with AWS
-Authenticate to the AWS CLI:
-```
-aws configure
-```
-
-For more information, read the [AWS CLI authentication documentation](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
+## Quickstart
+Read the [Quickstart documentation](../../docs/quickstart/).
 
 ### Run the Bootstrap Pipelines
 Run each pipeline listed in [`pipelines/bootstrap/README.md`](pipelines/bootstrap/README.md) once per repository.
