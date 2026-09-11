@@ -46,7 +46,7 @@ Here are the major components of the repository:
 - **[Bootstrap](pipelines/bootstrap/README.md)**: Contains pipelines that need to be run once per repository fork
 
 ## Quickstart
-Read the [Quickstart documentation](../../docs/quickstart/).
+Read the [Quickstart documentation](https://eks-forge.readthedocs.io/latest/docs/quickstart/).
 
 ### Run the Bootstrap Pipelines
 Run each pipeline listed in [`pipelines/bootstrap/README.md`](pipelines/bootstrap/README.md) once per repository.
