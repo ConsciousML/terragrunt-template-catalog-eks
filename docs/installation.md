@@ -1,7 +1,7 @@
 # Installation
 
 ## Fork the EKS Forge Catalog 
-EKS Forge is a toolkit containing multiple [repository templates](../../concepts/), each with their own responsabilities.
+EKS Forge is a toolkit containing multiple [repository templates](../../concepts/), each with their own responsibilities.
 They're meant to be forked and extended.
 
 To get started, you'll fork the catalog, a collection of [Terraform](https://developer.hashicorp.com/terraform) modules and [Terragrunt](https://docs.terragrunt.com/getting-started/terminology/#terragrunt) pipelines, re-usable across multiple environments (`dev`, `staging`, and `prod`):
@@ -11,7 +11,7 @@ For creating a private repository, go to the [catalog home page](https://github.
 1. click on `Use this template` in the top-right corner.
 2. select `Create a new repository`
 3. choose a repository name
-4. under `Configuration`, click to the drop down next to `Choose visiblity` and click on `Private`
+4. under `Configuration`, click to the drop down next to `Choose visibility` and click on `Private`
 5. click on `Create repository`
 
 ### Public Fork
@@ -38,7 +38,7 @@ mise trust
 mise install
 ```
 
-Finally, run the this to automatically activate mise when starting a shell:
+Finally, run the following to automatically activate mise when starting a shell:
 - For `zsh`: 
 ```bash
 echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc && source ~/.zshrc
@@ -48,7 +48,7 @@ echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc && source ~/.zshrc
 echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc && source ~/.bashrc
 ```
 
-If you use a different shell type, the [`mise activate` reference](https://mise.jdx.dev/cli/activate.html).
+For a different shell type, use the [`mise activate` reference](https://mise.jdx.dev/cli/activate.html).
 
 :::warning
 `mise` installed tools are not available system-wise by default.
