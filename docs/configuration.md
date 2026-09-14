@@ -27,7 +27,7 @@ Instead consider following the [security best practices in IAM documentation](ht
 If you're an organization member, ask your admin to attach the [`AdministratorAccess`](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AdministratorAccess.html) IAM policy to your identity. Then, authenticate to the CLI using the method recommended by your AWS administrator. More information in the [AWS CLI authentication documentation](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-authentication.html).
 
 ## Catalog Configuration
-The catalog is organized into [modules, units, and stacks](../../concepts/#architecture), assembled into deployable pipelines under [`pipelines/`](../pipelines/).
+The catalog is organized into [modules, units, and stacks](/docs/concepts/#architecture), assembled into deployable pipelines under [`pipelines/`](../pipelines/).
 
 These pipelines are modular. They read `.hcl` configuration files that you need to modify:
 1. In [`pipelines/github.hcl`](../pipelines/github.hcl), modify the following variables:
@@ -38,7 +38,7 @@ locals {
 }
 ```
 Where:
-- `<the-repository-name-of-your-fork>` should be the name you chose when [you forked the catalog](../../quickstart/installation#fork-the-eks-forge-catalog)
+- `<the-repository-name-of-your-fork>` should be the name you chose when [you forked the catalog](/docs/quickstart/installation/#fork-the-eks-forge-catalog)
 - `<github_owner_catalog>` is the GitHub username or organization name where your fork lives 
 
 This change points all the `terraform { source = <url>}` to your fork instead of the official EKS Forge catalog.

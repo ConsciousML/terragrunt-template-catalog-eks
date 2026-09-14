@@ -1,7 +1,7 @@
 {/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 # Bootstrap Pipelines
 
-As EKS Forge supports multiple advanced [features](../../../overview/#features)
+As EKS Forge supports multiple advanced [features](/docs/overview/#features)
 
 Run each of these pipelines **once** after forking this repository, before deploying any stack:
 
