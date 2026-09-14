@@ -1,11 +1,11 @@
 {/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 # Bootstrap Pipelines
 
-As EKS Forge supports multiple advanced [features](/docs/overview/#features)
+EKS Forge's [advanced features](/docs/overview/#features) use multiple different tools (AWS, [Tailscale](https://tailscale.com/), [Slack](https://slack.com/intl/en-gb/), etc.). We'll need to configure each tool before deploying the infrastructure.
 
-Run each of these pipelines **once** after forking this repository, before deploying any stack:
+Some manual steps are inevitable. However, everything else is automated through [Terragrunt pipelines](.) (see the [catalog architecture](/docs/concepts/#architecture)). These pipelines deploy account-level and repository-level resources, independent of the IaC environments (`dev`, `staging`, etc.). Those environments need the bootstrap resources deployed first to function.
 
-- **[AWS Billing Alerts](aws_billing_alerts/README.md)**: creates AWS Budgets and a Cost Anomaly Detection monitor that email a notification when spend crosses a configured threshold
+Follow every individual bootstrap pipeline documentation:
 - **[AWS GitHub Actions Auth](aws_gh_actions_auth/README.md)**: authenticates GitHub Actions with AWS via OIDC
 - **[AWS Service Quotas](aws_service_quotas/README.md)**: requests EC2 vCPU Service Quota increases so the EKS stack can allocate enough instances
 - **[Setup DNS](setup_dns/README.md)**: creates a public Route53 hosted zone per environment for ACM certificate validation
