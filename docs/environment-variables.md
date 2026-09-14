@@ -16,9 +16,7 @@ Once filled in, `.env` holds sensitive credentials. Never commit it to version c
 
 ## `GITHUB_TOKEN`
 
-**Required by**: `pipelines/bootstrap/aws_gh_actions_auth/`
-
-A GitHub fine-grained personal access token used to register GitHub secrets and deploy keys in the bootstrap pipeline.
+This environment variable is needed for running the [GitHub Terraform provider](https://registry.terraform.io/providers/integrations/github/latest/docs).
 
 Authenticate with the GitHub CLI first:
 ```bash
@@ -30,7 +28,7 @@ Then copy the token:
 gh auth token
 ```
 
-Add it to your `.env`:
+Add it to your `.env` file:
 ```bash
 export GITHUB_TOKEN=<your_token>
 ```

@@ -1,17 +1,13 @@
+{/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 # GitHub Actions AWS Bootstrap
-Authenticates GitHub Actions with AWS, enabling Terragrunt to run in CI/CD.
 
-## Purpose
+In this guide, you'll authenticate GitHub Actions with AWS so that Terragrunt can run in [CI/CD](/docs/ci-cd/).
 
-Run this **once** after creating a new GitHub repository from this template, so CI can authenticate to AWS without managing secrets or credentials by hand.
+:::note
+This guide needs to be performed only once per repository fork before running the [deployment](/docs/quickstart/deployment/).
+:::
 
-## Quick Start
-
-### Prerequisites
-Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate with AWS` (included).
-
-### Configuration
-Set up `GITHUB_TOKEN` following the [environment variables guide](../../../docs/environment-variables.md#github_token).
+Before starting, you set up `GITHUB_TOKEN` in your `.env` file by following the [environment variables guide](/docs/reference/environment_variable/#github_token).
 
 In the `terragrunt.stack.hcl`, update the following values in the `stack "aws_gh_actions_auth"` block:
 

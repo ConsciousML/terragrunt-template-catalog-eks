@@ -1,3 +1,4 @@
+{/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 # DNS Bootstrap
 
 In this guide, you'll set up your domain to be able to expose your cluster apps through it during the [deployment](/docs/quickstart/deployment/).
@@ -31,6 +32,8 @@ cd pipelines/bootstrap/setup_dns/<environment>
 terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
+
+Read the [Infrastructure as Code documentation](/docs/iac) for a high-level overview of TG.
 
 :::note
 On the first run, `--backend-bootstrap` automatically creates the [S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html) holding the [Terraform state](https://developer.hashicorp.com/terraform/language/state). More information in the [Terragrunt state backend documentation](https://docs.terragrunt.com/features/units/state-backend/).
