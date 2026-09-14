@@ -4,9 +4,9 @@ import {DollarSign, KeyRound, Gauge, Globe, MessageSquare, Network} from 'lucide
 
 # Bootstrap Pipelines
 
-EKS Forge's [advanced features](/docs/overview/#features) use multiple different tools (AWS, [Tailscale](https://tailscale.com/), [Slack](https://slack.com/intl/en-gb/), etc.). We'll need to configure each tool before deploying the infrastructure.
+EKS Forge's [advanced features](/docs/overview/#features) rely on several tools (AWS, [Tailscale](https://tailscale.com/), [Slack](https://slack.com/intl/en-gb/), etc.) that need to be configured before you deploy the infrastructure. **Bootstrap pipelines** automate these configurations.
 
-Some manual steps are inevitable. However, everything else is automated through [Terragrunt pipelines](.) (see the [catalog architecture](/docs/concepts/#architecture)). These pipelines deploy account-level and repository-level resources, independent of the IaC environments (`dev`, `staging`, etc.). Those environments need the bootstrap resources deployed first to function.
+They're [Terragrunt stacks](/docs/concepts/#catalog-architecture) that deploy account-level and repository-level resources, independent of any IaC environment (`dev`, `staging`, etc.). Each environment depends on these resources to function, so bootstrap pipelines need to run first.
 
 Complete each of these one-time setup guides:
 

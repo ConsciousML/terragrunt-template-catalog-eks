@@ -1,12 +1,18 @@
+{/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 # Environment Variables
 
-The single reference for every environment variable used across the bootstrap pipelines and EKS stack: what it is, how to obtain it, and which workflows require it.
+The reference for every environment variable used by EKS Forge.
 
 ## Prerequisite
 If you haven't already, copy the example file:
 ```bash
 cp .env.example .env
 ```
+`.env.example` is prefilled with every variable below, pointing to the doc that explains it. You only need to fill in the values.
+
+:::danger
+Once filled in, `.env` holds sensitive credentials. Never commit it to version control.
+:::
 
 ## `GITHUB_TOKEN`
 
