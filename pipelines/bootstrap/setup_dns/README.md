@@ -32,7 +32,7 @@ terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
-:::info
+:::note
 On the first run, `--backend-bootstrap` automatically creates the [S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html) holding the [Terraform state](https://developer.hashicorp.com/terraform/language/state). More information in the [Terragrunt state backend documentation](https://docs.terragrunt.com/features/units/state-backend/).
 :::
 
