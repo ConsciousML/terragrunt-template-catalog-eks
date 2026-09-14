@@ -46,7 +46,7 @@ Create a Slack app at [https://api.slack.com/apps/new](https://api.slack.com/app
 
 `chat:write.public` lets the bot post to any channel without being invited to it first. `channels:read`, `channels:manage`, and `channels:join` are what the `pablovarela/slack` Terraform provider's `slack_conversation` resource needs to create and manage channels (see [`units/slack/channels`](../../../units/slack/README.md)).
 
-On the app's "OAuth & Permissions" page, below "OAuth Tokens", click "Install to <YourWorkspaceName>" and approve the consent screen.
+On the app's "OAuth & Permissions" page, below "OAuth Tokens", click "Install to `<YourWorkspaceName>`" and approve the consent screen.
 
 ### Configuration
 
