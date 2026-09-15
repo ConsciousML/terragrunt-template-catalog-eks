@@ -46,3 +46,5 @@ terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-gene
 ## Module Details
 
 See the [`units/tailscale`](../../../units/tailscale/README.md) and [`units/eks/addons/tailscale`](../../../units/eks/addons/tailscale/README.md) group READMEs for what each unit provisions and how they compose.
+
+For more information about this bootstrap, read the [`tailscale/acl`](/docs/reference/bootstrap/tailscale_acl/) and [`tailscale/wif`](/docs/reference/bootstrap/tailscale_wif/) reference documentation.
