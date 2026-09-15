@@ -204,5 +204,8 @@
       "Edit(~/.claude/CLAUDE.md)",
       "Edit(~/.claude/hooks/**)"
     ]
+  },
+  "skillOverrides": {
+    "how-to-write-docs-catalog": "off"
   }
 }

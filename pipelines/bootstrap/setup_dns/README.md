@@ -79,3 +79,5 @@ dig NS <environment>.yourdomain.com
 Delegation is working when 4 AWS nameservers appear in the `ANSWER SECTION`.
 
 You can also confirm this visually in the [Route 53 console](https://console.aws.amazon.com/route53/v2/hostedzones). You should see your newly created hosted zone listed. Click it to see its records.
+
+For more information about this bootstrap, read the [reference documentation](/docs/reference/bootstrap/setup_dns/).
