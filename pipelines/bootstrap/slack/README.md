@@ -74,3 +74,5 @@ The bot is a member of each channel it creates by default, but you aren't. Join 
 ## Module Details
 
 See the [`units/slack`](../../../units/slack/README.md) group README for what each unit provisions and how they compose.
+
+For more information about this bootstrap, read the [`slack/gh_secret`](/docs/reference/bootstrap/slack_github_secrets/) and [`slack/channels`](/docs/reference/bootstrap/slack_channels/) reference documentation.
