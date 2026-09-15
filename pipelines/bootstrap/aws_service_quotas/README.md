@@ -52,3 +52,5 @@ terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-gene
 ```
 
 Some quota increase requests are validated manually by AWS. Check status in the [Service Quotas request history console](https://us-east-1.console.aws.amazon.com/servicequotas/home/requests).
+
+For more information about this bootstrap, read the [`ec2_quotas`](/docs/reference/bootstrap/aws_ec2_quotas/) reference documentation.
