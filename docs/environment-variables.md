@@ -35,9 +35,7 @@ export GITHUB_TOKEN=<your_token>
 
 ## `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET`
 
-**Required by**: `pipelines/bootstrap/tailscale/`
-
-A Tailscale OAuth client used to authenticate to the Tailscale API and provision resources (ACL, WIF credential, subnet router, split DNS).
+A Tailscale OAuth client used to authenticate to the Tailscale API and provision resources.
 
 Go to [Tailscale Trust Credentials](https://login.tailscale.com/admin/settings/trust-credentials), then:
 

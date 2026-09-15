@@ -24,7 +24,7 @@ The ACL gives `tag:ci` the permission to create [auth keys](https://tailscale.co
 
 ## 3. Kubernetes Operator
 
-The [Tailscale Kubernetes operator](https://tailscale.com/kb/1236/kubernetes-operator) joins an EKS cluster to the tailnet, using an auth key created under `tag:k8s-operator`. Unlike the ACL and WIF, it's deployed per-cluster through [app-of-apps](/docs/application) and is environment scoped.
+The [Tailscale Kubernetes operator](https://tailscale.com/kb/1236/kubernetes-operator) joins an EKS cluster to the tailnet, using an auth key created under `tag:k8s-operator`. Unlike the ACL and WIF, it's deployed per-cluster through [app-of-apps](/docs/applications) and is environment scoped.
 
 Its own OAuth client credential is provisioned by the [`oauth_client_tailscale_operator`](../../units/eks/addons/tailscale/oauth_client_tailscale_operator/terragrunt.hcl) and [`oauth_client_secret`](../../units/eks/addons/tailscale/oauth_client_secret/terragrunt.hcl) units, and synced into the cluster via the [External Secrets Operator](https://external-secrets.io/latest/), so the credential itself never lives in git.
 
