@@ -53,3 +53,5 @@ terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-gene
 ## Module Details
 
 See the [`units/billing`](../../../units/billing/README.md) group README for what each unit provisions.
+
+For more information about this bootstrap, read the [`billing_budgets`](/docs/reference/bootstrap/aws_billing_budgets/) and [`billing_anomaly_detection`](/docs/reference/bootstrap/aws_billing_anomaly_detection/) reference documentation.
