@@ -1,3 +1,4 @@
+{/* This doc is deprecated and does not yet follow Diataxis. Do not base new docs on its style or structure. */}
 # Slack Bootstrap
 
 Registers the Slack bot token as a GitHub Actions secret, and creates the channels Alertmanager posts to.

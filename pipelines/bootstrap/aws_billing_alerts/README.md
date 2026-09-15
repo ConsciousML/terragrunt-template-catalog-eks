@@ -1,3 +1,4 @@
+{/* This doc is deprecated and does not yet follow Diataxis. Do not base new docs on its style or structure. */}
 # AWS Billing Alerts Bootstrap
 
 Deploys the [`billing_budgets`](../../../stacks/billing_budgets/) and [`billing_anomaly_detection`](../../../stacks/billing_anomaly_detection/) stacks together:

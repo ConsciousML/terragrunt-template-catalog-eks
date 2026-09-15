@@ -1,3 +1,4 @@
+{/* This doc is deprecated and does not yet follow Diataxis. Do not base new docs on its style or structure. */}
 # AWS Service Quotas Bootstrap
 
 Deploys the [`ec2_quotas`](../../../stacks/ec2_quotas/) stack: requests an increase for the account's EC2 `L-1216C47A` (Running On-Demand Standard instances) and `L-34B43A08` (All Standard Spot Instance Requests) vCPU Service Quotas.
