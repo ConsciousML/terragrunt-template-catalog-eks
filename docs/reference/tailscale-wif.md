@@ -17,7 +17,7 @@ For setup steps, read the [catalog bootstrap guide](/docs/quickstart/bootstrap/t
 | Name | Description | Type | Default | Required |
 |------|------|------|---------|----------|
 | `issuer` | OIDC issuer URL for the federated identity. | `string` | - | Yes |
-| `subject` | OIDC subject claim pattern (`repo:<org>/<repo>:*`), scoping the credential to this repository. | `string` | - | Yes |
+| `github_owner` | GitHub organization or user account that owns the repository. Combined with `github_repo_name` to build the OIDC subject claim (`repo:<org>/<repo>:*`) scoping the credential to this repository. | `string` | - | Yes |
 | `scopes` | OAuth scopes for auth keys issued via this federated identity. | `set(string)` | `["devices:core", "auth_keys", "dns"]` | No |
 | `github_token` | GitHub personal access token with `repo` permissions. | `string` | - | Yes |
 | `github_repo_name` | GitHub repository name where `TS_OAUTH_CLIENT_ID`, `TS_AUDIENCE`, and `TS_TAGS` are stored. | `string` | - | Yes |
