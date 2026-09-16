@@ -13,9 +13,7 @@ For setup steps, read the [catalog bootstrap guide](/docs/quickstart/bootstrap/s
 
 ## Inputs
 
-| Name | Description | Type | Default | Required |
-|------|------|------|---------|----------|
-| `base_domain` | Base domain configured in [`pipelines/dns.hcl`](../../pipelines/dns.hcl). Combined with the environment name to form the hosted zone's domain name (`<environment>.<base_domain>`). | `string` | - | Yes |
+This stack takes no configurable inputs beyond `version`. Its domain name (`<environment>.<base_domain>`) is built from the environment name and the `base_domain` set in [`pipelines/dns.hcl`](../../pipelines/dns.hcl), read directly rather than passed in as a value.
 
 ## Outputs
 
