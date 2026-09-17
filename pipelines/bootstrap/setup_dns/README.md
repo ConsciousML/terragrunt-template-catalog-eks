@@ -3,7 +3,7 @@
 
 In this guide, you'll set up your domain to be able to expose your cluster apps through it during the [deployment](/docs/quickstart/deployment/).
 
-:::note
+:::warning
 This guide needs to be performed only once per repository fork before running the [deployment](/docs/quickstart/deployment/).
 :::
 
