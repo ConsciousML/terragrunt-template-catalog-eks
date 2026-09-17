@@ -14,13 +14,7 @@ aws service-quotas get-service-quota --service-code ec2 --quota-code L-1216C47A 
 aws service-quotas get-service-quota --service-code ec2 --quota-code L-34B43A08 # Spot Standard
 ```
 
-Both quotas are account-wide, covering every on-demand or spot vCPU consumer across every environment on the account. The default `desired_value` in `terragrunt.stack.hcl` is a starting headroom above the AWS default, not a computed sum. Check current and prospective usage against these files before deciding if the default is enough:
-
-- [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](../../dev/eks/stack/terragrunt.stack.hcl): dev's `eks_managed_node_groups`, `karpenter_node_pool_critical`, and `karpenter_node_pool_elastic` blocks
-- [`terragrunt-template-live-eks`'s `live/staging/eks/stack/terragrunt.stack.hcl`](https://github.com/ConsciousML/terragrunt-template-live-eks/blob/main/live/staging/eks/stack/terragrunt.stack.hcl): the same blocks for staging
-- [`terragrunt-template-live-eks`'s `live/prod/eks/stack/terragrunt.stack.hcl`](https://github.com/ConsciousML/terragrunt-template-live-eks/blob/main/live/prod/eks/stack/terragrunt.stack.hcl): the same blocks for prod
-
-Each of those blocks carries a comment pointing back to this pipeline: if you change instance types, node counts, capacity-type, or AZ count in any of them, revisit these quotas.
+For guidance sizing the requested values against your `eks_managed_node_groups` and Karpenter NodePool configuration, see [Increase EC2 Capacity](/docs/compute/increase-ec2-capacity/).
 
 Update the `locals` block in `terragrunt.stack.hcl` in this directory:
 

@@ -3,6 +3,8 @@
 
 The [`ec2_quotas` stack](../../stacks/ec2_quotas/), deployed by the [`aws_service_quotas` pipeline](../../pipelines/bootstrap/aws_service_quotas/), requests an increase for the account's EC2 `L-1216C47A` (Running On-Demand Standard instances) and `L-34B43A08` (All Standard Spot Instance Requests) [Service Quotas](https://docs.aws.amazon.com/eks/latest/best-practices/known_limits_and_service_quotas.html#_other_aws_service_quotas).
 
+Both quotas are account-wide: they cover every on-demand or spot vCPU consumer across every [environment](/docs/iac/#environments) on the account, not just this stack.
+
 For setup steps, read the [catalog bootstrap guide](/docs/quickstart/bootstrap/aws_service_quotas).
 
 ## Modules
@@ -18,6 +20,8 @@ For setup steps, read the [catalog bootstrap guide](/docs/quickstart/bootstrap/a
 |------|------|------|---------|----------|
 | `ondemand_desired_value` | Requested value for the `L-1216C47A` (On-Demand Standard) quota. | `number` | - | Yes |
 | `spot_desired_value` | Requested value for the `L-34B43A08` (Spot Standard) quota. | `number` | - | Yes |
+
+The default values set in `terragrunt.stack.hcl` are a starting headroom above the AWS default, not a computed sum of any environment's vCPU usage.
 
 ## Outputs
 
