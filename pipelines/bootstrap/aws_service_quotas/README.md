@@ -5,11 +5,7 @@ Deploys the [`ec2_quotas`](../../../stacks/ec2_quotas/) stack: requests an incre
 
 **Warning**: only instantiate this in the catalog repo, not in a live repo. It's scoped to the AWS account, not to a repo or environment. Skip this pipeline if the account already has sufficient quota headroom: running it against an account that already has enough risks an unnecessary or conflicting request.
 
-## Purpose
-
 This template's EC2 usage exceeds AWS's default quotas (5 vCPU for both On-Demand and Spot Standard instances on a new account). Without this pipeline, the EKS stack deploy fails because AWS can't allocate enough EC2 instances. Run this **once per AWS account** to provision headroom before deploying.
-
-### Check current quotas
 
 Before deciding whether to skip this pipeline, check the account's current values:
 
@@ -17,8 +13,6 @@ Before deciding whether to skip this pipeline, check the account's current value
 aws service-quotas get-service-quota --service-code ec2 --quota-code L-1216C47A # On-Demand Standard
 aws service-quotas get-service-quota --service-code ec2 --quota-code L-34B43A08 # Spot Standard
 ```
-
-### Where vCPU usage is defined
 
 Both quotas are account-wide, covering every on-demand or spot vCPU consumer across every environment on the account. The default `desired_value` in `terragrunt.stack.hcl` is a starting headroom above the AWS default, not a computed sum. Check current and prospective usage against these files before deciding if the default is enough:
 
@@ -28,10 +22,6 @@ Both quotas are account-wide, covering every on-demand or spot vCPU consumer acr
 
 Each of those blocks carries a comment pointing back to this pipeline: if you change instance types, node counts, capacity-type, or AZ count in any of them, revisit these quotas.
 
-## Deployment
-
-### Configuration
-
 Update the `locals` block in `terragrunt.stack.hcl` in this directory:
 
 ```hcl
@@ -40,8 +30,6 @@ locals {
   spot_desired_value     = 32 # requested value for L-34B43A08
 }
 ```
-
-### Deploy
 
 From the root directory of this repository, run:
 
