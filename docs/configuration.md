@@ -27,7 +27,7 @@ Instead consider following the [security best practices in IAM documentation](ht
 If you're an organization member, ask your admin to attach the [`AdministratorAccess`](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AdministratorAccess.html) IAM policy to your identity. Then, authenticate to the CLI using the method recommended by your AWS administrator. More information in the [AWS CLI authentication documentation](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-authentication.html).
 
 ## Catalog Configuration
-The catalog is organized into [modules, units, and stacks](/docs/concepts/#catalog-architecture), assembled into deployable pipelines under [`pipelines/`](../pipelines/).
+The catalog is organized into [modules, units, and stacks](/docs/architecture/#catalog-architecture), assembled into deployable pipelines under [`pipelines/`](../pipelines/).
 
 These pipelines are modular. They read `.hcl` configuration files that you need to modify:
 1. In [`pipelines/github.hcl`](../pipelines/github.hcl), modify the following variables:

@@ -6,7 +6,7 @@ import {DollarSign, KeyRound, Gauge, Globe, MessageSquare, Network} from 'lucide
 
 EKS Forge's [advanced features](/docs/overview/#features) rely on several tools (AWS, [Tailscale](https://tailscale.com/), [Slack](https://slack.com/intl/en-gb/), etc.) that need to be configured before you deploy the infrastructure. **Bootstrap pipelines** automate these configurations.
 
-They're [Terragrunt stacks](/docs/concepts/#catalog-architecture) that deploy account-level and repository-level resources, independent of any IaC environment (`dev`, `staging`, etc.). Each environment depends on these resources to function, so bootstrap pipelines need to run first.
+They're [Terragrunt stacks](/docs/architecture/#catalog-architecture) that deploy account-level and repository-level resources, independent of any IaC environment (`dev`, `staging`, etc.). Each environment depends on these resources to function, so bootstrap pipelines need to run first.
 
 Complete each of these one-time setup guides:
 
