@@ -1,25 +1,11 @@
-{/* This doc is deprecated and does not yet follow Diataxis. Do not base new docs on its style or structure. */}
+{/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 # Slack Bootstrap
 
-Registers the Slack bot token as a GitHub Actions secret, and creates the channels Alertmanager posts to.
+In this guide, you'll set up Slack to receive alerts from your cluster once it's [deployed](/docs/quickstart/deployment/).
 
-## Purpose
+First, [create a Slack workspace](https://slack.com/get-started#/createnew) if you don't already have one.
 
-Run this after manually creating and installing a Slack app. There are two independent bootstrap pipelines:
-
-- [`gh_secret`](gh_secret/): pushes `SLACK_BOT_TOKEN` into this repository's GitHub Actions secrets, so CI-driven environments can inject it into Alertmanager without managing the value by hand. Environment-independent, run **once**. `dev` reads the same value directly from local `.env` instead of going through this.
-- [`channels`](channels/): creates that environment's Slack channels, prefixed with the environment name (e.g. `dev-k8s-critical`), so the same shared bot can post every environment's alerts without colliding on one channel. Run **once per environment**.
-
-## Quick Start
-
-### Prerequisites
-
-Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate with AWS` (included).
-
-Create a Slack workspace at [https://slack.com/get-started#/createnew](https://slack.com/get-started#/createnew) if you don't already have one.
-
-Create a Slack app at [https://api.slack.com/apps/new](https://api.slack.com/apps/new), choosing "From an app manifest" and your workspace, then paste:
-
+Alerts need to be posted by a bot, not a personal account. You'll create a Slack app for it. First, [sign in](https://slack.com/signin#/signin) to Slack. Then, go to the [Slack's app page](https://api.slack.com/apps/) and click on `Create New App`. Then, choose `From an app manifest` and click on `Continue`. In the JSON code block, paste the following:
 ```json
 {
   "display_information": { "name": "alertmanager" },
@@ -44,19 +30,23 @@ Create a Slack app at [https://api.slack.com/apps/new](https://api.slack.com/app
   }
 }
 ```
+`chat:write.public` lets the bot post to any channel without being invited first. `channels:read`, `channels:manage`, and `channels:join` let it create and manage the channels you'll deploy next.
 
-`chat:write.public` lets the bot post to any channel without being invited to it first. `channels:read`, `channels:manage`, and `channels:join` are what the `pablovarela/slack` Terraform provider's `slack_conversation` resource needs to create and manage channels (see [`units/slack/channels`](../../../units/slack/README.md)).
+Under `Workspace`, select the workspace you want to receive notifications from and click `Next`. Finally, click on `Create and Install`. Your Slack App should be created by now.
 
-On the app's "OAuth & Permissions" page, below "OAuth Tokens", click "Install to `<YourWorkspaceName>`" and approve the consent screen.
+Next, we'll install the App into our workspace. Go back to the [Slack App home page](https://api.slack.com/apps) and click on `alertmanager` under `Your Apps`. Then, in the sidebar click on `OAuth & Permissions`. Below `OAuth Tokens`, click `Install to YourWorkspaceName` and approve the consent screen. You should see your bot token appear under the same section. It starts by `xoxb-`.
 
-### Configuration
+That token now needs to reach GitHub Actions, so CI can use it without you managing the value by hand. This bootstrap pipeline deploys a [`gh_secret` stack](gh_secret/) that adds the token to Github Actions secrets for you.
 
-Set up `GITHUB_TOKEN` and `SLACK_BOT_TOKEN` following the [environment variables guide](../../../docs/environment-variables.md).
+To be able to run `gh_secret`, set [`GITHUB_TOKEN`](/docs/reference/environment_variable/#github_token) and [`SLACK_BOT_TOKEN`](/docs/reference/environment_variable/#slack_bot_token) in your `.env` file.
 
-### Deploy
+Alerts also need somewhere to land. The [`channels` stack](channels/) creates the Slack channels your cluster posts alerts to (e.g. `dev-k8s-critical`).
 
-From the root directory of this repository, run:
+:::note
+Run `gh_secret` once per repository fork. CI needs `SLACK_BOT_TOKEN` as a GitHub Actions secret to run `terragrunt plan` on pull requests.
+:::
 
+Now let's deploy the pipelines. From the root directory of your [catalog fork](/docs/quickstart/installation/#fork-the-eks-forge-catalog), run the following [Terragrunt commands](/docs/iac/):
 ```bash
 source .env
 cd pipelines/bootstrap/slack
@@ -64,16 +54,15 @@ terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
-This deploys `gh_secret` and every environment under `channels/` in one pass. Terragrunt discovers both nested stacks from this directory.
+The bot is a member of each channel it creates by default, but you aren't. [Sign in](https://app.slack.com/signin#/signin) to Slack, click on your Workspace name and:
+1. Click `Directories` in the sidebar, then `Channels`
+2. Search for each channel name, prefixed by `dev-` (see [`channels.hcl`](channels.hcl) for the base names)
+3. Click `Join` on each one
 
-The bot is a member of each channel it creates by default, but you aren't. Join them from the Slack client:
+On your Slack workspace home page, under `Channels`, you should see all the `dev-` prefixed channel names.
 
-1. Click "Directories" in the sidebar, then "Channels"
-2. Search for each environment-prefixed channel name (see [`channels.hcl`](channels.hcl) for the base names)
-3. Click "Join" on each one
+On your repository's GitHub page, go to `Settings > Secrets and variables > Actions`. Under `Repository secrets`, you should see `SLACK_BOT_TOKEN` listed (its value stays hidden, only the name is shown). This confirms `gh_secret` deployed correctly.
 
-## Module Details
-
-See the [`units/slack`](../../../units/slack/README.md) group README for what each unit provisions and how they compose.
-
-For more information about this bootstrap, read the [`slack/gh_secret`](/docs/reference/bootstrap/slack_github_secrets/) and [`slack/channels`](/docs/reference/bootstrap/slack_channels/) reference documentation.
+For more information, read the following stack reference documentations:
+- [`slack/gh_secret`](/docs/reference/bootstrap/slack_github_secrets/)
+- [`slack/channels`](/docs/reference/bootstrap/slack_channels/)
