@@ -5,6 +5,8 @@ EKS Forge deploys internal tooling (ArgoCD, Prometheus, etc.) that your team nee
 In this guide, you'll set up [Tailscale](https://tailscale.com/docs/concepts/what-is-tailscale) as a VPN to access internal tools without exposing them to the internet, as well as allow CI to authenticate to Tailscale to create the resources required to bring up the VPN.
 
 :::warning
+This guide needs to be performed only once per repository fork before running the [deployment](/docs/quickstart/deployment/).
+
 Only instantiate the `acl` unit in the [catalog repository](https://github.com/ConsciousML/terragrunt-template-catalog-eks). It's a single tailnet-wide policy, not scoped to an environment.
 :::
 

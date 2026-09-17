@@ -3,6 +3,10 @@
 
 In this guide, you'll set up Slack to receive alerts from your cluster once it's [deployed](/docs/quickstart/deployment/).
 
+:::warning
+This guide needs to be performed only once per repository fork before running the [deployment](/docs/quickstart/deployment/).
+:::
+
 First, [create a Slack workspace](https://slack.com/get-started#/createnew) if you don't already have one.
 
 Alerts need to be posted by a bot, not a personal account. You'll create a Slack app for it. First, [sign in](https://slack.com/signin#/signin) to Slack. Then, go to the [Slack's app page](https://api.slack.com/apps/) and click on `Create New App`. Then, choose `From an app manifest` and click on `Continue`. In the JSON code block, paste the following:
@@ -41,10 +45,6 @@ That token now needs to reach GitHub Actions, so CI can use it without you manag
 To be able to run `gh_secret`, set [`GITHUB_TOKEN`](/docs/reference/environment_variable/#github_token) and [`SLACK_BOT_TOKEN`](/docs/reference/environment_variable/#slack_bot_token) in your `.env` file.
 
 Alerts also need somewhere to land. The [`channels` stack](channels/) creates the Slack channels your cluster posts alerts to (e.g. `dev-k8s-critical`).
-
-:::note
-Run `gh_secret` once per repository fork. CI needs `SLACK_BOT_TOKEN` as a GitHub Actions secret to run `terragrunt plan` on pull requests.
-:::
 
 Now let's deploy the pipelines. From the root directory of your [catalog fork](/docs/quickstart/installation/#fork-the-eks-forge-catalog), run the following [Terragrunt commands](/docs/iac/):
 ```bash
