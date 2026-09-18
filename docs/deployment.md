@@ -106,6 +106,6 @@ terragrunt run --all destroy --non-interactive --no-stack-generate
 
 ## What's next
 1. see the [monitoring guide](/docs/monitoring/) to learn how to interact with internal tools
-2. deploy the `prod` and `staging` environment with [CI/CD](/docs/ci-cd/)
+2. deploy the `prod` and `staging` environment with the [deployment guide](/docs/deployment/)
 3. add an application to your cluster following [applications guide](/docs/applications/)
 4. add infrastructure components using the [IaC development guide](/docs/iac/development/)
