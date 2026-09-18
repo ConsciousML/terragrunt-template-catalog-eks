@@ -12,7 +12,7 @@ The dev directory uses the same configuration pattern as the live template:
 - [`region.hcl`](../region.hcl): AWS region for all resources
 - [`dns.hcl`](../dns.hcl): Base domain and per-app subdomains for private and public applications, used for Route53 and ACM
 - [`network.hcl`](../network.hcl): VPC CIDR blocks, per-service host offsets for pinned VPC interface endpoint IPs, and the app-param key each maps to for `CiliumNetworkPolicy` consumers
-- [`github.hcl`](../github.hcl): GitHub owner, catalog repository name, and app-of-apps repository name for module sources
+- [`github.hcl`](../github.hcl): GitHub owners (catalog and app-of-apps), catalog repository name, and app-of-apps repository name for module sources
 - [`version.hcl`](../version.hcl): Resolves the current git branch used as `?ref=` in all module sources
 - [`environment.hcl`](environment.hcl): Environment name (e.g., `dev`) used for resource naming and state isolation, and the alias exposed to Helm as `global.environment`
 - [`cluster_name.hcl`](cluster_name.hcl): EKS cluster name

@@ -194,7 +194,7 @@ dependency "vpc_endpoint_cidrs" {
 
 inputs = {
   cluster_name          = dependency.eks_cluster.outputs.cluster_name
-  repo_url              = "https://github.com/${include.root.locals.github_owner_catalog}/${include.root.locals.github_repo_name_app_of_apps}"
+  repo_url              = "https://github.com/${include.root.locals.github_owner_app_of_apps}/${include.root.locals.github_repo_name_app_of_apps}"
   name                  = values.name
   namespace             = values.namespace
   path                  = values.path
