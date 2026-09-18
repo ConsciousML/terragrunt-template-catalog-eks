@@ -6,7 +6,7 @@ Now that you've reviewed the [prerequisites](/docs/quickstart/prerequisites/), a
 ## Create the spot service-linked role
 
 EKS Forge uses [spot EC2 instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html) for non-critical workloads to reduce cloud costs.
-This creates the EC2 Spot [service-linked role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create-service-linked-role.html) required for Karpenter to provision spot instances:
+This creates the EC2 Spot [service-linked role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create-service-linked-role.html) required to provision spot instances:
 ```bash
 aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 ```
@@ -23,7 +23,7 @@ terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-gene
 
 The deployment of this [Terragrunt stack](/docs/iac/#stacks) should take around 20 mins.
 
-When it's done, connect `kubectl` to your `dev` EKS cluster by creating a `kubeconfig` (replace `<region-code>` by the region you used when you [configured the catalog](/docs/quickstart/configuration/#catalog-configuration)):
+When it's done, connect `kubectl` to your `dev` EKS cluster by creating a [`kubeconfig`](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/) (replace `<region-code>` by the region you used when you [configured the catalog](/docs/quickstart/configuration/#catalog-configuration)):
 ```bash
 aws eks update-kubeconfig --region <region-code> --name dev-cluster
 ```
@@ -44,7 +44,7 @@ eks-pod-identity-agent-9pq6k   1/1     Running   0          41m
 
 ## Deploy applications with ArgoCD
 
-This stack spins up [ArgoCD](https://argo-cd.readthedocs.io/en/stable/) to deploy the [Kubernetes](https://kubernetes.io/) resources with [GitOps](https://about.gitlab.com/topics/gitops/). Once you've run the Terragrunt stack, ArgoCD will take some time deploying these resources. You can monitor the progress by running:
+This stack spins up [ArgoCD](https://argo-cd.readthedocs.io/en/stable/) to deploy [Kubernetes](https://kubernetes.io/) resources with [GitOps](https://about.gitlab.com/topics/gitops/). Once you've run the Terragrunt stack, ArgoCD will take some time deploying these resources. You can monitor the progress by running:
 ```bash
 kubectl get app -n argocd
 ```
@@ -63,7 +63,7 @@ When every application shows `Synced` and `Healthy`, the deployment succeeded.
 
 ## Log in to ArgoCD
 
-For security reasons, internal tooling is not exposed to the internet. ArgoCD's API and UI are only reachable using Tailscale. Run the [Tailscale Client](https://tailscale.com/download) and click on `Log In...`. Then click on the button in the top-right to connect or run `tailscale up` in your terminal.
+For security reasons, internal tools (ArgoCD, Prometheus, etc.) are not exposed to the internet. ArgoCD's API and UI are only reachable using Tailscale. Run the [Tailscale Client](https://tailscale.com/download) and click on `Log In...`. Then click on the button in the top-right to connect or run `tailscale up` in your terminal.
 
 The ArgoCD host is `argocd.private.dev.<base_domain>` (replace `<base_domain>` with the [value from `pipelines/dns.hcl`](/docs/quickstart/bootstrap/setup_dns/), e.g. `argocd.private.dev.axelmendoza.com`).
 There are two ways to interact with your ArgoCD instance:
@@ -105,4 +105,7 @@ terragrunt run --all destroy --non-interactive --no-stack-generate
 ```
 
 ## What's next
-- EKS Forge deploys many internal tools alongside ArgoCD, see the [monitoring guide](/docs/monitoring/) to learn how to interact with them
+1. see the [monitoring guide](/docs/monitoring/) to learn how to interact with internal tools
+2. deploy the `prod` and `staging` environment with [CI/CD](/docs/ci-cd/)
+3. add an application to your cluster following [applications guide](/docs/applications/)
+4. add infrastructure components using the [IaC development guide](/docs/iac/development/)
