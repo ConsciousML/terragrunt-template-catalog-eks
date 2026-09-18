@@ -3,7 +3,7 @@
 # Installation
 
 ## Fork the EKS Forge Catalog 
-EKS Forge is a toolkit containing multiple [repository templates](../../concepts/), each with their own responsibilities.
+EKS Forge is a toolkit containing multiple [repository templates](/docs/architecture/), each with their own responsibilities.
 They're meant to be forked and extended.
 
 To get started, you'll fork the catalog, a collection of [Terraform](https://developer.hashicorp.com/terraform) modules and [Terragrunt](https://docs.terragrunt.com/getting-started/terminology/#terragrunt) pipelines, re-usable across multiple environments (`dev`, `staging`, and `prod`):

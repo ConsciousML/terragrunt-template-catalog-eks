@@ -1,12 +1,12 @@
 {/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 
-### Architecture
+## Catalog Architecture
 
-The [catalog repository](https://github.com/ConsciousML/terragrunt-template-catalog-eks) contains multiple building blocks that follow a layered architecture where each layer builds upon the previous one:
-1. [Terraform module](https://developer.hashicorp.com/terraform/language/modules): a re-usable component that creates cloud resources.
-2. [Terragrunt unit](https://docs.terragrunt.com/features/units/): a wrapper over a TF module. It defines a single, deployable piece of infrastructure.
-3. [Terragrunt stack](https://docs.terragrunt.com/features/stacks/): a re-usable [DAG](https://en.wikipedia.org/wiki/Directed_acyclic_graph) of units.
+The [catalog repository](https://github.com/ConsciousML/terragrunt-template-catalog-eks) is organized into Terraform modules, Terragrunt units, and stacks, a layered architecture where each layer builds upon the previous one:
+- [`modules/`](../modules/) contains the [Terraform modules](https://developer.hashicorp.com/terraform/language/modules)
+- [`units/`](../units/) contains the [Terragrunt units](/docs/iac/#units)
+- [`stacks/`](../stacks/) contains generic [Terragrunt stacks](/docs/iac/#stacks) that are used across repositories
 
-In other words, a stack orchestrates multiple units that materialize TF modules.
-The [`modules/`](../modules/), [`units/`](../units/), and [`stacks/`](../stacks/) directories contain these components respectively.
-In the [`pipelines/`](../pipelines/) directory, you'll find all the implemented stacks, also called pipelines.
+In the [`pipelines/`](../pipelines/) directory, you'll find all the implemented stacks, also called pipelines:
+- [`pipelines/bootstrap`](../pipelines/bootstrap/) contains all the [bootstrap pipelines](/docs/quickstart/bootstrap/)
+- [`pipelines/dev`](../pipelines/dev/) is the `dev` IaC environment deploying the [EKS stack](/docs/overview/#features) 

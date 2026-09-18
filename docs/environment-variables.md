@@ -1,18 +1,22 @@
+{/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 # Environment Variables
 
-The single reference for every environment variable used across the bootstrap pipelines and EKS stack: what it is, how to obtain it, and which workflows require it.
+The reference for every environment variable used by EKS Forge.
 
 ## Prerequisite
 If you haven't already, copy the example file:
 ```bash
 cp .env.example .env
 ```
+`.env.example` is prefilled with every variable below, pointing to the doc that explains it. You only need to fill in the values.
+
+:::danger
+Once filled in, `.env` holds sensitive credentials. Never commit it to version control.
+:::
 
 ## `GITHUB_TOKEN`
 
-**Required by**: `pipelines/bootstrap/aws_gh_actions_auth/`
-
-A GitHub fine-grained personal access token used to register GitHub secrets and deploy keys in the bootstrap pipeline.
+This environment variable is needed for running the [GitHub Terraform provider](https://registry.terraform.io/providers/integrations/github/latest/docs).
 
 Authenticate with the GitHub CLI first:
 ```bash
@@ -24,16 +28,14 @@ Then copy the token:
 gh auth token
 ```
 
-Add it to your `.env`:
+Add it to your `.env` file:
 ```bash
 export GITHUB_TOKEN=<your_token>
 ```
 
 ## `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET`
 
-**Required by**: `pipelines/bootstrap/tailscale/`
-
-A Tailscale OAuth client used to authenticate to the Tailscale API and provision resources (ACL, WIF credential, subnet router, split DNS).
+A Tailscale OAuth client used to authenticate to the Tailscale API and provision resources.
 
 Go to [Tailscale Trust Credentials](https://login.tailscale.com/admin/settings/trust-credentials), then:
 

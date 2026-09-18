@@ -1,63 +1,21 @@
-# GitHub Actions AWS Bootstrap
-Authenticates GitHub Actions with AWS, enabling Terragrunt to run in CI/CD.
+{/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
+# AWS GitHub Actions Authentication Bootstrap
 
-## Purpose
+EKS Forge uses [CI/CD](/docs/ci-cd/) to run code quality checks such as `terragrunt plan` on PR. To be able to do that, you'll authenticate GitHub Actions with AWS.
 
-Run this **once** after creating a new GitHub repository from this template, so CI can authenticate to AWS without managing secrets or credentials by hand.
+:::warning
+This guide needs to be performed only once per repository fork before running the [deployment](/docs/quickstart/deployment/).
 
-## Quick Start
+If deploying this bootstrap for an additional repository on the same AWS account or organization, read the [reference documentation](/docs/reference/bootstrap/aws_gh_actions_auth/).
+:::
 
-### Prerequisites
-Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate with AWS` (included).
+To run Terragrunt in GitHub Actions, this [bootstrap pipeline](/docs/quickstart/bootstrap) creates an IAM [OIDC identity provider and role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html) that GitHub Actions assumes at runtime. [OpenID Connect](https://docs.github.com/en/actions/concepts/security/openid-connect) (OIDC) is a protocol that lets AWS trust GitHub as an identity provider, so a workflow run authenticates with a GitHub-issued token instead of stored credentials.
 
-### Configuration
-Set up `GITHUB_TOKEN` following the [environment variables guide](../../../docs/environment-variables.md#github_token).
+After deploying this pipeline, you'll be able to have a functional CI for your [catalog repository fork](/docs/quickstart/installation/#fork-the-eks-forge-catalog) without any manual step.
 
-In the `terragrunt.stack.hcl`, update the following values in the `stack "aws_gh_actions_auth"` block:
+Before starting, set up `GITHUB_TOKEN` in your `.env` file by following the [environment variables guide](/docs/reference/environment_variable/#github_token).
 
-```hcl
-values = {
-  iam_role_name = "gh-terragrunt-role-catalog"
-
-  # Replace this by a list of fine-grained IAM policies for improved security 
-  policy_arns = [
-    "arn:aws:iam::aws:policy/AdministratorAccess",
-  ]
-
-  # Restrict to a specific branch for tighter security (e.g. "main")
-  # Defaults to "*" which allows all branches
-  github_branch = "*"
-
-  # OIDC Provider creation needs to be set to true only for the first repo in this AWS account
-  create_oidc_provider = false
-
-  # List of repository names to give read-only access to the CI
-  # This is necessary for Terragrunt to pull remote source code from external repositories
-  deploy_key_repositories = [
-    "repo_name_1",
-    ...
-    "repo_name_N"
-  ]
-
-  # Attribute a secret name for each deploy key. Use the same order as deploy_key_repositories
-  deploy_key_secret_names = [
-    "DEPLOY_KEY_TG_CATALOG",
-    ...
-  ]
-
-  deploy_key_title = "Terragrunt Catalog Deploy Key"
-  # ... other values can remain as defaults
-}
-```
-
-**Caution:** 
-- The GitHub Actions OIDC provider is a **global AWS account-level resource**.
-- It can only be created once per AWS account.
-- If you've already run this bootstrap pipeline in another repository using the same AWS account, set `create_oidc_provider = false` to use the existing OIDC provider instead of attempting to create a new one. Otherwise, the deployment will fail with an `EntityAlreadyExists` error.
-- Also change the value of `iam_role_name` to avoid conflicts.
-
-### Deploy
-From the root directory of this repository, run:
+Now let's deploy the pipeline. From the root of your catalog fork run the following commands:
 ```bash
 source .env
 cd pipelines/bootstrap/aws_gh_actions_auth/
@@ -65,36 +23,5 @@ terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
-### Update Your GitHub Actions file
-**Optional:** if you haven't changed the deploy key secret names, you can skip this step.
-
-Update your `.github/workflows/ci.yaml` to use the correct deploy key secret names in the setup action:
-
-For single deploy key, update the `deploy-keys` parameter to match the value in `deploy_key_secret_names`:
-```yaml
-- uses: ./.github/actions/setup
-  with:
-    deploy-keys: ${{ secrets.YOUR_DEPLOY_KEY_NAME }}
-    role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-    aws-region: ${{ secrets.AWS_REGION }}
-    # other arguments are unchanged
-```
-
-If using multiple deploy keys:
-```yaml
-- uses: ./.github/actions/setup
-  with:
-    deploy-keys: |
-      ${{ secrets.DEPLOY_KEY_SECRET_NAME_1 }}
-      ${{ secrets.DEPLOY_KEY_SECRET_NAME_2 }}
-    role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-    aws-region: ${{ secrets.AWS_REGION }}
-    # other arguments are unchanged
-```
-
-### Using the CI
-Read the [continuous integration guide](../../../docs/continuous-integration.md#using-the-ci).
-
-## Module Details
-
-See the [`units/github`](../../../units/github/README.md) group README for what each unit provisions and how they compose.
+Read the [Infrastructure as Code documentation](/docs/iac/) for a better understanding of Terragrunt.
+For more information about this bootstrap, read the [reference documentation](/docs/reference/bootstrap/aws_gh_actions_auth/).

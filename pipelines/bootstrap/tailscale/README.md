@@ -1,34 +1,30 @@
 # Tailscale Bootstrap
 
-Sets up Tailscale as a VPN and configures the access control policy, workload identity credentials, and GitHub secrets needed to:
+EKS Forge deploys internal tooling (ArgoCD, Prometheus, etc.) that your team needs as private endpoints inside your VPC. These endpoints are not accessible from the public internet.
 
-- Allow the Tailscale Connector to expose the private VPC subnets to the Tailnet, making internal cluster resources reachable over VPN
-- Access internal cluster tools (ArgoCD, etc.) over the Tailnet without exposing them to the public internet
-- Allow CI to authenticate to Tailscale to create the Tailscale resources required to bring up the VPN
+In this guide, you'll set up [Tailscale](https://tailscale.com/docs/concepts/what-is-tailscale) as a VPN to access internal tools without exposing them to the internet, as well as allow CI to authenticate to Tailscale to create the resources required to bring up the VPN.
 
-## Purpose
+:::warning
+This guide needs to be performed only once per repository fork before running the [deployment](/docs/quickstart/deployment/).
 
-Run this **once** before deploying the Tailscale operator into any EKS cluster. The ACL policy and WIF credential must exist in Tailscale before the per-cluster units can create subnet routers and configure split DNS.
+Only instantiate the `acl` unit in the [catalog repository](https://github.com/ConsciousML/terragrunt-template-catalog-eks). It's a single tailnet-wide policy, not scoped to an environment.
+:::
 
-**Warning**: only instantiate the `acl` unit in the catalog repo, not in a live repo. It's a single tailnet-wide policy, not scoped to a repo or environment.
+First, create an account and [login to Tailscale](https://login.tailscale.com/admin/welcome).
 
-## Quick Start
+Then, download and install the [Tailscale client](https://tailscale.com/download).
 
-### Prerequisites
-Perform the [quickstart](../../../README.md#getting-started) up to `Authenticate with AWS` (included).
+Next, set up `GITHUB_TOKEN` in the [environment variables guide](/docs/reference/environment_variable/#github_token).
 
-Create an account and login at [https://login.tailscale.com/admin/welcome](https://login.tailscale.com/admin/welcome).
+To authenticate Terraform with Tailscale, create an [OAuth client and fill the `TAILSCALE_OAUTH_CLIENT_ID` and `TAILSCALE_OAUTH_CLIENT_SECRET`](/docs/reference/environment_variable/#tailscale_oauth_client_id-and-tailscale_oauth_client_secret) environment variable in your `.env` file.
 
-Download and install the [Tailscale client](https://tailscale.com/download).
+A [tailnet](https://tailscale.com/docs/concepts/tailnet) is your private Tailscale network. This is what will allow you to reach the internal tools inside the cluster.
 
-### Configuration
-Set up `GITHUB_TOKEN`, `TAILSCALE_OAUTH_CLIENT_ID`, and `TAILSCALE_OAUTH_CLIENT_SECRET` following the [environment variables guide](../../../docs/environment-variables.md).
+Tailscale needs two things set up to work this way: 
+- The [Access Control (ACL)](https://tailscale.com/docs/features/access-control/acls) is the tailnet's central policy defining the resources' permission.
+- [Workload Identity Federation](https://tailscale.com/docs/features/workload-identity-federation) is a per-repository credential that lets CI prove its identity to Tailscale without a stored secret.
 
-All environment VPC CIDRs are read automatically from `network.hcl` and used to build the ACL `autoApprovers` dynamically. The `ci_tag` can be left as the default `tag:ci`.
-
-### Deploy
-
-The ACL must exist before the WIF credential, since the WIF's OAuth client is scoped to a tag (`tag:ci`) that only the ACL defines. Deploy the two in order, from the root directory of this repository:
+The ACL must exist first, since WIF's credential is scoped to a tag (`tag:ci`) only the ACL defines. Deploy the two pipelines in the right order, from the root directory of your [catalog fork](/docs/quickstart/installation/#fork-the-eks-forge-catalog):
 
 ```bash
 source .env
@@ -43,6 +39,14 @@ terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
-## Module Details
+Now let's explore the resources you have created using the Tailscale admin console. Launch the Tailscale client that you have installed (or run `tailscale up` in your terminal) and go to [My Machines](https://console.tailscale.com/admin/machines). Here, you should see your local machine connected to the tailnet.
 
-See the [`units/tailscale`](../../../units/tailscale/README.md) and [`units/eks/addons/tailscale`](../../../units/eks/addons/tailscale/README.md) group READMEs for what each unit provisions and how they compose.
+In the [ACL JSON Editor](https://console.tailscale.com/admin/acls/file), your ACL file should contain `autoApprovers` and `tagOwners`.
+
+On your repository's GitHub page, go to `Settings > Secrets and variables > Actions`. Under `Repository secrets`, you should see `TS_OAUTH_CLIENT_ID`, `TS_AUDIENCE`, and `TS_TAGS` (values stay hidden, only the names are shown). These are the secrets GitHub Actions uses to authenticate with Tailscale.
+
+For more information, read:
+- [how Tailscale has been implemented](/docs/security/tailscale/) in EKS Forge
+- the [`tailscale/acl`](/docs/reference/bootstrap/tailscale_acl/) reference documentation
+- the [`tailscale/wif`](/docs/reference/bootstrap/tailscale_wif/) reference documentation
+- the [Infrastructure as Code](/docs/iac/) documentation
