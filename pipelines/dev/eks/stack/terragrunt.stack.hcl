@@ -237,8 +237,8 @@ unit "cluster" {
         addon_version = "v1.14.2-eksbuild.4"
         configuration_values = jsonencode({
           resources = {
-            requests = { cpu = "11m", memory = "24M" }
-            limits   = { cpu = "55m", memory = "24M" }
+            requests = { cpu = "50m", memory = "48M" }
+            limits   = { cpu = "50m", memory = "48M" }
           }
           tolerations = local.mng_tolerations
         })
@@ -248,8 +248,8 @@ unit "cluster" {
         addon_version  = "v1.3.10-eksbuild.3"
         configuration_values = jsonencode({
           resources = {
-            requests = { cpu = "11m", memory = "24M" }
-            limits   = { cpu = "55m", memory = "24M" }
+            requests = { cpu = "50m", memory = "24M" }
+            limits   = { cpu = "50m", memory = "24M" }
           }
         })
       }
@@ -270,8 +270,8 @@ unit "cluster" {
         addon_version = "v0.9.0-eksbuild.2"
         configuration_values = jsonencode({
           resources = {
-            requests = { cpu = "11m", memory = "37M" }
-            limits   = { cpu = "55m", memory = "37M" }
+            requests = { cpu = "11m", memory = "64M" }
+            limits   = { cpu = "55m", memory = "64M" }
           }
           tolerations = local.mng_tolerations
         })
@@ -384,8 +384,8 @@ unit "ebs_csi_driver_addon" {
       }
       node = {
         resources = {
-          requests = { cpu = "11m", memory = "24M" }
-          limits   = { cpu = "11m", memory = "24M" }
+          requests = { cpu = "50m", memory = "24M" }
+          limits   = { cpu = "50m", memory = "24M" }
         }
         tolerations = local.mng_tolerations
       }
@@ -591,16 +591,16 @@ unit "argocd" {
           }
         }
         resources = {
-          requests = { cpu = "11m", memory = "64M" }
-          limits   = { cpu = "11m", memory = "64M" }
+          requests = { cpu = "50m", memory = "64M" }
+          limits   = { cpu = "50m", memory = "64M" }
         }
         nodeSelector = local.critical_node_selector
         tolerations  = local.critical_tolerations
       }
       applicationSet = {
         resources = {
-          requests = { cpu = "11m", memory = "64M" }
-          limits   = { cpu = "11m", memory = "64M" }
+          requests = { cpu = "50m", memory = "64M" }
+          limits   = { cpu = "50m", memory = "64M" }
         }
         nodeSelector = local.critical_node_selector
         tolerations  = local.critical_tolerations
