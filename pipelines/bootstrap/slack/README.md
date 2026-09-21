@@ -4,7 +4,7 @@
 In this guide, you'll set up Slack to receive alerts from your cluster once it's [deployed](/docs/quickstart/deployment/).
 
 :::warning
-This guide needs to be performed only once per repository fork before running the [deployment](/docs/quickstart/deployment/).
+This guide needs to be performed only once per catalog fork before running the [deployment](/docs/quickstart/deployment/).
 :::
 
 First, [create a Slack workspace](https://slack.com/get-started#/createnew) if you don't already have one.

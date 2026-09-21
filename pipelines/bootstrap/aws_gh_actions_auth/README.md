@@ -4,7 +4,7 @@
 EKS Forge uses [CI/CD](/docs/ci-cd/) to run code quality checks such as `terragrunt plan` on PR. To be able to do that, you'll authenticate GitHub Actions with AWS.
 
 :::warning
-This guide needs to be performed only once per repository fork before running the [deployment](/docs/quickstart/deployment/).
+This guide needs to be performed only once per catalog fork before running the [deployment](/docs/quickstart/deployment/).
 
 If deploying this bootstrap for an additional repository on the same AWS account or organization, read the [reference documentation](/docs/reference/bootstrap/aws_gh_actions_auth/).
 :::

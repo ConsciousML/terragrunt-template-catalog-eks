@@ -4,7 +4,7 @@
 In this guide, you'll set up your domain to be able to expose your cluster apps through it during the [deployment](/docs/quickstart/deployment/).
 
 :::warning
-This guide needs to be performed only once per repository fork before running the [deployment](/docs/quickstart/deployment/).
+This guide needs to be performed only once per catalog fork before running the [deployment](/docs/quickstart/deployment/).
 :::
 
 This [bootstrap pipeline](/docs/quickstart/bootstrap) creates a public [Route 53](https://aws.amazon.com/route53/) [hosted zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-working-with.html), a container for the DNS records that route traffic to your domain. It's what exposes your internet-facing apps, and what [ACM](https://aws.amazon.com/certificate-manager/) uses to validate their [TLS certificate](https://aws.amazon.com/what-is/ssl-certificate/), so they can be reached over [HTTPS](https://en.wikipedia.org/wiki/HTTPS).
