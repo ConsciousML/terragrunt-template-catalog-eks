@@ -53,7 +53,7 @@ You should see something similar to:
         "<nameserver_1>",
         "<nameserver_2>",
         "<nameserver_3>",
-        "<nameserver_4>",
+        "<nameserver_4>"
       ]
     }
   }
