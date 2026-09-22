@@ -10,6 +10,8 @@ stack "setup_dns" {
   source = "github.com/${local.github_owner_catalog}/${local.github_repo_name_catalog}//stacks/setup_dns?ref=${local.version}"
   path   = "setup_dns"
   values = {
-    version = local.version
+    version                  = local.version
+    github_owner_catalog     = local.github_owner_catalog
+    github_repo_name_catalog = local.github_repo_name_catalog
   }
 }

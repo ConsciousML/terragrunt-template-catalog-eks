@@ -1,5 +1,5 @@
 unit "tailscale_wif" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/tailscale/workflow_identity_federation?ref=${values.version}"
+  source = "git::git@github.com:${values.github_owner_catalog}/${values.github_repo_name_catalog}.git//units/tailscale/workflow_identity_federation?ref=${values.version}"
   path   = "tailscale/workflow_identity_federation"
 
   values = {
@@ -12,7 +12,7 @@ unit "tailscale_wif" {
 }
 
 unit "tailscale_github_secrets" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/tailscale/github_secrets?ref=${values.version}"
+  source = "git::git@github.com:${values.github_owner_catalog}/${values.github_repo_name_catalog}.git//units/tailscale/github_secrets?ref=${values.version}"
   path   = "tailscale/github_secrets"
 
   values = {

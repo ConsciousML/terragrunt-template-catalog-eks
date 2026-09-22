@@ -1,5 +1,5 @@
 unit "billing_anomaly_detection" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/billing/anomaly_detection?ref=${values.version}"
+  source = "git::git@github.com:${values.github_owner_catalog}/${values.github_repo_name_catalog}.git//units/billing/anomaly_detection?ref=${values.version}"
   path   = "billing/anomaly_detection"
 
   values = {

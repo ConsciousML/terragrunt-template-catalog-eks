@@ -19,7 +19,9 @@ stack "billing_budgets" {
   source = "github.com/${local.github_owner_catalog}/${local.github_repo_name_catalog}//stacks/billing_budgets?ref=${local.version}"
   path   = "billing_budgets"
   values = {
-    version = local.version
+    version                  = local.version
+    github_owner_catalog     = local.github_owner_catalog
+    github_repo_name_catalog = local.github_repo_name_catalog
 
     thresholds_usd            = local.thresholds_usd
     forecasted_thresholds_usd = local.forecasted_thresholds_usd
@@ -35,7 +37,9 @@ stack "billing_anomaly_detection" {
   source = "github.com/${local.github_owner_catalog}/${local.github_repo_name_catalog}//stacks/billing_anomaly_detection?ref=${local.version}"
   path   = "billing_anomaly_detection"
   values = {
-    version = local.version
+    version                  = local.version
+    github_owner_catalog     = local.github_owner_catalog
+    github_repo_name_catalog = local.github_repo_name_catalog
 
     # Edit these before deploying
     monitor_name      = "anomaly-monitor"

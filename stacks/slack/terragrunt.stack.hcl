@@ -1,5 +1,5 @@
 unit "slack_github_secrets" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/slack/github_secrets?ref=${values.version}"
+  source = "git::git@github.com:${values.github_owner_catalog}/${values.github_repo_name_catalog}.git//units/slack/github_secrets?ref=${values.version}"
   path   = "slack/github_secrets"
 
   values = {
