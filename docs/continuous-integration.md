@@ -6,10 +6,16 @@ The [CI](../.github/workflows/ci.yaml) validates Terragrunt configurations on ev
 
 ## How It Works
 
-The [CI](../.github/workflows/ci.yaml) consists of four jobs, run in sequence:
+The [CI](../.github/workflows/ci.yaml) consists of six jobs. The first three run in parallel and gate the rest, which run in sequence:
 
 ### Draft PR Check
 Runs first on every PR event and fails immediately if the PR is in draft mode. This prevents all downstream jobs from running until the PR is marked as ready for review.
+
+### TEMP Marker Check
+Fails if any file still contains a `TEMP:` marker, a reminder to revert a temporary change before merging.
+
+### Lock File Check
+Fails if any unit under `units/` has a `terragrunt.hcl` without a committed `.terraform.lock.hcl` next to it. Run `make check-lock-files` to reproduce locally, and see [reproducibility](reproducibility.md) to generate the missing files.
 
 ### Documentation Generation
 Uses `terraform-docs` to automatically generate `README.md` in each terraform module in `modules/`, committing and pushing any changes back to the PR branch.
