@@ -12,11 +12,13 @@ stack "aws_gh_actions_auth" {
   source = "github.com/${local.github_owner_catalog}/${local.github_repo_name_catalog}//stacks/aws_gh_actions_auth?ref=${local.version}"
   path   = "github_actions_bootstrap"
   values = {
-    version          = local.version
-    github_owner     = local.github_owner_catalog
-    github_repo_name = local.github_repo_name_catalog
-    github_token     = local.github_token
-    iam_role_name    = "gh-terragrunt-role-catalog"
+    version                  = local.version
+    github_owner_catalog     = local.github_owner_catalog
+    github_repo_name_catalog = local.github_repo_name_catalog
+    github_owner             = local.github_owner_catalog
+    github_repo_name         = local.github_repo_name_catalog
+    github_token             = local.github_token
+    iam_role_name            = "gh-terragrunt-role-catalog"
     policy_arns = [
       "arn:aws:iam::aws:policy/AdministratorAccess",
     ]

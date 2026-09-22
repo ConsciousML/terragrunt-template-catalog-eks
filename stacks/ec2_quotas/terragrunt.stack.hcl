@@ -1,5 +1,5 @@
 unit "ec2_ondemand_quota" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/service_quota?ref=${values.version}"
+  source = "git::git@github.com:${values.github_owner_catalog}/${values.github_repo_name_catalog}.git//units/service_quota?ref=${values.version}"
   path   = "ec2_ondemand_quota"
 
   values = {
@@ -11,7 +11,7 @@ unit "ec2_ondemand_quota" {
 }
 
 unit "ec2_spot_quota" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/service_quota?ref=${values.version}"
+  source = "git::git@github.com:${values.github_owner_catalog}/${values.github_repo_name_catalog}.git//units/service_quota?ref=${values.version}"
   path   = "ec2_spot_quota"
 
   values = {

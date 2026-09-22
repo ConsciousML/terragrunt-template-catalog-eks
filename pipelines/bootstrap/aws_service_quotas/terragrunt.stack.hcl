@@ -14,7 +14,9 @@ stack "ec2_quotas" {
   source = "github.com/${local.github_owner_catalog}/${local.github_repo_name_catalog}//stacks/ec2_quotas?ref=${local.version}"
   path   = "ec2_quotas"
   values = {
-    version = local.version
+    version                  = local.version
+    github_owner_catalog     = local.github_owner_catalog
+    github_repo_name_catalog = local.github_repo_name_catalog
 
     ondemand_desired_value = local.ondemand_desired_value
     spot_desired_value     = local.spot_desired_value

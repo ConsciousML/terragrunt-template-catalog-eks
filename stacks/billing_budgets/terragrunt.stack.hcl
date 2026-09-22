@@ -1,5 +1,5 @@
 unit "billing_budget_actual" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/billing/budget_actual?ref=${values.version}"
+  source = "git::git@github.com:${values.github_owner_catalog}/${values.github_repo_name_catalog}.git//units/billing/budget_actual?ref=${values.version}"
   path   = "billing/budget_actual"
 
   values = {
@@ -12,7 +12,7 @@ unit "billing_budget_actual" {
 }
 
 unit "billing_budget_forecasted" {
-  source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/billing/budget_forecasted?ref=${values.version}"
+  source = "git::git@github.com:${values.github_owner_catalog}/${values.github_repo_name_catalog}.git//units/billing/budget_forecasted?ref=${values.version}"
   path   = "billing/budget_forecasted"
 
   values = {

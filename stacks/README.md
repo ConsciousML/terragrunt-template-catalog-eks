@@ -24,11 +24,8 @@ terragrunt run --all apply --no-stack-generate
 For understanding individual components, see the [units directory](../units/).
 
 ## For Developers
-**Caution**: if you want to change the code of these pipelines, make sure to change every occurence of the following in the `stacks/` folder:
+Stacks build their unit sources from the `github_owner_catalog` and `github_repo_name_catalog` values:
 ```hcl
-source = "git::git@github.com:ConsciousML/terragrunt-template-catalog-eks.git//units/<unit_path>?ref=${values.version}"
+source = "git::git@github.com:${values.github_owner_catalog}/${values.github_repo_name_catalog}.git//units/<unit_path>?ref=${values.version}"
 ```
-by your forked repository (replacing `<github_owner>` and `<your_forked_repo_name>`):
-```hcl
-source = "git::git@github.com:<github_owner>/<your_forked_repo_name>.git//units/<unit_path>?ref=${values.version}"
-```
+Every caller must pass both values, read from `pipelines/github.hcl`. A fork only needs to update that file to source units from itself.
