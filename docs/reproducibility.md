@@ -1,6 +1,6 @@
 # Reproducibility
 
-Provider lock files (`.terraform.lock.hcl`) must be committed per unit for stacks to be reproducible.
+Provider lock files (`.terraform.lock.hcl`) must be committed per unit for stacks to be reproducible. CI enforces this with `make check-lock-files`.
 
 ## Generate the Lock Files
 

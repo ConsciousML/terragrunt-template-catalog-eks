@@ -39,14 +39,23 @@ jobs:
 
       - name: Fail on leftover TEMP markers
         run: |
-          if grep -rn "TEMP:" --exclude-dir=.git --exclude=ci.yaml .; then
+          if grep -rn "TEMP:" --exclude-dir=.git --exclude=ci.yaml --exclude=continuous-integration.md .; then
             echo "Found leftover TEMP: marker(s), revert before merging." >&2
             exit 1
           fi
 
+  check-lock-files:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+
+      - name: Fail on units missing a provider lock file
+        run: make check-lock-files
+
   terraform-docs:
     # Generates terraform documentation using terraform-docs
-    needs: [check-if-pr-is-draft, check-temp-markers]
+    needs: [check-if-pr-is-draft, check-temp-markers, check-lock-files]
     runs-on: ubuntu-24.04
 
     steps:

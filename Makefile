@@ -1,4 +1,7 @@
-.PHONY: clean sync-lock-files trivy trivy-local
+.PHONY: check-lock-files clean sync-lock-files trivy trivy-local
+
+check-lock-files:
+	./scripts/check-lock-files.sh
 
 clean:
 	terragrunt stack clean
