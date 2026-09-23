@@ -20,6 +20,7 @@ locals {
   # prometheus-operator CRD version.
   version_prometheus_operator_crds = "30.0.1"
   version_s3                       = "5.15.1"
+  version_cilium                   = "1.20.0"
 
   environment       = read_terragrunt_config(find_in_parent_folders("environment.hcl")).locals.environment
   cluster_name_full = read_terragrunt_config(find_in_parent_folders("cluster_name_env.hcl")).locals.cluster_name_full
@@ -782,6 +783,176 @@ unit "karpenter_iam" {
     # Set to true when using `SPOT` instances
     enable_spot_termination = true
     tags                    = {}
+# --- Cilium ---
+# Installed on the MNG before Karpenter: Karpenter nodes carry Cilium's agent-not-ready startup
+# taint, and cilium-operator (which removes it) can't depend on a Karpenter node.
+
+unit "cilium" {
+  source = "${get_repo_root()}/units/eks/addons/cilium/helm"
+  path   = "eks/addons/cilium/helm"
+
+  values = {
+    version            = local.version
+    helm_chart_version = local.version_cilium
+    helm_values = {
+      # Chaining mode: layers onto vpc-cni instead of replacing it, for Hubble flow visibility and NetworkPolicy enforcement.
+      cni = {
+        chainingMode = "aws-cni"
+        exclusive    = false
+        # Chained mode: vpc-cni immediately takes over once the conflist is gone, so
+        # removing it on agent shutdown/uninstall doesn't leave nodes unmanaged.
+        uninstall = true
+      }
+      routingMode          = "native"
+      enableIPv4Masquerade = false
+      kubeProxyReplacement = false
+      # Cilium is the sole NetworkPolicy enforcer. vpc-cni's own enforcement stays
+      # disabled (EKS default), so the two don't conflict.
+      policyEnforcementMode = "default"
+      # L7 proxy, unneeded for L3/4 flow visibility, would add another DaemonSet per node.
+      envoy = {
+        enabled = false
+      }
+
+      # Background worker: no CPU limit, throttling the dataplane risks packet drops cluster-wide.
+      resources = {
+        requests = { cpu = "63m", memory = "273M" }
+        limits   = { memory = "273M" }
+      }
+
+      # Relay and UI on the MNG: Hubble stays up to troubleshoot Karpenter node networking
+      # even when no Karpenter node is healthy.
+      hubble = {
+        enabled = true
+        relay = {
+          enabled  = true
+          replicas = 1
+          # Web API: bursty with flow-query load, needs CPU headroom.
+          resources = {
+            requests = { cpu = "23m", memory = "50M" }
+            limits   = { cpu = "100m", memory = "50M" }
+          }
+          prometheus = {
+            serviceMonitor = { enabled = true }
+          }
+          nodeSelector = local.mng_node_selector
+          tolerations  = local.mng_tolerations
+        }
+        ui = {
+          enabled  = true
+          replicas = 1
+          backend = {
+            # Web API: bursty with dashboard usage.
+            resources = {
+              requests = { cpu = "49m", memory = "127M" }
+              limits   = { cpu = "200m", memory = "127M" }
+            }
+            securityContext = { readOnlyRootFilesystem = true }
+          }
+          frontend = {
+            # Lightweight idle: static assets, no burst shape to plan for.
+            resources = {
+              requests = { cpu = "11m", memory = "20Mi" }
+              limits   = { cpu = "11m", memory = "20Mi" }
+            }
+            # Safe with a read-only root: the chart already mounts an emptyDir at /tmp
+            # for nginx's cache/pid paths.
+            securityContext = { readOnlyRootFilesystem = true }
+          }
+          nodeSelector = local.mng_node_selector
+          tolerations  = local.mng_tolerations
+        }
+        metrics = {
+          # Dynamic exporter: metric changes hot reload without a cilium-agent restart. dns and
+          # http are excluded, both need the L7 proxy (envoy disabled above), and L7 visibility
+          # is a known limitation of aws-cni chaining mode.
+          enabled = []
+          dynamic = {
+            enabled = true
+            config = {
+              configMapName   = "cilium-dynamic-metrics-config"
+              createConfigMap = true
+              content = [
+                for name in ["drop", "tcp", "flow", "icmp", "policy", "port-distribution"] : {
+                  name = name
+                  contextOptions = concat(
+                    [
+                      { name = "sourceContext", values = ["workload-name", "dns", "reserved-identity"] },
+                      { name = "destinationContext", values = ["workload-name", "dns", "reserved-identity"] },
+                    ],
+                    name == "port-distribution" ? [] : [
+                      {
+                        name = "labelsContext"
+                        values = name == "policy" ? ["source_namespace", "destination_namespace"] : [
+                          "source_namespace", "destination_namespace", "traffic_direction"
+                        ]
+                      }
+                    ]
+                  )
+                }
+              ]
+            }
+          }
+          serviceMonitor = { enabled = true }
+          dashboards = {
+            enabled     = true
+            annotations = { grafana_folder = "Hubble" }
+          }
+        }
+      }
+
+      # Requires the ServiceMonitor CRD from prometheus_operator_crds.
+      prometheus = {
+        enabled        = true
+        serviceMonitor = { enabled = true }
+      }
+      dashboards = {
+        enabled     = true
+        annotations = { grafana_folder = "Cilium" }
+      }
+
+      # On the MNG: removes the agent-not-ready startup taint from Karpenter nodes, so it can't
+      # run on one itself.
+      operator = {
+        replicas = 2
+        # Chained CNI still needs a local cilium-agent to build the pod sandbox, and
+        # agents wait on the operator for CRDs: hostNetwork: false can deadlock a
+        # restart. true avoids the chained path, like cilium-agent itself.
+        hostNetwork     = true
+        securityContext = { readOnlyRootFilesystem = true }
+        # gops (started for pprof/debugging) writes its socket file under $HOME on boot;
+        # with a read-only root that write fails and the operator never starts.
+        extraVolumes      = [{ name = "gops", emptyDir = {} }]
+        extraVolumeMounts = [{ name = "gops", mountPath = "/home/gops" }]
+        prometheus = {
+          serviceMonitor = { enabled = true }
+        }
+        dashboards = {
+          enabled     = true
+          annotations = { grafana_folder = "Cilium" }
+        }
+        nodeSelector = local.mng_node_selector
+        tolerations  = local.mng_tolerations
+      }
+    }
+  }
+}
+
+# Restarts workloads whose pods started before cilium-agent (coredns, metrics-server, created
+# with the cluster), they'd have no CiliumEndpoint. Helm post hook: the apply blocks on it, so
+# Karpenter only installs once it's done.
+unit "cilium_cep_restart" {
+  source = "${get_repo_root()}/units/eks/addons/cilium/cep_restart"
+  path   = "eks/addons/cilium/cep_restart"
+
+  values = {
+    version        = local.version
+    cilium_version = local.version_cilium
+    node_selector  = local.mng_node_selector
+    tolerations    = local.mng_tolerations
+  }
+}
+
   }
 }
 

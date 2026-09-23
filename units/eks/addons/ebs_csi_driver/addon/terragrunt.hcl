@@ -21,6 +21,12 @@ dependency "iam_role" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
+# Controller pods start after cilium-agent, so they get a CiliumEndpoint without a restart.
+dependency "cilium" {
+  config_path  = "../../cilium/helm"
+  skip_outputs = true
+}
+
 inputs = {
   cluster_name         = dependency.cluster.outputs.cluster_name
   addon_name           = "aws-ebs-csi-driver"

@@ -1,0 +1,5 @@
+apiVersion: v2
+name: cilium-cep-restart
+description: Restarts workloads whose pods predate cilium-agent and so have no CiliumEndpoint
+type: application
+version: 0.1.0

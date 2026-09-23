@@ -36,6 +36,13 @@ dependency "prometheus_operator_crds" {
   skip_outputs = true
 }
 
+# Cilium up and pre-Cilium pods restarted before any Karpenter node exists. NodePools carry
+# Cilium's agent-not-ready startup taint, cilium-operator (on the MNG) is what removes it.
+dependency "cilium_cep_restart" {
+  config_path  = "../../cilium/cep_restart"
+  skip_outputs = true
+}
+
 inputs = {
   cluster_name = dependency.eks_cluster.outputs.cluster_name
   # Must match the Pod Identity association's expected ServiceAccount name (units/eks/addons/karpenter/iam).
