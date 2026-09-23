@@ -53,7 +53,6 @@ You should see an output similar to:
 ```text
 NAME                          SYNC STATUS   HEALTH STATUS
 aws-lbc                       Synced        Healthy
-cilium                        Synced        Healthy
 external-secrets-operator     Synced        Healthy
 podinfo                       Synced        Healthy
 ...
