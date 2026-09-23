@@ -9,7 +9,7 @@ In this guide, you'll set up [Tailscale](https://tailscale.com/docs/concepts/wha
 This guide needs to be performed only once per catalog fork before running the [deployment](/docs/quickstart/deployment/).
 :::
 
-First, [log in to Tailscale](https://login.tailscale.com/admin/welcome).
+First, create an account and [log in to Tailscale](https://login.tailscale.com/admin/welcome).
 
 Then, download and install the [Tailscale client](https://tailscale.com/download).
 
