@@ -6,7 +6,7 @@ Now that you've reviewed the [prerequisites](/docs/quickstart/prerequisites/), a
 ## Create the spot service-linked role
 
 EKS Forge uses [spot EC2 instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html) for non-critical workloads to reduce cloud costs.
-This creates the EC2 Spot [service-linked role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create-service-linked-role.html) required to provision spot instances:
+Run the following to create the EC2 Spot [service-linked role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create-service-linked-role.html) required to provision spot instances:
 ```bash
 aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 ```
@@ -21,15 +21,15 @@ terragrunt stack generate
 terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
 ```
 
-The deployment of this [Terragrunt stack](/docs/iac/#stacks) should take around 20 mins.
+The deployment of this [Terragrunt stack](/docs/iac/#stacks) should take around 30 minutes.
 
-When it's done, connect `kubectl` to your `dev` EKS cluster by creating a [`kubeconfig`](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/) (replace `<region-code>` by the region you used when you [configured the catalog](/docs/quickstart/configuration/#catalog-configuration)):
+When it's done, connect `kubectl` to your `dev` EKS cluster by creating a [`kubeconfig`](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/) (replace `<region-code>` with the region you used when you [configured the catalog](/docs/quickstart/configuration/#catalog-configuration)):
 ```bash
 aws eks update-kubeconfig --region <region-code> --name dev-cluster
 ```
 
 Next, verify `kubectl` is connected:
-```
+```bash
 kubectl get pods -n kube-system
 ```
 
@@ -62,31 +62,34 @@ When every application shows `Synced` and `Healthy`, the deployment succeeded.
 
 ## Log in to ArgoCD
 
-For security reasons, internal tools (ArgoCD, Prometheus, etc.) are not exposed to the internet. ArgoCD's API and UI are only reachable using Tailscale. Run the [Tailscale Client](https://tailscale.com/download) and click on `Log In...`. Then click on the button in the top-right to connect or run `tailscale up` in your terminal.
+For security reasons, internal tools (ArgoCD, Prometheus, etc.) are not exposed to the internet. ArgoCD's API and UI are only reachable using Tailscale. Connect to Tailscale by running `tailscale up`, or with the button in the Tailscale client.
 
 The ArgoCD host is `argocd.private.dev.<base_domain>` (replace `<base_domain>` with the [value from `pipelines/dns.hcl`](/docs/quickstart/bootstrap/setup_dns/), e.g. `argocd.private.dev.axelmendoza.com`).
 There are two ways to interact with your ArgoCD instance:
 - Open `https://argocd.private.dev.<base_domain>` in your browser and log in with username `admin`. Retrieve the password with:
-```bash
-aws secretsmanager get-secret-value \
-  --secret-id dev-argocd-password \
-  --query SecretString \
-  --output text | jq -r .plaintext
-```
-- Authenticate using the ArgoCD CLI by running this command:
-```bash
-argocd login argocd.private.dev.<base_domain> \
-  --username admin \
-  --password $(aws secretsmanager get-secret-value \
+  ```bash
+  aws secretsmanager get-secret-value \
     --secret-id dev-argocd-password \
     --query SecretString \
-    --output text | jq -r .plaintext) \
+    --output text | jq -r .plaintext
+  ```
+  You should see the same applications as in the `kubectl get app` output above.
+- Authenticate using the ArgoCD CLI by running this command:
+  ```bash
+  argocd login argocd.private.dev.<base_domain> \
+    --username admin \
+    --password $(aws secretsmanager get-secret-value \
+      --secret-id dev-argocd-password \
+      --query SecretString \
+      --output text | jq -r .plaintext) \
     --grpc-web
-```
+  ```
+  You should see `'admin:login' logged in successfully`.
 
 ## Access the Podinfo app
 
-This stack exposes `podinfo` to the public internet. Open `https://podinfo.public.dev.<base_domain>` in your browser to check that it deployed succesfully. 
+This stack exposes `podinfo` to the public internet. Open `https://podinfo.public.dev.<base_domain>` in your browser to check that it deployed successfully. You should see the podinfo page with its `greetings from podinfo` message.
+
 `podinfo` is a sample app meant to be swapped for a real one in your fork.
 
 ## Destroy the infrastructure
@@ -103,10 +106,19 @@ cd pipelines/dev/eks/stack
 terragrunt run --all destroy --non-interactive --no-stack-generate
 ```
 
+The [bootstrap](/docs/quickstart/bootstrap) resources stay in place, so you can reuse them for your next deployments. Among them, only the Route 53 hosted zones created by [Setup DNS](/docs/quickstart/bootstrap/setup_dns/) are billed.
+
 ## What's next
-Continue with the [Deployment tutorial](/docs/deployment/) to deploy the `staging` and `prod` environments from the live repository.
+Continue with the [staging and production deployment tutorial](/docs/deployment/) to deploy the `staging` and `prod` environments from the live repository.
 
 Or, when you need them:
 - interact with internal tools using the [monitoring guide](/docs/monitoring/)
 - add an application to your cluster with the [applications guide](/docs/applications/)
 - add infrastructure components with the [IaC development guide](/docs/iac/development/)
+
+If you're done with EKS Forge, remove the bootstrap resources by running the following from the root of your [catalog fork](/docs/quickstart/installation/#fork-the-eks-forge-catalog):
+```bash
+source .env
+cd pipelines/bootstrap
+terragrunt run --all destroy --non-interactive --no-stack-generate
+```
