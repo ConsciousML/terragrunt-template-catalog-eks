@@ -80,6 +80,17 @@ locals {
     }
   ]
 
+  # Holds pods off a new Karpenter node until cilium-agent is ready there, otherwise they get
+  # an IP from vpc-cni but no CiliumEndpoint and are treated as `world` by every policy.
+  # cilium-operator (on the MNG) removes it. See https://docs.cilium.io/en/latest/installation/taints/
+  karpenter_node_pool_startup_taints = [
+    {
+      key    = "node.cilium.io/agent-not-ready"
+      value  = "true"
+      effect = "NoExecute"
+    }
+  ]
+
   # Required onto the critical NodePool, no fallback to the MNG.
   critical_node_selector = {
     "karpenter.sh/nodepool" = "critical"
@@ -772,17 +783,6 @@ unit "tailscale_split_dns_eks_endpoint" {
   }
 }
 
-# --- Karpenter ---
-
-unit "karpenter_iam" {
-  source = "${get_repo_root()}/units/eks/addons/karpenter/iam"
-  path   = "eks/addons/karpenter/iam"
-
-  values = {
-    version = local.version_karpenter_iam
-    # Set to true when using `SPOT` instances
-    enable_spot_termination = true
-    tags                    = {}
 # --- Cilium ---
 # Installed on the MNG before Karpenter: Karpenter nodes carry Cilium's agent-not-ready startup
 # taint, and cilium-operator (which removes it) can't depend on a Karpenter node.
@@ -953,6 +953,17 @@ unit "cilium_cep_restart" {
   }
 }
 
+# --- Karpenter ---
+
+unit "karpenter_iam" {
+  source = "${get_repo_root()}/units/eks/addons/karpenter/iam"
+  path   = "eks/addons/karpenter/iam"
+
+  values = {
+    version = local.version_karpenter_iam
+    # Set to true when using `SPOT` instances
+    enable_spot_termination = true
+    tags                    = {}
   }
 }
 
@@ -1029,6 +1040,7 @@ unit "karpenter_node_pool_critical" {
         effect = "NoSchedule"
       }
     ]
+    startup_taints = local.karpenter_node_pool_startup_taints
     disruption = {
       consolidationPolicy = "Balanced"
       consolidateAfter    = "15m"
@@ -1071,6 +1083,7 @@ unit "karpenter_node_pool_elastic" {
         effect = "NoSchedule"
       }
     ]
+    startup_taints = local.karpenter_node_pool_startup_taints
     disruption = {
       consolidationPolicy = "WhenEmptyOrUnderutilized"
       consolidateAfter    = "2m"

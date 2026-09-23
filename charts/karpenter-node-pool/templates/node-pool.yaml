@@ -22,6 +22,8 @@ spec:
         {{- end }}
       taints:
         {{- toYaml .Values.taints | nindent 8 }}
+      startupTaints:
+        {{- toYaml .Values.startupTaints | nindent 8 }}
       expireAfter: {{ .Values.expireAfter | default "720h" | quote }}
       {{- if .Values.terminationGracePeriod }}
       terminationGracePeriod: {{ .Values.terminationGracePeriod | quote }}
