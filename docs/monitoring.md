@@ -46,7 +46,7 @@ aws secretsmanager get-secret-value \
 
 ## Network Observability (Hubble)
 
-[Cilium](https://cilium.io/) runs in [CNI chaining mode](https://docs.cilium.io/en/stable/installation/cni-chaining/) alongside the `vpc-cni` EKS addon, for flow visibility and `NetworkPolicy` enforcement. Configuration lives in the App of Apps repo's [`charts/cilium/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/charts/cilium/values.yaml).
+[Cilium](https://cilium.io/) runs in [CNI chaining mode](https://docs.cilium.io/en/stable/installation/cni-chaining/) alongside the `vpc-cni` EKS addon, for flow visibility and `NetworkPolicy` enforcement. Deployed by [`units/eks/addons/cilium`](../units/eks/addons/cilium/README.md), values in the `cilium` unit of [`terragrunt.stack.hcl`](../pipelines/dev/eks/stack/terragrunt.stack.hcl).
 
 [Hubble](https://docs.cilium.io/en/stable/observability/hubble/) shows, per flow, who talked to whom, over what protocol, and whether it was allowed or dropped, useful for auditing traffic without guessing at a `NetworkPolicy`. No login, access is restricted via Tailscale like every other private UI here.
 
@@ -70,9 +70,9 @@ See the [Hubble CLI docs](https://docs.cilium.io/en/latest/observability/hubble/
 
 ### Restoring Full Flow Visibility
 
-Cilium only manages pods created after `cilium-agent` is already running on their node, so every pod predating it (the entire EKS bootstrap) has no `CiliumEndpoint` and stays invisible to Hubble.
+Cilium only manages pods created after `cilium-agent` is already running on their node, so a pod predating it has no `CiliumEndpoint` and stays invisible to Hubble.
 
-By default this is handled automatically: `argocd-app-of-apps-template`'s [`manifests/cilium-restart-job`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/manifests/cilium-restart-job) runs a one-shot `Job` right after Cilium syncs, restarting every bootstrap-time pod.
+By default this is handled automatically, see [`units/eks/addons/cilium`](../units/eks/addons/cilium/README.md): Karpenter nodes hold pods off until `cilium-agent` is ready, and a Helm hook `Job` restarts the pods created with the cluster right after Cilium installs.
 
 If a pod is still missing one afterward, fix it with [`scripts/restart-missing-cilium-endpoints.sh`](../scripts/restart-missing-cilium-endpoints.sh), see [Cilium's restart-existing-pods guidance](https://docs.cilium.io/en/stable/installation/cni-chaining-aws-cni/#restart-existing-pods). It logs what it finds missing before restarting it, waits for each rollout, then re-scans and fails if anything is still missing.
 

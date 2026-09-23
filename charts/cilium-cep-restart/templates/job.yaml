@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cilium-cep-restart
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    # Post hook: Helm blocks the release (and so the Terragrunt apply) until it completes,
+    # failing the release if it fails. A plain Job wouldn't be waited on.
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  # The whole run is idempotent (re-restarting an already-restarted workload is a no-op
+  # risk-wise), so a retry absorbs a transient failure without masking a real one.
+  backoffLimit: 1
+  # Safety net for the whole run across every target found, not a per-target timeout. Kept
+  # under the unit's Helm timeout so the Job fails with its own reason first.
+  activeDeadlineSeconds: 1200
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cilium-cep-restart
+      annotations:
+        # Changes on every Cilium version bump, so the release upgrades and the hook reruns.
+        cilium-version: {{ .Values.ciliumVersion | quote }}
+    spec:
+      serviceAccountName: cilium-cep-restart
+      restartPolicy: Never
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: restart-missing-ceps
+          image: alpine/k8s:1.30.0
+          command: ["sh", "/scripts/restart-missing-ceps.sh"]
+          # kubectl caches discovery/HTTP data under $HOME/.kube by default, which needs
+          # somewhere writable now that the root filesystem is read-only.
+          env:
+            - name: HOME
+              value: /tmp
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: script
+              mountPath: /scripts
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: script
+          configMap:
+            name: cilium-cep-restart-script
+            defaultMode: 0555
+        - name: tmp
+          emptyDir: {}

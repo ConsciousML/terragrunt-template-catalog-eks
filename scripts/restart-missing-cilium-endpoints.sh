@@ -2,15 +2,15 @@
 set -eu
 
 # Cilium only manages pods created after cilium-agent is already running on their node, so
-# every pod predating it (the entire EKS bootstrap) has no CiliumEndpoint and stays invisible
-# to Hubble and any CiliumNetworkPolicy enforcement. See docs/monitoring.md.
+# every pod predating it has no CiliumEndpoint and stays invisible to Hubble and any
+# CiliumNetworkPolicy enforcement. See docs/monitoring.md.
 #
 # Restarts every Deployment/StatefulSet/DaemonSet with a pod missing a CiliumEndpoint, waits
 # for every rollout, then re-scans and fails if any is still missing one.
 #
-# Same script as the one baked into argocd-app-of-apps-template's
-# manifests/cilium-restart-job ConfigMap (which runs it as a one-shot Job on cluster bootstrap);
-# kept in sync manually since it must stay POSIX sh to run in that Job's Alpine container.
+# Same script as the one baked into charts/cilium-cep-restart/templates/configmap.yaml (run as
+# a Helm hook Job by units/eks/addons/cilium/cep_restart). Kept in sync manually, it must stay
+# POSIX sh to run in that Job's Alpine container.
 #
 # Warning: restarting deletes and recreates pods. Run only during a maintenance window.
 

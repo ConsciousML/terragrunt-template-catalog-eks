@@ -247,15 +247,6 @@ inputs = {
       "argocd-httproute" = {
         host = local.domain_private_argocd
       }
-      "cilium" = {
-        cilium = {
-          # Bare API server host as KUBERNETES_SERVICE_HOST, cluster_endpoint's https://
-          # scheme stripped. Cilium can't rely on kubernetes.default.svc before its own
-          # service load-balancing is up.
-          k8sServiceHost = trimprefix(dependency.eks_cluster.outputs.cluster_endpoint, "https://")
-          k8sServicePort = "443"
-        }
-      }
       "external-dns-private" = {
         vpcEndpointCidrs = {
           route53 = dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.route53

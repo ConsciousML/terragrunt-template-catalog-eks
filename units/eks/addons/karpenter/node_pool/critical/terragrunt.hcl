@@ -45,6 +45,7 @@ inputs = {
     ec2NodeClassName       = dependency.karpenter_ec2_node_class.outputs.name
     requirements           = values.requirements
     taints                 = values.taints
+    startupTaints          = values.startup_taints
     limitsCpu              = values.limits_cpu
     terminationGracePeriod = try(values.termination_grace_period, null)
     expireAfter            = try(values.expire_after, null)

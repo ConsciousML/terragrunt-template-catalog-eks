@@ -2,6 +2,7 @@ name: ""
 ec2NodeClassName: ""
 requirements: []
 taints: []
+startupTaints: []
 limitsCpu: ""
 terminationGracePeriod: ""
 expireAfter: ""

@@ -11,7 +11,7 @@ How to secure the internal cluster network: build a feature in a namespace unres
 
 ## Concepts
 
-[Cilium](https://cilium.io/) is the sole `NetworkPolicy` enforcer, in [CNI chaining mode](https://docs.cilium.io/en/stable/installation/cni-chaining/) alongside `vpc-cni`. Configured in the [App of Apps repo](https://github.com/ConsciousML/argocd-app-of-apps-template)'s [`charts/cilium/values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/charts/cilium/values.yaml). See [Monitoring](monitoring.md#network-observability-hubble) for how Hubble is deployed and its UI.
+[Cilium](https://cilium.io/) is the sole `NetworkPolicy` enforcer, in [CNI chaining mode](https://docs.cilium.io/en/stable/installation/cni-chaining/) alongside `vpc-cni`. Deployed by [`units/eks/addons/cilium`](../units/eks/addons/cilium/README.md). See [Monitoring](monitoring.md#network-observability-hubble) for how Hubble is deployed and its UI.
 
 ## How Enforcement Works
 
