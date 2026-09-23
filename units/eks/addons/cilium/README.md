@@ -21,6 +21,10 @@ Everything Cilium needs runs on the MNG, installed before Karpenter: `cilium-ope
 - **[helm](helm/)**: Deploys Cilium via the upstream `cilium` chart. The API server host is injected from the cluster endpoint, since the agent can't use `kubernetes.default.svc` before its own service load-balancing is up
 - **[cep_restart](cep_restart/)**: Deploys a Helm `post-install`/`post-upgrade` hook `Job`, via a chart bundled locally under [`charts/cilium-cep-restart`](../../../../charts/cilium-cep-restart/), that restarts every workload with a pod missing a `CiliumEndpoint`. Helm blocks on the hook, so the apply only moves on to Karpenter once it's done. It reruns on every Cilium version bump
 
+## Querying Hubble Metrics
+
+See the [Hubble metrics reference](https://docs.cilium.io/en/stable/observability/metrics/#hubble) for the full metric catalog, labels, and context options. Prometheus names are `hubble_` plus the reference's `Name` column (e.g. `flows_processed_total` is queried as `hubble_flows_processed_total`). The reference tables don't spell out the prefix.
+
 ## Upstream Dependencies
 
 - **[`units/eks/cluster`](../../cluster/)**: `helm` reads the cluster endpoint for `k8sServiceHost`
