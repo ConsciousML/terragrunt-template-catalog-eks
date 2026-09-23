@@ -114,7 +114,7 @@ Continue with the [staging and production deployment tutorial](/docs/deployment/
 Or, when you need them:
 - interact with internal tools using the [monitoring guide](/docs/monitoring/)
 - add an application to your cluster with the [applications guide](/docs/applications/)
-- add infrastructure components with the [IaC development guide](/docs/iac/development/)
+- [add an IaC component to your stack](/docs/iac/add-an-iac-component/)
 
 If you're done with EKS Forge, remove the bootstrap resources by running the following from the root of your [catalog fork](/docs/quickstart/installation/#fork-the-eks-forge-catalog):
 ```bash
