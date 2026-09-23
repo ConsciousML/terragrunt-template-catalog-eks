@@ -20,3 +20,9 @@ Everything Cilium needs runs on the MNG, installed before Karpenter: `cilium-ope
 
 - **[helm](helm/)**: Deploys Cilium via the upstream `cilium` chart. The API server host is injected from the cluster endpoint, since the agent can't use `kubernetes.default.svc` before its own service load-balancing is up
 - **[cep_restart](cep_restart/)**: Deploys a Helm `post-install`/`post-upgrade` hook `Job`, via a chart bundled locally under [`charts/cilium-cep-restart`](../../../../charts/cilium-cep-restart/), that restarts every workload with a pod missing a `CiliumEndpoint`. Helm blocks on the hook, so the apply only moves on to Karpenter once it's done. It reruns on every Cilium version bump
+
+## Upstream Dependencies
+
+- **[`units/eks/cluster`](../../cluster/)**: `helm` reads the cluster endpoint for `k8sServiceHost`
+- **[`units/eks/addons/prometheus_stack/crds`](../prometheus_stack/crds/)**: `helm` depends on it so the Prometheus Operator CRDs exist before the chart renders its `ServiceMonitor`s
+- **[helm](helm/)**: `cep_restart` depends on it, the hook `Job` needs `cilium-agent` running and the `CiliumEndpoint` CRD installed

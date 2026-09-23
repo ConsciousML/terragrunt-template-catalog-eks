@@ -4,6 +4,8 @@ Runs [Karpenter](https://karpenter.sh/) as the node autoscaler for the EKS clust
 
 NodePools split workloads by how disruption-sensitive they are. The critical pool takes a `workload-class=critical` taint with a conservative disruption policy, for workloads that shouldn't be evicted just because a node looks underutilized. The elastic pool consolidates more aggressively, for everything else. A workload opts into a pool with a matching `nodeSelector` and toleration.
 
+Both NodePools also carry Cilium's `node.cilium.io/agent-not-ready` startup taint, so pods wait until `cilium-agent` is ready on a new node. See [`addons/cilium`](../cilium/README.md).
+
 > **Note**: Each NodePool's vCPU limit and capacity-type requirement are set in [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](../../../../pipelines/dev/eks/stack/terragrunt.stack.hcl). Raise a limit if a pool needs more headroom, and switch the critical NodePool's capacity-type to on-demand for prod.
 
 ## Prerequisites
@@ -33,4 +35,5 @@ aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 
 - **[`units/eks/cluster`](../../cluster/)**: `iam` depends on it for the cluster name and to register the node role access entry
 - **[`units/eks/addons/prometheus_stack/crds`](../prometheus_stack/crds/)**: `helm` depends on it so the Prometheus Operator CRDs exist before Karpenter's own Helm release renders any `ServiceMonitor`
+- **[`units/eks/addons/cilium/cep_restart`](../cilium/cep_restart/)**: `helm` depends on it so Cilium is running, and pods created before it restarted, before any Karpenter node exists. `cilium-operator` removes the NodePools' startup taint, so it must never wait on a Karpenter node
 - **[`units/vpc`](../../../vpc/vpc/)**: `ec2_node_class` requires subnets to carry the `karpenter.sh/discovery = <cluster-name>` tag (set via `private_subnet_tags` in the stack) so Karpenter can discover them when provisioning nodes

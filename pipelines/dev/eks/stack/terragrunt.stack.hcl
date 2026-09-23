@@ -296,8 +296,7 @@ unit "cluster" {
             # Prefix delegation: nodes need more IPs than one-per-ENI allows
             ENABLE_PREFIX_DELEGATION = "true"
           }
-          # Policy enforcement moved to Cilium (chaining mode), see charts/cilium in
-          # argocd-app-of-apps-template.
+          # Policy enforcement moved to Cilium (chaining mode), see the cilium unit below.
           enableNetworkPolicy = "false"
           # aws-node container. No CPU limit: it programs the node's CNI config, throttling it
           # breaks pod sandbox create/delete for every pod scheduled on the node.
@@ -339,7 +338,8 @@ unit "cluster" {
           http_endpoint               = "enabled"
         }
 
-        # Reserves the MNG for pods that tolerate it (Karpenter's controller).
+        # Reserves the MNG for pods that tolerate it (Karpenter's controller, cilium-operator,
+        # Hubble Relay and UI, the cilium_cep_restart Job).
         # The taint alone doesn't attract those pods, mng_node_selector also needs this label.
         labels = local.mng_node_selector
 

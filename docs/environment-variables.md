@@ -63,7 +63,7 @@ export SLACK_BOT_TOKEN=<your-bot-token>
 
 ## `APP_OF_APPS_BRANCH`
 
-**Required by**: the dev EKS stack's `argocd_app_of_apps` unit (optional)
+**Used by**: the dev EKS stack's `argocd_app_of_apps` unit (optional)
 
 The `argocd-app-of-apps-template` branch ArgoCD syncs from. Defaults to `main` when unset. Set it to test an app-of-apps branch without editing the stack file:
 ```bash
