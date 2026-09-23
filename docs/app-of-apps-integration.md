@@ -65,6 +65,6 @@ Ensure the new app `name` you'll use in [`apps/values.yaml`](https://github.com/
 
 ### Deploy Your New App
 1. Commit and push changes in both repositories
-2. In the [EKS stack file](../pipelines/dev/eks/stack/terragrunt.stack.hcl), under the `argocd_app_of_apps` unit, change `target_revision` to match your branch name there.
+2. Set [`APP_OF_APPS_BRANCH`](environment-variables.md#app_of_apps_branch) in your `.env` to your app-of-apps branch name, then source it.
 3. [Deploy the EKS stack](../README.md#deploy-a-dev-eks-cluster)
 4. [Log into the ArgoCD UI](../README.md#log-in-to-argocd) and verify your app has been deployed.
