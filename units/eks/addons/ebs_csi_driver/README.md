@@ -18,4 +18,4 @@ This unit only installs the driver. It creates no `StorageClass`. Without `stora
 ## Upstream Dependencies
 
 - **[`units/eks/cluster`](../../cluster/)**: Provides the `cluster_name` output consumed by both `iam_role` and `addon`. Without the `addon` unit waiting on `iam_role`, the controller pod starts without credentials and the addon stays in `CREATING` indefinitely
-- **[`units/eks/addons/cilium/helm`](../cilium/helm/)**: `addon` depends on it so the controller and node pods start after `cilium-agent` is ready, getting a `CiliumEndpoint` without a restart
+- **[`units/eks/addons/cilium/cep_restart`](../cilium/cep_restart/)**: `addon` depends on it so the controller and node pods start after `cilium-agent` is ready, getting a `CiliumEndpoint` without a restart. Waiting on `cep_restart` rather than just `cilium/helm` keeps its scan from catching these pods before their `CiliumEndpoint` exists

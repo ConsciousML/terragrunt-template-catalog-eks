@@ -21,9 +21,11 @@ dependency "iam_role" {
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
 
-# Controller pods start after cilium-agent, so they get a CiliumEndpoint without a restart.
-dependency "cilium" {
-  config_path  = "../../cilium/helm"
+# Controller and node pods start after cilium-agent, so they get a CiliumEndpoint without a
+# restart. After cep_restart, not just Cilium: its scan would otherwise catch these pods before
+# their CiliumEndpoint exists and restart them for nothing.
+dependency "cilium_cep_restart" {
+  config_path  = "../../cilium/cep_restart"
   skip_outputs = true
 }
 
