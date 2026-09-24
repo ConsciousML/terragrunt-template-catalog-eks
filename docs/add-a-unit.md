@@ -1,5 +1,8 @@
 {/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 This guide shows you how to add a [unit](/docs/iac/#units) to your [forked catalog](/docs/quickstart/installation/#fork-the-eks-forge-catalog), or edit an existing one, and ship it to [`staging`](/docs/iac/#staging) and [`prod`](/docs/iac/#prod). It covers AWS resources and the Kubernetes add-ons that must run before ArgoCD. For applications ArgoCD deploys, see [Applications](/docs/applications/).
 
 First, create a branch in your forked catalog:
@@ -7,13 +10,17 @@ First, create a branch in your forked catalog:
 git checkout -b <your branch>
 ```
 
-Then start from the section that fits your change:
-- An AWS resource covered by a public module: [Wrap a Registry Module](#wrap-a-registry-module).
-- A Kubernetes add-on that must run before ArgoCD: [Deploy a Kubernetes Add-on](#deploy-a-kubernetes-add-on).
-- Anything else: [Write a Custom Module](#write-a-custom-module).
-- A change to an existing unit: make it, then skip to [Validate in Dev](#validate-in-dev).
+If you're editing an existing unit, make your change and skip to [Validate in Dev](#validate-in-dev).
 
-## Wrap a Registry Module
+## Write the Unit
+
+Pick the tab that fits your component:
+- **Registry module**: an AWS resource covered by a public module.
+- **Kubernetes add-on**: an add-on that must run before ArgoCD.
+- **Custom module**: anything else.
+
+<Tabs>
+<TabItem value="registry" label="Registry module">
 
 Create `units/<group>/<name>/terragrunt.hcl`, grouping it by domain like the existing units (e.g. `units/vpc/endpoints/terragrunt.hcl` for the VPC endpoints), and include the root configuration with `expose = true`:
 ```hcl
@@ -42,9 +49,8 @@ inputs = {
 
 For complete examples, see the [`vpc`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/vpc/vpc/terragrunt.hcl), [`cluster`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/cluster/terragrunt.hcl), and [Loki S3 `chunks`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/loki/s3/chunks/terragrunt.hcl) units.
 
-Then continue from [Connect the Unit](#connect-the-unit) to wire shared configuration and dependencies into `inputs`.
-
-## Deploy a Kubernetes Add-on
+</TabItem>
+<TabItem value="kubernetes" label="Kubernetes add-on">
 
 Create `units/eks/addons/<name>/helm/terragrunt.hcl` (e.g. `units/eks/addons/cilium/helm/terragrunt.hcl`). On top of the root configuration, include the Kubernetes and Helm provider files. They add the dependency on the EKS cluster, and skip the unit while the cluster doesn't exist yet:
 ```hcl
@@ -88,9 +94,8 @@ If you bundle the chart yourself, put it under `charts/<name>/`, drop `repositor
 
 For complete examples, see the [`cilium`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/cilium/helm/terragrunt.hcl) and [`karpenter`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/karpenter/helm/terragrunt.hcl) units for upstream charts, and the [Karpenter `ec2_node_class`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/karpenter/ec2_node_class/terragrunt.hcl) unit for a bundled one.
 
-Then continue from [Connect the Unit](#connect-the-unit) to wire shared configuration and dependencies into `inputs`.
-
-## Write a Custom Module
+</TabItem>
+<TabItem value="custom" label="Custom module">
 
 Create the module under `modules/<name>/` (e.g. `modules/acm_certificate/`). CI generates its `README.md` from `header.md` and `footer.md`, so add both, even if `footer.md` stays empty:
 ```text
@@ -128,7 +133,8 @@ inputs = {
 
 For complete examples, see the [`acm_certificate`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/modules/acm_certificate) module and [its unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/route53/acm_certificate/terragrunt.hcl), or the [`eks_addon`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/modules/eks_addon) module and [its unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/ebs_csi_driver/addon/terragrunt.hcl).
 
-Then continue from [Connect the Unit](#connect-the-unit) to wire shared configuration and dependencies into `inputs`.
+</TabItem>
+</Tabs>
 
 ## Connect the Unit
 
