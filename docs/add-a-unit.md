@@ -17,14 +17,14 @@ If you're editing an existing unit, make your change, then:
 ## Write the Unit
 
 Pick the tab that fits your component:
-- **Registry module**: an AWS resource covered by a public module.
+- **Registry module**: an AWS resource covered by a public module on the [Terraform Registry](https://registry.terraform.io/).
 - **Kubernetes add-on**: an add-on that must run before ArgoCD.
 - **Custom module**: anything else.
 
 <Tabs groupId="component">
 <TabItem value="registry" label="Registry module">
 
-Create `units/<group>/<name>/terragrunt.hcl`, grouping it by domain like the existing units (e.g. `units/vpc/endpoints/terragrunt.hcl` for the VPC endpoints), and include the root configuration with `expose = true`:
+Create `units/<group>/<name>/terragrunt.hcl`, grouping it by domain like the existing units (e.g. `units/vpc/endpoints/terragrunt.hcl` for the VPC endpoints), and [include](https://docs.terragrunt.com/reference/hcl/blocks/#include) the root configuration with `expose = true`:
 ```hcl
 # units/<group>/<name>/terragrunt.hcl
 
@@ -34,7 +34,7 @@ include "root" {
 }
 ```
 
-Point `source` at the registry module. You pin the version later, in the dev stack:
+Point [`source`](https://docs.terragrunt.com/reference/hcl/blocks/#terraform) at the registry module. You pin the version later, in the dev stack:
 ```hcl
 terraform {
   # e.g. tfr:///terraform-aws-modules/s3-bucket/aws?version=${values.version}
@@ -79,7 +79,7 @@ terraform {
 }
 ```
 
-Make it run after `cilium_cep_restart`, so its pods start once `cilium-agent` is ready and get a CiliumEndpoint without a restart:
+Make it run after `cilium_cep_restart`, so its pods start once `cilium-agent` is ready and get a [CiliumEndpoint](https://docs.cilium.io/en/stable/network/kubernetes/ciliumendpoint/) without a restart:
 ```hcl
 dependency "cilium_cep_restart" {
   config_path  = "../../cilium/cep_restart"
@@ -87,7 +87,7 @@ dependency "cilium_cep_restart" {
 }
 ```
 
-Describe the chart in `inputs`, replacing `<release-name>`, `<chart-repository-url>`, `<chart-name>`, and `<namespace>` with your chart's details. The cluster name comes from the dependency the provider file added:
+Describe the [Helm chart](https://helm.sh/docs/topics/charts/) in `inputs`, replacing `<release-name>`, `<chart-repository-url>`, `<chart-name>`, and `<namespace>` with your chart's details. The cluster name comes from the dependency the provider file added:
 ```hcl
 inputs = {
   cluster_name       = dependency.eks_cluster.outputs.cluster_name
@@ -148,7 +148,7 @@ For complete examples, see the [`acm_certificate`](https://github.com/ConsciousM
 
 ## Read Shared Config and Other Units' Outputs
 
-If your unit needs shared configuration, read it from the `.hcl` files under `pipelines/`, listed in the [shared configuration reference](/docs/reference/shared_configuration/). Read what `root.hcl` already loads through `include.root.locals`. Read any other file with `find_in_parent_folders`.
+If your unit needs shared configuration, read it from the `.hcl` files under `pipelines/`, listed in the [shared configuration reference](/docs/reference/shared_configuration/). Read what `root.hcl` already loads through `include.root.locals`. Read any other file with [`read_terragrunt_config`](https://docs.terragrunt.com/reference/hcl/functions/#read_terragrunt_config) and [`find_in_parent_folders`](https://docs.terragrunt.com/reference/hcl/functions/#find_in_parent_folders).
 
 Prefix resource names with the environment, so they don't collide across environments:
 ```hcl
@@ -162,7 +162,7 @@ inputs = {
 }
 ```
 
-If your unit needs another unit's outputs, add a `dependency` block pointing at that unit's directory, and read its outputs in `inputs`. If it only has to run after the other unit, without reading its outputs, set `skip_outputs = true` instead. For example, the EBS CSI driver add-on reads the cluster name from `cluster`:
+If your unit needs another unit's outputs, add a [`dependency`](https://docs.terragrunt.com/reference/hcl/blocks/#dependency) block pointing at that unit's directory, and read its outputs in `inputs`. If it only has to run after the other unit, without reading its outputs, set `skip_outputs = true` instead. For example, the EBS CSI driver add-on reads the cluster name from `cluster`:
 ```hcl
 # units/eks/addons/ebs_csi_driver/addon/terragrunt.hcl
 
@@ -179,7 +179,7 @@ inputs = {
 }
 ```
 
-The `mock_outputs` let `plan` run before the `cluster` unit has been applied.
+The [`mock_outputs`](https://docs.terragrunt.com/reference/hcl/blocks/#mock-outputs) let `plan` run before the `cluster` unit has been applied.
 
 Add a `README.md` describing what the unit deploys and which units it depends on. For example, the EBS CSI driver's README, in `units/eks/addons/ebs_csi_driver/`:
 ```markdown
@@ -197,7 +197,7 @@ provisioning backed by EBS volumes.
 
 ## Add the Unit to the Dev Stack
 
-Add a `unit` block to [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/pipelines/dev/eks/stack/terragrunt.stack.hcl). Point `source` at your unit, and set `path` to the unit's directory under `units/`, so its lock file syncs back to it in [Commit the Lock File](#commit-the-lock-file). Pick the tab that fits your component:
+Add a [`unit`](https://docs.terragrunt.com/reference/hcl/blocks/#unit) block to [`pipelines/dev/eks/stack/terragrunt.stack.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/pipelines/dev/eks/stack/terragrunt.stack.hcl). Point `source` at your unit, and set `path` to the unit's directory under `units/`, so its lock file syncs back to it in [Commit the Lock File](#commit-the-lock-file). Pick the tab that fits your component:
 
 <Tabs groupId="component">
 <TabItem value="registry" label="Registry module">
@@ -285,7 +285,7 @@ git commit -m "<message>" # e.g. "feat: add loki s3 chunks bucket"
 git push origin <branch>
 ```
 
-Deploy the dev stack from the repository root. Clean it first, so no unit left over from a previous generate gets applied:
+Deploy the dev stack from the repository root. [Clean](https://docs.terragrunt.com/reference/cli/commands/stack/clean/) it first, so no unit left over from a previous [generate](https://docs.terragrunt.com/reference/cli/commands/stack/generate/) gets applied:
 ```bash
 source .env
 cd pipelines/dev/eks/stack
@@ -312,7 +312,7 @@ terragrunt run --all destroy --non-interactive --no-stack-generate
 
 ## Commit the Lock File
 
-If you added a unit or changed a provider version, commit its provider lock file, so a tag always resolves the same provider versions. CI fails on a unit without one.
+If you added a unit or changed a provider version, commit its [provider lock file](https://developer.hashicorp.com/terraform/language/files/dependency-lock), so a tag always resolves the same provider versions. CI fails on a unit without one.
 
 The apply generated your unit's lock file under `.terragrunt-stack/`, which is wiped on every `stack clean`. From the repository root, copy it back into `units/`:
 ```bash
