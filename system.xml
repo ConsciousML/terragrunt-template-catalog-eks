@@ -20,9 +20,7 @@
         - `modules/`: Terraform modules declaring AWS resources
         - `units/`: Terragrunt wrappers around modules, one per component, via `source =`
         - `pipelines/dev/`: executable stack configs for local dev (e.g.
-          `pipelines/dev/eks/stack/terragrunt.stack.hcl`). See `pipelines/dev/README.md` for
-          the shared config file inventory (backend, provider wiring, DNS, networking,
-          versioning, ...)
+          `pipelines/dev/eks/stack/terragrunt.stack.hcl`)
         - `pipelines/bootstrap/`: one-time setup pipelines, run before any stack. See
           `pipelines/bootstrap/README.md`
     </architecture>
@@ -58,8 +56,6 @@
 
         Stack and pipeline level:
         - `units/eks/README.md`: full EKS stack topology, see &lt;eks_stack&gt;
-        - `pipelines/dev/README.md`: shared dev config inventory, see &lt;architecture&gt;
-        - `pipelines/dev/eks/README.md`: dev-specific notes for instantiating the EKS stack
         - `pipelines/bootstrap/README.md`: bootstrap pipeline inventory, see
           &lt;bootstrap_pipelines&gt;
 
