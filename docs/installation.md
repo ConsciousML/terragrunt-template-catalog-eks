@@ -6,24 +6,31 @@
 EKS Forge is a toolkit containing multiple [repository templates](/docs/architecture/), each with their own responsibilities.
 They're meant to be forked and extended.
 
-To get started, you'll fork the catalog, a collection of [Terraform](https://developer.hashicorp.com/terraform) modules and [Terragrunt](https://docs.terragrunt.com/getting-started/terminology/#terragrunt) pipelines, re-usable across multiple environments (`dev`, `staging`, and `prod`):
+To get started, you'll fork the catalog, a collection of [Terraform](https://developer.hashicorp.com/terraform) modules and [Terragrunt](https://docs.terragrunt.com/getting-started/terminology/#terragrunt) pipelines, re-usable across multiple environments (`dev`, `staging`, and `prod`).
 
-### Private Fork
-For creating a private repository, go to the [catalog home page](https://github.com/ConsciousML/terragrunt-template-catalog-eks) and:
-1. click on `Use this template` in the top-right corner.
-2. select `Create a new repository`
-3. choose a repository name
-4. under `Configuration`, click to the drop down next to `Choose visibility` and click on `Private`
-5. click on `Create repository`
+First, [create an empty repository](https://github.com/new) on GitHub, private or public. Leave the README, `.gitignore`, and license options unset.
 
-### Public Fork
-For creating a public repository, go to the [catalog home page](https://github.com/ConsciousML/terragrunt-template-catalog-eks) and:
-1. click on the `Fork` button
-2. change the repository name if needed
-3. click on `Create fork`
+Then, set your GitHub owner (user or organization) and the name of the repository you created, by replacing the `<...>`:
+```bash
+export GITHUB_OWNER=<your-github-owner>
+export CATALOG_REPO_NAME=<your-catalog-repo-name>
+```
+
+Clone the catalog and push it to your repository:
+```bash
+git clone https://github.com/ConsciousML/terragrunt-template-catalog-eks.git $CATALOG_REPO_NAME
+cd $CATALOG_REPO_NAME
+git remote set-url origin git@github.com:$GITHUB_OWNER/$CATALOG_REPO_NAME.git
+git push origin main
+git push origin --tags
+```
+
+:::warning
+Follow these exact steps instead of GitHub's `Fork` button. The [live repository](/docs/deployment/) pins catalog versions by git tag, and these steps guarantee your repository has them.
+:::
 
 ## Install the CLI Tools
-Clone your fork, and `cd` at the root of the repository.
+Stay at the root of your catalog repository.
 
 You'll use multiple CLI tools to deploy and operate EKS Forge.
 Luckily, the catalog comes with a [mise-en-place](https://mise.jdx.dev/) configuration that allows you to install them all effortlessly.

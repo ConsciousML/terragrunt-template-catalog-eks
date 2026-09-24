@@ -23,6 +23,18 @@ For setup steps, read the [catalog bootstrap guide](/docs/quickstart/bootstrap/a
 
 The default values set in `terragrunt.stack.hcl` are a starting headroom above the AWS default, not a computed sum of any environment's vCPU usage.
 
+## Sizing the Request
+
+When the account already runs other EC2 workloads, the defaults don't account for their vCPU usage. Each value must cover the vCPUs already used on the account plus the EKS Forge headroom.
+
+Set both values in the `locals` block of the [pipeline stack file](../../pipelines/bootstrap/aws_service_quotas/terragrunt.stack.hcl):
+```hcl
+locals {
+  ondemand_desired_value = 32 # requested value for L-1216C47A
+  spot_desired_value     = 32 # requested value for L-34B43A08
+}
+```
+
 ## Outputs
 
 Per unit (`ec2_ondemand_quota`, `ec2_spot_quota`):

@@ -7,7 +7,7 @@ You'll need to authenticate with the AWS CLI to deploy cloud resources with [Ter
 The EKS stack provisions resources across many AWS services, so `AdministratorAccess` is the convenient choice here.
 You can scope down to a narrower policy later by reviewing the [units](../units/) this catalog uses.
 
-### Fast Track (admin)
+### Fast Track (Admin)
 If you're a root user or admin:
 1. create an [IAM user](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
 2. [attach the `AdministratorAccess` policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_manage-attach-detach.html) to it

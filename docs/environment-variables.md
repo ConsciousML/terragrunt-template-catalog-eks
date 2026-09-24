@@ -37,7 +37,7 @@ export GITHUB_TOKEN=<your_token>
 
 A Tailscale OAuth client used to authenticate to the Tailscale API and provision resources.
 
-Go to [Tailscale Trust Credentials](https://login.tailscale.com/admin/settings/trust-credentials), then:
+Go to [Tailscale Trust Credentials](https://console.tailscale.com/admin/settings/trust-credentials), then:
 
 - Click `+ Credential`
 - Select `OAuth` and click `Continue`
