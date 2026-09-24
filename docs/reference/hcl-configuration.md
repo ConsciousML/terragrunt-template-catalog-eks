@@ -1,9 +1,11 @@
 {/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 # HCL Configuration
 
-The `.hcl` files that units and stacks read for shared values. They live under [`pipelines/`](../../pipelines/) in the catalog and under [`live/`](https://github.com/ConsciousML/terragrunt-template-live-eks/tree/main/live) in the live repository.
+This page lists the `.hcl` files that units and stacks read for shared values. They live under [`pipelines/`](../../pipelines/) in the catalog and under [`live/`](https://github.com/ConsciousML/terragrunt-template-live-eks/tree/main/live) in the live repository.
 
 Units and stacks locate each file with [`find_in_parent_folders`](https://docs.terragrunt.com/reference/hcl/functions/#find_in_parent_folders), which returns the nearest file with that name above them. A file can therefore sit at a different level in each repository and still be found.
+
+To use these values in a unit, read the [add a unit guide](/docs/iac/add-a-unit/).
 
 ## Layout
 
@@ -29,7 +31,7 @@ Scopes:
 - **Per stack**: one file per stack inside an environment, composing names from the shared and per-environment files.
 - **Catalog only**: no live counterpart.
 
-The catalog has a single `dev` environment, so some files sit at a different level than in live. `region.hcl` is shared in the catalog and per environment in live. `cluster_name.hcl` and the `provider_*.hcl` files sit under `pipelines/dev/` in the catalog and at the root of `live/`.
+The catalog deploys the `dev` environment, so some files sit at a different level than in live. `region.hcl` is shared in the catalog and per environment in live. `cluster_name.hcl` and the `provider_*.hcl` files sit under `pipelines/dev/` in the catalog and at the root of `live/`.
 
 The [bootstrap pipelines](#bootstrap) have their own files.
 
@@ -51,14 +53,14 @@ The root configuration every unit includes through `include "root"`. It loads `r
 | `catalog` | Block | Points the [Terragrunt catalog](https://docs.terragrunt.com/reference/hcl/blocks/#catalog) at the catalog repository. |
 | `inputs` | Attribute | Merges the `region.hcl` and `environment.hcl` locals into every unit's inputs. |
 
-Units read the locals through `include.root.locals`.
+Units read its locals through `include.root.locals`.
 
 ### `github.hcl`
 
 GitHub owners and repository names used in module sources and GitHub resources.
 
-| Local | Description |
-|-------|-------------|
+| Name | Description |
+|------|-------------|
 | `github_owner_catalog` | User or organization owning the catalog repository. |
 | `github_repo_name_catalog` | Catalog repository name. |
 | `github_owner_app_of_apps` | User or organization owning the app-of-apps repository. |
@@ -66,14 +68,12 @@ GitHub owners and repository names used in module sources and GitHub resources.
 | `github_owner_live` | Live only. User or organization owning the live repository. |
 | `github_repo_name_live` | Live only. Live repository name. |
 
-**Read by**: `root.hcl` and every bootstrap stack. In live, `github_owner_live` and `github_repo_name_live` are read by the `aws_gh_actions_auth`, `tailscale`, and `slack/gh_secret` bootstrap stacks.
-
 ### `dns.hcl`
 
 The base domain and the subdomain of each application.
 
-| Local | Description |
-|-------|-------------|
+| Name | Description |
+|------|-------------|
 | `base_domain` | Domain every environment's hosted zone is created under. |
 | `subdomain_argocd` | ArgoCD subdomain. |
 | `subdomain_podinfo` | Podinfo subdomain. |
@@ -83,14 +83,12 @@ The base domain and the subdomain of each application.
 | `subdomain_goldilocks` | Goldilocks subdomain. |
 | `subdomain_hubble` | Hubble subdomain. |
 
-**Read by**: [`domains.hcl`](#domainshcl) and the `units/eks/route53/hosted_zone_public` unit, deployed by the EKS stack and the `setup_dns` bootstrap stack.
-
 ### `network.hcl`
 
 VPC CIDR blocks and the pinned IPs of the VPC interface endpoints.
 
-| Local | Description |
-|-------|-------------|
+| Name | Description |
+|------|-------------|
 | `vpc_cidrs` | Map of environment name to VPC CIDR block. |
 | `endpoint_host_offsets` | Map of AWS service to the host offset of its interface endpoint's pinned IP within each private subnet. |
 | `app_param_key_map` | Map of AWS service to the key each `CiliumNetworkPolicy` consumer in the app-of-apps repository expects in `vpcEndpointCidrs`. Services without an entry, such as `ecr.api`, `ecr.dkr`, and `sts`, have no consumer. |
@@ -106,15 +104,13 @@ VPC CIDR blocks and the pinned IPs of the VPC interface endpoints.
 
 The CIDR blocks must not overlap across both repositories. The catalog's Tailscale ACL bootstrap stack auto-approves a subnet route for every CIDR in `vpc_cidrs`.
 
-**Read by**: the `units/vpc/vpc`, `units/vpc/endpoints`, and `units/vpc/endpoint_cidrs` units, the EKS stack, and the catalog's Tailscale ACL bootstrap stack.
-
 ### `cluster_name.hcl`
 
-| Local | Description |
-|-------|-------------|
-| `cluster_name` | EKS cluster name, without the environment prefix. |
+The base EKS cluster name, shared by every environment.
 
-**Read by**: [`cluster_name_env.hcl`](#cluster_name_envhcl).
+| Name | Description |
+|------|-------------|
+| `cluster_name` | EKS cluster name, without the environment prefix. |
 
 ### `provider_k8s_base.hcl`
 
@@ -128,37 +124,35 @@ Shared setup for units that talk to the Kubernetes API. Included by units that a
 | `exclude` | Block | Excludes the unit from `init`, `validate`, `plan`, and `destroy` while the cluster doesn't exist. |
 | `generate "provider_k8s_base"` | Block | `aws_eks_cluster` and `aws_eks_cluster_auth` data sources named `this`. Generates `provider_k8s_base.tf`. |
 
-**Read by**: the Helm-based add-on units (`argocd`, `cilium`, `karpenter`, and `prometheus_stack/crds`).
-
 ### `provider_helm.hcl`
+
+The Helm provider for units that deploy Helm charts. Included alongside `provider_k8s_base.hcl`.
 
 | Name | Kind | Description |
 |------|------|-------------|
 | `generate "provider_helm"` | Block | Helm provider authenticated against the cluster from the `provider_k8s_base.hcl` data sources, with an `aws eks get-token` exec fallback. Generates `provider_helm.tf`. |
 
-**Read by**: the same units as [`provider_k8s_base.hcl`](#provider_k8s_basehcl).
-
 ## Per Environment
 
 ### `environment.hcl`
 
-| Local | Description |
-|-------|-------------|
+The name of the environment a deployment targets.
+
+| Name | Description |
+|------|-------------|
 | `environment` | Environment name. Suffixes the state bucket and prefixes resource names, so environments don't collide. |
 | `environment_alias` | Environment name exposed to Helm as `global.environment`. Lets an environment reuse another environment's Helm value overlays while keeping its own state and resource names. |
 
-In the catalog, `environment` defaults to `dev` and `environment_alias` defaults to `environment`. `TG_ENVIRONMENT` and `TG_ENVIRONMENT_ALIAS` override them, as CI does with `catalog-eks-ci` and `dev`. In live, both are hardcoded per environment.
-
-**Read by**: `root.hcl`, the per-stack files, the EKS stack, and the Slack channels bootstrap stacks.
+In the catalog, `environment` defaults to `dev` and `environment_alias` defaults to `environment`. The [`TG_ENVIRONMENT` and `TG_ENVIRONMENT_ALIAS`](/docs/reference/environment_variable/#tg_environment-and-tg_environment_alias) environment variables override them, as CI does with `catalog-eks-ci` and `dev`. In live, both are hardcoded per environment.
 
 ### `region.hcl`
 
-| Local | Description |
-|-------|-------------|
+The AWS region and Availability Zones an environment deploys to.
+
+| Name | Description |
+|------|-------------|
 | `region` | AWS region. |
 | `azs` | Availability Zones the VPC spans. |
-
-**Read by**: `root.hcl`, and the `units/vpc/vpc`, `units/eks/addons/argocd/app_of_apps`, and `units/eks/addons/tailscale/split_dns/eks` units.
 
 ## Per Stack
 
@@ -166,20 +160,20 @@ These files sit next to the stack directory (`eks/`), so every unit of the stack
 
 ### `cluster_name_env.hcl`
 
-| Local | Description |
-|-------|-------------|
+The full EKS cluster name, composed from `cluster_name.hcl` and `environment.hcl`.
+
+| Name | Description |
+|------|-------------|
 | `environment` | `environment` from `environment.hcl`. |
 | `cluster_name` | `cluster_name` from `cluster_name.hcl`. |
 | `cluster_name_full` | Full cluster name: `<environment>-<cluster_name>`. |
-
-**Read by**: `provider_k8s_base.hcl`, the EKS stack, and the `units/eks/cluster` and `units/eks/addons/tailscale/oauth_client_tailscale_operator` units.
 
 ### `domains.hcl`
 
 Per-application domains, composed from `dns.hcl` and `environment.hcl`.
 
-| Local | Value |
-|-------|-------|
+| Name | Value |
+|------|-------|
 | `domain_env` | `<environment>.<base_domain>` |
 | `domain_env_private` | `private.<domain_env>` |
 | `domain_env_public` | `public.<domain_env>` |
@@ -191,25 +185,25 @@ Per-application domains, composed from `dns.hcl` and `environment.hcl`.
 | `domain_private_goldilocks` | `<subdomain_goldilocks>.<domain_env_private>` |
 | `domain_private_hubble` | `<subdomain_hubble>.<domain_env_private>` |
 
-**Read by**: the `units/eks/domain_name/*` units, the `units/eks/route53/acm_certificate` and `units/eks/route53/hosted_zone_private` units, and the `argocd` add-on units.
-
 ### `vpc.hcl`
 
-| Local | Description |
-|-------|-------------|
+The full VPC name, composed from a base name and `environment.hcl`.
+
+| Name | Description |
+|------|-------------|
 | `environment` | `environment` from `environment.hcl`. |
 | `vpc_name` | VPC name, without the environment suffix. |
 | `vpc_full_name` | Full VPC name: `<vpc_name>-<environment>`. |
-
-**Read by**: the `units/vpc/vpc` and `units/eks/fck_nat` units.
 
 ## Catalog Only
 
 ### `version.hcl`
 
-| Local | Description |
-|-------|-------------|
-| `version` | Git ref used as `?ref=` in the catalog stacks' unit sources. |
+The catalog Git ref that catalog stacks pull units and modules from.
+
+| Name | Description |
+|------|-------------|
+| `version` | Catalog Git ref. Bootstrap stacks use it as `?ref=` on their unit sources. Every catalog stack passes it to its units as `values.version`, which units use as `?ref=` on their module sources. |
 
 `version` resolves to the first non-empty value of:
 1. `GITHUB_HEAD_REF`, the pull request branch in GitHub Actions
@@ -217,13 +211,18 @@ Per-application domains, composed from `dns.hcl` and `environment.hcl`.
 3. The current git branch, or the tag when `HEAD` is detached
 4. `main`
 
-Live has no `version.hcl`. Each live stack file pins the catalog tag in its own `version_catalog` local.
-
-**Read by**: the EKS stack and every bootstrap stack.
+Live has no `version.hcl`. Each live stack file pins the catalog tag in its own local: `version_catalog` in the EKS stacks, `version` in the bootstrap stacks.
 
 ## Bootstrap
 
-The bootstrap pipelines under `pipelines/bootstrap/` and `live/bootstrap/` read the shared `github.hcl`, `network.hcl`, and `dns.hcl`, plus the following files.
+The bootstrap pipelines under `pipelines/bootstrap/` and `live/bootstrap/` read some shared files and their own files.
+
+Shared files they read:
+- `github.hcl`, by every bootstrap stack
+- `network.hcl`, by the catalog's Tailscale ACL stack
+- `dns.hcl`, by the `setup_dns` stacks through the `units/eks/route53/hosted_zone_public` unit
+
+Their own files:
 
 | File | Catalog path | Live path |
 |------|--------------|-----------|
@@ -233,16 +232,17 @@ The bootstrap pipelines under `pipelines/bootstrap/` and `live/bootstrap/` read 
 | `environment.hcl` per Slack environment | `pipelines/bootstrap/slack/channels/<dev\|ci>/environment.hcl` | `live/bootstrap/slack/channels/<staging\|prod>/environment.hcl` |
 | `channels.hcl` | `pipelines/bootstrap/slack/channels.hcl` | `live/bootstrap/slack/channels.hcl` |
 
-`pipelines/bootstrap/environment.hcl` and `live/bootstrap/environment.hcl` set `environment` to `bootstrap-catalog-eks` and `bootstrap-live-eks`, which isolates the bootstrap state from the application environments. `live/bootstrap/region.hcl` sets `region` only.
+`pipelines/bootstrap/environment.hcl` and `live/bootstrap/environment.hcl` set `environment` to `bootstrap-catalog-eks` and `bootstrap-live-eks` respectively, which isolates the bootstrap state from the application environments. They set `environment_alias` to `dev` and `staging` respectively. `live/bootstrap/region.hcl` sets `region` only.
 
-The `setup_dns` and `slack/channels` stacks run once per application environment. Each has its own `environment.hcl` naming the environment it targets, which takes precedence over `bootstrap/environment.hcl`.
+The `setup_dns` and `slack/channels` stacks run once per application environment. Each has its own `environment.hcl` naming the environment it targets. `find_in_parent_folders` finds it first, so these stacks ignore `bootstrap/environment.hcl`.
 
 ### `channels.hcl`
 
-| Local | Description |
-|-------|-------------|
+The Slack channels created for each environment's Alertmanager notifications.
+
+| Name | Description |
+|------|-------------|
 | `channel_names` | Slack channel names, without the environment prefix or leading `#`. |
 
 Each name must match the suffix after `<environment>-` of a `slack_configs[].channel` entry in the Alertmanager configuration of [`kube-prometheus-stack`'s `values.yaml`](https://github.com/ConsciousML/argocd-app-of-apps-template/blob/main/charts/monitoring/kube-prometheus-stack/values.yaml) in the app-of-apps repository.
 
-**Read by**: the `slack/channels` bootstrap stacks.
