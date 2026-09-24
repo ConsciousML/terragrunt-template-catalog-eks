@@ -148,7 +148,7 @@ For complete examples, see the [`acm_certificate`](https://github.com/ConsciousM
 
 ## Read Shared Config and Other Units' Outputs
 
-If your unit needs shared configuration, read it from the `.hcl` files under `pipelines/`, listed in the [shared configuration reference](/docs/reference/shared_configuration/). Read what `root.hcl` already loads through `include.root.locals`. Read any other file with [`read_terragrunt_config`](https://docs.terragrunt.com/reference/hcl/functions/#read_terragrunt_config) and [`find_in_parent_folders`](https://docs.terragrunt.com/reference/hcl/functions/#find_in_parent_folders).
+If your unit needs shared configuration, read it from the `.hcl` files under `pipelines/`, listed in the [HCL configuration reference](/docs/reference/hcl_configuration/). Read what `root.hcl` already loads through `include.root.locals`. Read any other file with [`read_terragrunt_config`](https://docs.terragrunt.com/reference/hcl/functions/#read_terragrunt_config) and [`find_in_parent_folders`](https://docs.terragrunt.com/reference/hcl/functions/#find_in_parent_folders).
 
 Prefix resource names with the environment, so they don't collide across environments:
 ```hcl
