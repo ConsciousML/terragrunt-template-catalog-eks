@@ -72,6 +72,18 @@ export APP_OF_APPS_BRANCH=<your-branch>
 
 Unset it (or comment it out and open a new shell) once the branch is merged. CI never sets it, so it always plans against `main`.
 
+## `TG_ENVIRONMENT` and `TG_ENVIRONMENT_ALIAS`
+
+**Used by**: [`pipelines/dev/environment.hcl`](../pipelines/dev/environment.hcl) (optional)
+
+Override the `environment` and `environment_alias` locals of the dev environment, described in the [HCL configuration reference](/docs/reference/hcl_configuration/#environmenthcl). `TG_ENVIRONMENT` defaults to `dev`. `TG_ENVIRONMENT_ALIAS` defaults to `TG_ENVIRONMENT`.
+
+CI sets them to `catalog-eks-ci` and `dev` respectively in [`.github/workflows/ci.yaml`](../.github/workflows/ci.yaml).
+```bash
+export TG_ENVIRONMENT=<your-environment>
+export TG_ENVIRONMENT_ALIAS=<environment-to-reuse-helm-values-from>
+```
+
 ## `AWS_REGION`
 
 **Required by**: `.github/workflows/ci.yaml`

@@ -114,7 +114,7 @@ Continue with the [staging and production deployment tutorial](/docs/deployment/
 Or, when you need them:
 - interact with internal tools using the [monitoring guide](/docs/monitoring/)
 - add an application to your cluster with the [applications guide](/docs/applications/)
-- [add an IaC component to your stack](/docs/iac/add-an-iac-component/)
+- [add or edit a unit in your stack](/docs/iac/add-a-unit/)
 
 ## Remove EKS Forge
 :::warning
