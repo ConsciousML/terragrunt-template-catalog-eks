@@ -3,7 +3,7 @@
 
 Now that you've reviewed the [prerequisites](/docs/quickstart/prerequisites/), and performed the [installation](/docs/quickstart/installation/), [configuration](/docs/quickstart/configuration/), and [bootstrap](/docs/quickstart/bootstrap), you're ready to deploy the EKS stack in the [`dev` environment](/docs/iac/#dev).
 
-## Create the spot service-linked role
+## Create the Spot Service-Linked Role
 
 EKS Forge uses [spot EC2 instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html) for non-critical workloads to reduce cloud costs.
 Run the following to create the EC2 Spot [service-linked role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create-service-linked-role.html) required to provision spot instances:
@@ -11,7 +11,7 @@ Run the following to create the EC2 Spot [service-linked role](https://docs.aws.
 aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 ```
 
-## Run the Terragrunt stack
+## Run the Terragrunt Stack
 In your [catalog fork](/docs/quickstart/installation/#fork-the-eks-forge-catalog), run the following [Terragrunt commands](/docs/iac) from the root to deploy the `dev` environment:
 
 ```bash
@@ -42,7 +42,7 @@ eks-pod-identity-agent-9pq6k   1/1     Running   0          41m
 ...
 ```
 
-## Deploy applications with ArgoCD
+## Deploy Applications with ArgoCD
 
 This stack spins up [ArgoCD](https://argo-cd.readthedocs.io/en/stable/) to deploy [Kubernetes](https://kubernetes.io/) resources with [GitOps](https://about.gitlab.com/topics/gitops/). Once you've run the Terragrunt stack, ArgoCD will take some time deploying these resources. You can monitor the progress by running:
 ```bash
@@ -60,7 +60,7 @@ podinfo                       Synced        Healthy
 
 When every application shows `Synced` and `Healthy`, the deployment succeeded.
 
-## Log in to ArgoCD
+## Log In to ArgoCD
 
 For security reasons, internal tools (ArgoCD, Prometheus, etc.) are not exposed to the internet. ArgoCD's API and UI are only reachable using Tailscale. Connect to Tailscale by running `tailscale up`, or with the button in the Tailscale client.
 
@@ -86,13 +86,13 @@ There are two ways to interact with your ArgoCD instance:
   ```
   You should see `'admin:login' logged in successfully`.
 
-## Access the Podinfo app
+## Access the Podinfo App
 
 This stack exposes `podinfo` to the public internet. Open `https://podinfo.public.dev.<base_domain>` in your browser to check that it deployed successfully. You should see the podinfo page with its `greetings from podinfo` message.
 
 `podinfo` is a sample app meant to be swapped for a real one in your fork.
 
-## Destroy the infrastructure
+## Destroy the Infrastructure
 
 Destroying the infrastructure removes the [Tailscale Connector](/docs/security/tailscale/#4-connector-and-split-dns): the component responsible for routing the Kubernetes API server traffic into the private endpoint. Once it's gone, you lose access to the cluster API.
 
@@ -108,7 +108,7 @@ terragrunt run --all destroy --non-interactive --no-stack-generate
 
 The [bootstrap](/docs/quickstart/bootstrap) resources stay in place, so you can reuse them for your next deployments. Among them, only the Route 53 hosted zones created by [Setup DNS](/docs/quickstart/bootstrap/setup_dns/) are billed.
 
-## What's next
+## What's Next
 Continue with the [staging and production deployment tutorial](/docs/deployment/) to deploy the `staging` and `prod` environments from the live repository.
 
 Or, when you need them:
@@ -116,9 +116,9 @@ Or, when you need them:
 - add an application to your cluster with the [applications guide](/docs/applications/)
 - [add an IaC component to your stack](/docs/iac/add-an-iac-component/)
 
-If you're done with EKS Forge, remove the bootstrap resources by running the following from the root of your [catalog fork](/docs/quickstart/installation/#fork-the-eks-forge-catalog):
-```bash
-source .env
-cd pipelines/bootstrap
-terragrunt run --all destroy --non-interactive --no-stack-generate
-```
+## Remove EKS Forge
+:::warning
+The [deployment tutorials](/docs/deployment/) reuse the bootstrap resources. Don't remove them if you plan to continue.
+:::
+
+Only if you want to remove EKS Forge from your AWS account entirely, follow [How to Remove EKS Forge](/docs/iac/remove-eks-forge/).
