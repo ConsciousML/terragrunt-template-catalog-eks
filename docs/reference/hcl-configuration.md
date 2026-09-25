@@ -104,6 +104,10 @@ VPC CIDR blocks and the pinned IPs of the VPC interface endpoints.
 
 The CIDR blocks must not overlap across both repositories. The catalog's Tailscale ACL bootstrap stack auto-approves a subnet route for every CIDR in `vpc_cidrs`.
 
+:::warning
+Changing an environment's CIDR block recreates its VPC and cluster.
+:::
+
 ### `cluster_name.hcl`
 
 The base EKS cluster name, shared by every environment.
@@ -153,6 +157,10 @@ The AWS region and Availability Zones an environment deploys to.
 |------|-------------|
 | `region` | AWS region. |
 | `azs` | Availability Zones the VPC spans. |
+
+:::warning
+Changing `region` recreates the environment's VPC and cluster in the new region.
+:::
 
 ## Per Stack
 

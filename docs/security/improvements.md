@@ -18,7 +18,9 @@ unit "cluster" {
 }
 ```
 
-Then re-apply the stack as described in [Run the Terragrunt Stack](/docs/quickstart/deployment/#run-the-terragrunt-stack).
+Then re-apply the stack:
+- `dev`: see [Run the Terragrunt Stack](/docs/quickstart/deployment/#run-the-terragrunt-stack).
+- `staging` and `prod`: see [How to Edit the Live Configuration](/docs/iac/edit-live-configuration/).
 
 From this point on, `kubectl` and the AWS CLI can only reach the API server while connected to Tailscale.
 
