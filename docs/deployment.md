@@ -1,5 +1,5 @@
 {/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
-# Deployment
+# Dev Deployment
 
 Now that you've reviewed the [prerequisites](/docs/quickstart/prerequisites/), and performed the [installation](/docs/quickstart/installation/), [configuration](/docs/quickstart/configuration/), and [bootstrap](/docs/quickstart/bootstrap), you're ready to deploy the EKS stack in the [`dev` environment](/docs/iac/#dev).
 
@@ -114,7 +114,7 @@ Continue with the [staging and production deployment tutorial](/docs/deployment/
 Or, when you need them:
 - interact with internal tools using the [monitoring guide](/docs/monitoring/)
 - add an application to your cluster with the [applications guide](/docs/applications/)
-- [add or edit a unit in your stack](/docs/iac/add-a-unit/)
+- [add, edit, or remove a unit in your stack](/docs/iac/add-a-unit/)
 
 ## Remove EKS Forge
 :::warning
